@@ -9,16 +9,16 @@ A mobile-friendly, tap-the-map geography game based on the interaction model of 
 
 ## Deploy to GitHub Pages
 1. Create a new repository (or use a separate branch/repository for the India quiz).
-2. Upload these three files to the repository root.
+2. Upload all files to the repository root.
 3. In **Settings → Pages**, choose **Deploy from a branch**, select `main` and `/ (root)`.
 4. Open the published GitHub Pages URL.
 
 ## Map and reference data
-- Clickable administrative boundaries: Esri India Living Atlas `LivingAtlas/IND_AdminBoundary/MapServer/1` state layer. The parent map service credits Survey of India.
+- Clickable boundaries: GeoJSON/TopoJSON from https://github.com/udit-001/india-maps-data, loaded via jsDelivr (with raw.githubusercontent fallback). Individual state/UT files fill in anything missing from the country file.
 - Official political map reference and official state/UT map downloads: https://surveyofindia.gov.in/pages/political-map-of-india
 - Union Territory list: Ministry of Home Affairs, https://www.mha.gov.in/union-territories-divisions
 
-The app checks that the boundary service returns all 28 States and 8 Union Territories before starting a round. It uses the service online; the game interface and saved score/history use browser local storage. D3.js is loaded from jsDelivr.
+The app checks that all 28 States and 8 Union Territories are available before starting a round. D3.js and topojson-client are loaded from jsDelivr.
 
 ## Gameplay
 - **All regions:** 28 States + 8 Union Territories.
