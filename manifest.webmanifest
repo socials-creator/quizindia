@@ -3,7 +3,7 @@
   "short_name": "India Map Quiz",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f6f2ea",
-  "theme_color": "#f6f2ea",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
   "icons": []
 }

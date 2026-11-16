@@ -31,8 +31,8 @@
   }
   function setStatus() {
     const el=$('offline-status');
-    if (!navigator.onLine) {el.textContent='● Offline';el.dataset.state='offline';}
-    else {el.textContent='● Online';el.dataset.state='online';}
+    if (!navigator.onLine) {el.textContent='Offline';el.dataset.state='offline';}
+    else {el.textContent='Online';el.dataset.state='online';}
   }
   function readJSON(key,fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
   function saveHistory(item) {
@@ -120,11 +120,10 @@
     // Fit the full administrative extent, including the island territories, without clipping.
     projection.fitExtent([[65,65],[935,690]],fc);
     mapGroup.selectAll('path').data(collection.features).join('path')
-      .attr('class','region').attr('d',path).attr('data-name',d=>d.properties.quizName)
-      .attr('tabindex',0).attr('role','button').attr('aria-label',d=>d.properties.quizName)
+      .attr('class','region').attr('d',path)
+      .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
       .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);})
-      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}})
-      .append('title').text(d=>d.properties.quizName);
+      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}});
     zoom=d3.zoom().scaleExtent([1,9]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',event=>mapGroup.attr('transform',event.transform));
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
