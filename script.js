@@ -65,7 +65,7 @@
   }
   function startGame() {
     const pool=listForMode();
-    if (!s.length) {toast('The map is still loading.');return;}
+    if (!features.length) {toast('The map is still loading.');return;}
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
     queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null;
