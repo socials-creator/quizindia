@@ -14,7 +14,7 @@
   ]);
   const ALL = [...STATES.map(name => ({name,type:'State'})), ...UTS.map(name => ({name,type:'Union Territory'}))];
   const $ = id => document.getElementById(id);
-  let features = [], featureByName = new Map(), currentMode = 'all', queue = [], current = null;
+  let features = [], featureByName = new Map(), queue = [], current = null;
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
 
@@ -23,7 +23,7 @@
     if (ALIASES.has(clean)) return ALIASES.get(clean);
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
-  function listForMode(mode=currentMode) { return mode === 'state' ? STATES : mode === 'ut' ? UTS : ALL.map(x=>x.name); }
+  function listForMode() { return ALL.map(x=>x.name); }
   function typeOf(name) { return STATES.includes(name) ? 'State' : 'Union Territory'; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
@@ -101,7 +101,7 @@
   }
   function finishGame(completed) {
     roundActive=false; current=null; showPrompt(); updateStats();
-    const total=listForMode().length, score=found.size, modeLabel=currentMode==='all'?'All regions':currentMode==='state'?'States':'UTs';
+    const total=listForMode().length, score=found.size, modeLabel='All regions';
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
     saveHistory({score,total,misses:mistakes,modeLabel,date,completed});
     $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?'India mapped!':'Round over';
@@ -184,7 +184,9 @@
   function toFeatures(data) {
     if (data?.type==='Topology') {
       if (!window.topojson) throw new Error('topojson-client failed to load');
-      return Object.values(data.objects).flatMap(o=>{const f=topojson.feature(data,o);return f.type==='FeatureCollection'?f.features:[f];});
+      // Use the dissolved 'states' object (36 state/UT outlines), not the district-level object.
+      const o=data.objects.states||Object.values(data.objects)[0];
+      const f=topojson.feature(data,o);return f.type==='FeatureCollection'?f.features:[f];
     }
     if (data?.type==='FeatureCollection') return data.features;
     if (data?.type==='Feature') return [data];
@@ -193,7 +195,7 @@
   async function fetchBoundaries() {
     const collected=new Map();
     // 1) Whole-country file (GeoJSON, then TopoJSON)
-    for (const file of ['geojson/india.geojson','topojson/india.json']) {
+    for (const file of ['topojson/india.json','geojson/india.geojson']) {
       try {
         const feats=toFeatures(await fetchJson(file));
         const items=feats.map(f=>({name:pickName(f.properties),geometry:f.geometry})).filter(x=>x.name);
@@ -229,17 +231,9 @@
       $('map-message').textContent='Map unavailable';
     }
   }
-  function setMode(mode) {
-    if (roundActive) {toast('Finish the current round before changing the quiz area.');return;}
-    currentMode=mode;
-    document.querySelectorAll('.mode-tab').forEach(b=>{const active=b.dataset.mode===mode;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
-    updateStats(); $('remaining').textContent=listForMode().length; $('progress-label').textContent=`0 / ${listForMode().length}`; $('progress-fill').style.width='0%';
-    $('map-message').textContent=`${listForMode().length} ${mode==='all'?'regions':mode==='state'?'States':'Union Territories'} ready`;
-  }
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   function init() {
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
-    document.querySelectorAll('.mode-tab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
     $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);
     $('zoom-in').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1.5));$('zoom-out').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1/1.5));$('zoom-reset').addEventListener('click',resetMapView);
     $('info-toggle').addEventListener('click',()=>openDrawer(true));$('drawer-close').addEventListener('click',()=>openDrawer(false));$('drawer-scrim').addEventListener('click',()=>openDrawer(false));
