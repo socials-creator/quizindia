@@ -164,3 +164,11 @@ ol,ul{margin:0;padding:0;list-style:none}
 @media (min-width:600px){.result-overlay{align-items:center}.result-card{border-radius:28px;transform:translateY(30px) scale(.96);opacity:0;transition:all .35s cubic-bezier(.2,.9,.25,1)}.result-overlay.open .result-card{opacity:1;transform:none}.result-card::before{display:none}}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Enlarged tap rings for tiny regions */
+.ring{fill:var(--blue);fill-opacity:.14;stroke:var(--blue);stroke-dasharray:4 3;cursor:pointer;vector-effect:non-scaling-stroke;transition:fill-opacity .15s}
+@media (hover:hover){.ring:hover{fill-opacity:.3}}
+.ring.found{fill:var(--green);fill-opacity:.35;stroke:var(--green);stroke-dasharray:none;cursor:default}
+.ring.missed{fill:var(--red);fill-opacity:.3;stroke:var(--red);stroke-dasharray:none}
+.ring.target-reveal{fill:var(--orange);fill-opacity:.55;stroke:var(--orange);stroke-dasharray:none}
+.ring:focus{outline:none}

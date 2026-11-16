@@ -124,7 +124,28 @@
       .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
       .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);})
       .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}});
-    zoom=d3.zoom().scaleExtent([1,9]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',event=>mapGroup.attr('transform',event.transform));
+    // Enlarged tap targets (rings) for tiny regions so they are as easy to hit as Sikkim.
+    const RING_REGIONS={'Delhi':'largest','Chandigarh':'largest','Puducherry':'largest','Dadra and Nagar Haveli and Daman and Diu':'largest','Lakshadweep':'bounds','Andaman and Nicobar Islands':'bounds','Goa':'largest'};
+    const ringData=[];
+    collection.features.forEach(f=>{
+      const mode=RING_REGIONS[f.properties.quizName]; if(!mode) return;
+      let c;
+      if(mode==='bounds'){const b=path.bounds(f);c=[(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];}
+      else{const polys=polysOf(f.geometry);let best=null,ba=-1;polys.forEach(p=>{const g={type:'Polygon',coordinates:p};const a=d3.geoArea(g);if(a>ba){ba=a;best=g;}});c=path.centroid(best);}
+      if(c&&isFinite(c[0])&&isFinite(c[1])) ringData.push({name:f.properties.quizName,x:c[0],y:c[1]});
+    });
+    const rings=mapGroup.append('g').attr('class','rings').selectAll('circle').data(ringData).join('circle')
+      .attr('class','ring').attr('cx',d=>d.x).attr('cy',d=>d.y).attr('tabindex',0).attr('role','button').attr('aria-label','Small region tap target')
+      .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.name);})
+      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.name);}});
+    const regionEls=mapGroup.selectAll('path.region');
+    function syncRings(){ rings.each(function(d){const r=regionEls.filter(x=>x.properties.quizName===d.name).node();const cls=r?r.getAttribute('class'):'';this.setAttribute('class','ring'+(cls.includes('found')?' found':'')+(cls.includes('missed')?' missed':'')+(cls.includes('target-reveal')?' target-reveal':''));}); }
+    new MutationObserver(syncRings).observe(mapGroup.node(),{subtree:true,attributes:true,attributeFilter:['class']});
+    let curK=1;
+    function sizeRings(){ const svgEl=mapSvg.node();const sc=Math.min(svgEl.clientWidth/1000,svgEl.clientHeight/760)||1; rings.attr('r',15/(curK*sc)).style('stroke-width','2px'); }
+    window.addEventListener('resize',sizeRings);
+    zoom=d3.zoom().scaleExtent([1,40]).translateExtent([[-200,-200],[1200,960]]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',event=>{curK=event.transform.k;mapGroup.attr('transform',event.transform);sizeRings();});
+    sizeRings();
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
   }
@@ -234,7 +255,7 @@
   function init() {
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
     $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);
-    $('zoom-in').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1.5));$('zoom-out').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1/1.5));$('zoom-reset').addEventListener('click',resetMapView);
+    $('zoom-in').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,2));$('zoom-out').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1/2));$('zoom-reset').addEventListener('click',resetMapView);
     $('info-toggle').addEventListener('click',()=>openDrawer(true));$('drawer-close').addEventListener('click',()=>openDrawer(false));$('drawer-scrim').addEventListener('click',()=>openDrawer(false));
     $('play-again').addEventListener('click',()=>{$('result-overlay').classList.remove('open');$('result-overlay').setAttribute('aria-hidden','true');startGame();});$('close-result').addEventListener('click',()=>{$('result-overlay').classList.remove('open');$('result-overlay').setAttribute('aria-hidden','true');});
     loadMap();
