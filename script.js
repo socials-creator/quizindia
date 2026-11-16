@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const SERVICE = 'https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_AdminBoundary/MapServer/1/query';
+  const SERVICE = 'https://livingatlas.esri.in/server/rest/services/IAB2024/IAB_State_2024/MapServer/0/query';
   const MAX_MISSES = 5;
   const HISTORY_KEY = 'indiaMapQuiz.history.v1';
   const BEST_KEY = 'indiaMapQuiz.best.v1';
@@ -65,7 +65,7 @@
   }
   function startGame() {
     const pool=listForMode();
-    if (!features.length) {toast('The map is still loading.');return;}
+    if (!s.length) {toast('The map is still loading.');return;}
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
     queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null;
