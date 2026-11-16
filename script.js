@@ -130,23 +130,42 @@
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
   }
+  const SOURCES = [
+    {url:'https://livingatlas.esri.in/server/rest/services/IAB2024/IAB_State_2024/MapServer/0/query', fields:'name,censusname', simplify:true},
+    {url:'https://livingatlas.esri.in/server/rest/services/IAB2024/IAB_State_2024/MapServer/0/query', fields:'*', simplify:true},
+    {url:'https://livingatlas.esri.in/server/rest/services/LivingAtlas/IND_AdminBoundary/MapServer/1/query', fields:'*', simplify:true},
+    {url:'https://livingatlas.esri.in/server/rest/services/IAB2024/IAB_State_2024/MapServer/0/query', fields:'*', simplify:false}
+  ];
+  function pickName(props) {
+    const keys=['name','censusname','state','STATE','State','stname','STNAME','NAME','Name'];
+    for (const k of keys) { if (props?.[k]) { const n=canonical(props[k]); if (ALL.some(x=>x.name===n)) return n; } }
+    for (const v of Object.values(props||{})) { if (typeof v==='string') { const n=canonical(v); if (ALL.some(x=>x.name===n)) return n; } }
+    return null;
+  }
+  async function fetchBoundaries() {
+    let lastError;
+    for (const src of SOURCES) {
+      try {
+        const q={where:'1=1',outFields:src.fields,returnGeometry:'true',outSR:'4326',f:'geojson'};
+        if (src.simplify) { q.maxAllowableOffset='0.01'; q.geometryPrecision='3'; }
+        const response=await fetch(`${src.url}?${new URLSearchParams(q)}`,{mode:'cors',credentials:'omit'});
+        if(!response.ok) throw new Error(`Map service returned ${response.status}`);
+        const data=await response.json();
+        if(data.error) throw new Error(`Map service error ${data.error.code||''}: ${data.error.message||''}`);
+        if(!data.features?.length) throw new Error('No boundary features were returned.');
+        const map=new Map();
+        data.features.forEach(f=>{const n=pickName(f.properties); if(!n) return; f.properties=f.properties||{}; f.properties.quizName=n; f.properties.quizType=typeOf(n); if(!map.has(n)) map.set(n,f);});
+        const missing=ALL.map(x=>x.name).filter(n=>!map.has(n));
+        if(missing.length) throw new Error(`The boundary service did not return all 36 regions. Missing: ${missing.join(', ')}`);
+        return [...map.values()];
+      } catch(e) { console.warn('Boundary source failed', src.url, e); lastError=e; }
+    }
+    throw lastError || new Error('All boundary sources failed.');
+  }
   async function loadMap() {
-    const params=new URLSearchParams({where:'1=1',outFields:'*',returnGeometry:'true',outSR:'4326',f:'geojson'});
-    const url=`${SERVICE}?${params.toString()}`;
     try {
-      const response=await fetch(url,{mode:'cors',credentials:'omit'});
-      if(!response.ok) throw new Error(`Map service returned ${response.status}`);
-      const data=await response.json();
-      if(!data.features?.length) throw new Error('No boundary features were returned.');
-      const mapped=[];
-      data.features.forEach(feature=>{
-        const raw=feature.properties?.state || feature.properties?.STATE || feature.properties?.State || feature.properties?.stname || feature.properties?.STNAME;
-        const name=canonical(raw);
-        if(!ALL.some(x=>x.name===name)) {console.warn('Ignoring unrecognized boundary name',raw,feature.properties);return;}
-        feature.properties.quizName=name; feature.properties.quizType=typeOf(name); mapped.push(feature); featureByName.set(name,feature);
-      });
-      const missing=ALL.map(x=>x.name).filter(n=>!featureByName.has(n));
-      if(missing.length) throw new Error(`The boundary service did not return all 36 regions. Missing: ${missing.join(', ')}`);
+      const mapped=await fetchBoundaries();
+      featureByName=new Map(mapped.map(f=>[f.properties.quizName,f]));
       features=mapped; drawMap({type:'FeatureCollection',features:mapped});
       $('map').classList.add('ready');
     } catch(error) {
