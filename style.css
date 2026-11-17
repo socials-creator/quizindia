@@ -175,7 +175,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 /* v1.8 — mode switcher (States & UTs / Districts) */
 [hidden]{display:none!important}
 .mode-bar{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
-.segmented{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px;border-radius:14px;background:var(--seg-bg)}
+.segmented{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;border-radius:14px;background:var(--seg-bg)}
 .seg-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border-radius:11px;font-weight:600;font-size:.9rem;color:var(--label-2);white-space:nowrap}
 .seg-btn.active{background:var(--card);color:var(--label);box-shadow:0 1px 3px rgba(0,0,0,.12),0 3px 8px rgba(0,0,0,.06)}
 .seg-badge{font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:99px;background:var(--blue);color:#fff}
@@ -200,3 +200,14 @@ ol,ul{margin:0;padding:0;list-style:none}
 .hit-area.hit-small{stroke-width:12px}
 
 .version-note{text-align:center;font-size:.72rem;font-weight:600;color:var(--label-3);margin:6px 0 0}
+
+/* Airports mode */
+.base-region{fill:var(--land);stroke:var(--border);stroke-width:1.2;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
+.map-canvas.airports svg{cursor:crosshair}
+.airport-node{pointer-events:none}
+.airport-zone{fill:transparent;stroke:none;vector-effect:non-scaling-stroke}
+.airport-dot{fill:none;opacity:0}
+.airport-node.found .airport-zone{fill:var(--green);fill-opacity:.55;stroke:var(--green);stroke-width:1.5}
+.airport-node.missed .airport-zone{fill:var(--red);fill-opacity:.5;stroke:var(--red);stroke-width:1.5}
+.airport-node.target-reveal .airport-zone{fill:var(--orange);fill-opacity:.8;stroke:var(--orange);stroke-width:2;animation:pulse .6s ease 2}
+.airport-node.found .airport-dot,.airport-node.missed .airport-dot,.airport-node.target-reveal .airport-dot{fill:var(--label);opacity:1}

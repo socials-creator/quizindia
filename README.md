@@ -24,6 +24,7 @@ The app checks that all 28 States and 8 Union Territories are available before s
 Pick a mode with the switch at the top of the page:
 - **States & UTs:** all 28 States + 8 Union Territories (36 regions).
 - **Districts:** point out the districts of one state. Currently **Telangana** and **Andhra Pradesh** (28 districts incl. Markapuram and Polavaram, created Dec 2025); choose the state from the dropdown under the mode switch (alphabetical; no state is pre-selected). More states will appear in that list.
+- **Airports (new in v2.1):** point out India's international airports (38). The tap target is a ~25 km radius around each airport (`AIRPORT_RADIUS_KM` in `script.js`); tapping elsewhere counts as a miss. Found/missed airports reveal their tap circle. Edit the `AIRPORTS` list to add or remove airports.
 - A round ends after every region in the mode is found or after 5 misses.
 - Wrong taps and skips reveal the target region.
 - Last 10 rounds are saved on the current device/browser. Best score is tracked separately for each mode, and your last-used mode is remembered.
@@ -32,6 +33,7 @@ Pick a mode with the switch at the top of the page:
 In `script.js`, add an entry to `DISTRICT_SETS` (state name, boundary-file `slug`, the official district list, and an `aliases` map for older/variant spellings). The dropdown entry, boundary loading, scoring and best-score tracking pick it up automatically. District names are read from the boundary file, so the number of districts in a round follows the data.
 
 ## Changelog
+- **v2.1** — New **Airports** mode: locate India's international airports with a 25 km tap radius.
 - **v2.0** — Districts mode now starts with a **Select a state** dropdown (alphabetical) instead of a default state.
 - **v1.9** — Districts mode adds **Andhra Pradesh** (28 districts). If the boundary data predates a reorganisation, the round uses the districts present in the data and the map footer says how many of the official total it has.
 - **v1.8** — New **Districts** mode (Telangana). Mode switcher, per-mode best score, remembered last mode, small-district tap targets, finer borders on district maps.
