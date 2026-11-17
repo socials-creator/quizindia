@@ -187,7 +187,7 @@
   // ---- District mode: one entry per state/UT that has a district quiz. Add more states here later. ----
   const DISTRICT_SETS = {
     'Telangana': {
-      slug:'telangana',
+      slug:'telangana', expected:33,
       districts:['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem Asifabad','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal-Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
       // Spelling variants / older names found in public boundary files -> current official name.
       aliases:{
@@ -206,6 +206,25 @@
         'Medchal-Malkajgiri':['Medchal Malkajgiri','Medchal','Malkajgiri'],
         'Narayanpet':['Narayanapet'],
         'Nagarkurnool':['Nagar Kurnool']
+      }
+    },
+    'Andhra Pradesh': {
+      slug:'andhra-pradesh', expected:28,
+      districts:['Alluri Sitharama Raju','Anakapalli','Anantapur','Annamayya','Bapatla','Chittoor','Dr. B.R. Ambedkar Konaseema','East Godavari','Eluru','Guntur','Kakinada','Krishna','Kurnool','Markapuram','Nandyal','NTR','Palnadu','Parvathipuram Manyam','Polavaram','Prakasam','Sri Potti Sriramulu Nellore','Sri Sathya Sai','Srikakulam','Tirupati','Visakhapatnam','Vizianagaram','West Godavari','YSR Kadapa'],
+      aliases:{
+        'Alluri Sitharama Raju':['Alluri Sitarama Raju','Alluri Seetharama Raju','ASR'],
+        'Anakapalli':['Anakapalle','Anakapalli'],
+        'Anantapur':['Ananthapuramu','Anantapuramu','Ananthapur'],
+        'Dr. B.R. Ambedkar Konaseema':['Konaseema','Ambedkar Konaseema','B.R. Ambedkar Konaseema','Dr B R Ambedkar Konaseema'],
+        'Sri Potti Sriramulu Nellore':['Nellore','SPSR Nellore','S.P.S.R. Nellore','Sri Potti Sri Ramulu Nellore'],
+        'Sri Sathya Sai':['Sathya Sai','Puttaparthi'],
+        'YSR Kadapa':['Kadapa','Cuddapah','YSR','Y.S.R.','Y.S.R. Kadapa','YSR District'],
+        'NTR':['NTR Vijayawada','Vijayawada'],
+        'Tirupati':['Sri Balaji','Sri Balaji Tirupati'],
+        'Parvathipuram Manyam':['Parvathipuram','Manyam'],
+        'Visakhapatnam':['Vishakhapatnam','Visakhapatnam'],
+        'Palnadu':['Palnad'],
+        'Kurnool':['Kurnul']
       }
     }
   };
@@ -329,6 +348,10 @@
       poolNames=m==='districts'?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
       drawMap({type:'FeatureCollection',features:mapped});
       $('map').classList.add('ready'); updateStats(); showPrompt();
+      if (m==='districts') {
+        const exp=DISTRICT_SETS[key].expected;
+        if (exp && poolNames.length!==exp) { $('map-message').textContent=`Map ready · boundary data has ${poolNames.length} of ${exp} districts`; console.info(`${key}: boundary data has ${poolNames.length} districts, expected ${exp}`); }
+      }
     } catch(error) {
       if (token!==loadToken) return;
       console.error(error);
