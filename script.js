@@ -20,8 +20,13 @@
     ['Port Blair (Veer Savarkar)',11.6412,92.7297],['Tiruchirappalli',10.7654,78.7097],['Coimbatore',11.0300,77.0434],['Madurai',9.8345,78.0934],['Mangaluru',12.9613,74.8901],
     ['Nagpur (Dr. Babasaheb Ambedkar)',21.0922,79.0472],['Indore (Devi Ahilya Bai Holkar)',22.7218,75.8011],['Surat',21.1141,72.7418],['Rajkot (Hirasar)',22.3881,71.0283],
     ['Visakhapatnam (Alluri Sitarama Raju, Bhogapuram)',17.9715,83.5036],['Vijayawada',16.5304,80.7968],
-    ['Navi Mumbai',18.9846,73.0653],['Noida (Jewar)',28.1799,77.6118],['Tirupati',13.6325,79.5433],['Shirdi (Sai Baba)',19.6886,74.3789],['Bhubaneswar (Biju Patnaik)',20.2444,85.8178]
+    ['Navi Mumbai',18.9846,73.0653],['Noida (Jewar)',28.1799,77.6118],['Tirupati',13.6325,79.5433],['Shirdi (Sai Baba)',19.6886,74.3789],['Bhubaneswar (Biju Patnaik)',20.2444,85.8178],
+    ['Patna (Jay Prakash Narayan)',25.5913,85.0880],['Bhopal (Raja Bhoj)',23.2875,77.3374],['Aurangabad (Chhatrapati Sambhajinagar)',19.8627,75.3981],['Vadodara',22.3362,73.2263],
+    // Major domestic airports
+    ['Raipur (Swami Vivekananda)',21.1804,81.7388],['Ranchi (Birsa Munda)',23.3143,85.3217],['Dehradun (Jolly Grant)',30.1897,78.1803],['Jammu',32.6891,74.8374],
+    ['Leh (Kushok Bakula Rimpochee)',34.1359,77.5465],['Dibrugarh',27.4839,95.0169],['Udaipur (Maharana Pratap)',24.6177,73.8961],['Jodhpur',26.2511,73.0489]
   ];
+  const DOMESTIC_AIRPORTS = new Set(['Raipur (Swami Vivekananda)','Ranchi (Birsa Munda)','Dehradun (Jolly Grant)','Jammu','Leh (Kushok Bakula Rimpochee)','Dibrugarh','Udaipur (Maharana Pratap)','Jodhpur']);
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
@@ -46,9 +51,9 @@
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
   function listForMode() { return poolNames; }
-  function typeOf(name) { return mode==='airports' ? 'International airport' : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
+  function typeOf(name) { return mode==='airports' ? (DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
   function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : 'region'; }
-  function modeLabel() { return mode==='airports' ? 'International airports' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
+  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
   function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
@@ -84,9 +89,9 @@
   }
   function showPrompt() {
     $('side-skip').textContent=`Skip this ${noun()} →`;
-    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':'Press New game'); $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international airports. Tapping within ${AIRPORT_RADIUS_KM} km of an airport counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
+    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':'Press New game'); $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international and major domestic airports. Tapping within the airport’s radius (about ${AIRPORT_RADIUS_KM} km; less for same-city airports) counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
     $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=mode==='airports'?`Tap within about ${radiusFor(current)} km of the airport.`:`Tap the matching ${noun()} on the map.`;
-    $('side-prompt').textContent=current; $('side-description').textContent=mode==='airports'?`International airport · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
+    $('side-prompt').textContent=current; $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
     const pool=listForMode();
@@ -146,7 +151,7 @@
   let airportFeatures=[];
   function drawAirportMap(collection) {
     const host=$('map'); host.innerHTML=''; host.classList.remove('districts'); host.classList.add('airports');
-    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating international airports').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating airports').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
