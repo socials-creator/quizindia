@@ -16,7 +16,7 @@
   const ALL = [...STATES.map(name => ({name,type:'State'})), ...UTS.map(name => ({name,type:'Union Territory'}))];
   const $ = id => document.getElementById(id);
   let features = [], featureByName = new Map(), queue = [], current = null;
-  let mode = 'country', districtKey = 'Telangana', poolNames = ALL.map(x => x.name), loadToken = 0, gameId = 0;
+  let mode = 'country', districtKey = null, poolNames = ALL.map(x => x.name), loadToken = 0, gameId = 0;
   const mapCache = new Map();
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
@@ -29,8 +29,8 @@
   function listForMode() { return poolNames; }
   function typeOf(name) { return mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
   function noun() { return mode==='districts' ? 'district' : 'region'; }
-  function modeLabel() { return mode==='districts' ? `${districtKey} districts` : 'All regions'; }
-  function bestKey() { return mode==='districts' ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
+  function modeLabel() { return mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
+  function bestKey() { return mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>$('toast').classList.remove('show'),1700);
@@ -65,12 +65,13 @@
   }
   function showPrompt() {
     $('side-skip').textContent=`Skip this ${noun()} →`;
-    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':'Press New game'; $('prompt-kind').textContent=mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='districts'?(poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
+    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':'Press New game'); $('prompt-kind').textContent=mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
     $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=`Tap the matching ${noun()} on the map.`;
     $('side-prompt').textContent=current; $('side-description').textContent=mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
     const pool=listForMode();
+    if (mode==='districts' && !districtKey) {toast('Select a state first.');return;}
     if (!features.length) {toast('The map is still loading.');return;}
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
@@ -338,6 +339,11 @@
   async function loadMap() {
     const token=++loadToken, m=mode, key=districtKey, cacheKey=m==='districts'?`districts:${key}`:'country';
     features=[]; featureByName=new Map(); poolNames=m==='districts'?[]:ALL.map(x=>x.name);
+    if (m==='districts' && !key) {
+      $('map').classList.remove('ready','districts');
+      $('map').innerHTML='<div class="map-loading"><span class="map-empty-icon">🗺️</span><strong>Select a state</strong><small>Choose a state from the menu above to practise its districts.</small></div>';
+      $('map-message').textContent='Choose a state to begin'; updateStats(); showPrompt(); return;
+    }
     showMapLoading(); updateStats(); showPrompt();
     try {
       let mapped=mapCache.get(cacheKey);
@@ -362,23 +368,22 @@
     }
   }
   // ---- Mode switching (States & UTs  /  Districts) ----
-  function renderStateChips() {
-    const box=$('state-chips'); box.innerHTML='';
-    Object.keys(DISTRICT_SETS).forEach(k=>{
-      const b=document.createElement('button'); b.type='button'; b.className='chip'+(k===districtKey?' active':''); b.textContent=k; b.dataset.state=k;
-      b.setAttribute('aria-pressed',String(k===districtKey)); b.addEventListener('click',()=>setMode('districts',k)); box.append(b);
-    });
-    const soon=document.createElement('span'); soon.className='chip-soon'; soon.textContent='More states coming soon'; box.append(soon);
+  function renderStateSelect() {
+    const sel=$('state-select'); sel.innerHTML='';
+    const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a state…'; ph.disabled=true; sel.append(ph);
+    Object.keys(DISTRICT_SETS).sort((x,y)=>x.localeCompare(y)).forEach(k=>{const o=document.createElement('option'); o.value=k; o.textContent=k; sel.append(o);});
+    sel.value=districtKey||'';
   }
   function applyModeUI() {
     document.querySelectorAll('.seg-btn').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    $('region-picker').hidden=mode!=='districts'; renderStateChips();
+    $('region-picker').hidden=mode!=='districts'; renderStateSelect();
   }
-  function setMode(newMode,newKey=districtKey) {
+  function setMode(newMode,newKey=null) {
+    if (newMode!=='districts') newKey=null;
     if (newMode===mode && newKey===districtKey) return;
     const wasActive=roundActive;
     mode=newMode; districtKey=newKey;
-    try { localStorage.setItem(MODE_KEY,JSON.stringify({mode,districtKey})); } catch {}
+    try { localStorage.setItem(MODE_KEY,JSON.stringify({mode})); } catch {}
     gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0;
     $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
@@ -388,8 +393,9 @@
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   function init() {
     const saved=readJSON(MODE_KEY,null);
-    if (saved && (saved.mode==='country'||saved.mode==='districts') && DISTRICT_SETS[saved.districtKey]) {mode=saved.mode;districtKey=saved.districtKey;}
-    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+    if (saved && (saved.mode==='country'||saved.mode==='districts')) mode=saved.mode;
+    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.mode!==mode) setMode(b.dataset.mode); }));
+    $('state-select').addEventListener('change',e=>setMode('districts',e.target.value||null));
     applyModeUI();
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
     $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);

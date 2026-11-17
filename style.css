@@ -179,13 +179,16 @@ ol,ul{margin:0;padding:0;list-style:none}
 .seg-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border-radius:11px;font-weight:600;font-size:.9rem;color:var(--label-2);white-space:nowrap}
 .seg-btn.active{background:var(--card);color:var(--label);box-shadow:0 1px 3px rgba(0,0,0,.12),0 3px 8px rgba(0,0,0,.06)}
 .seg-badge{font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:99px;background:var(--blue);color:#fff}
-.region-picker{display:flex;align-items:center;gap:10px;overflow:hidden}
+.region-picker{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
 .region-picker .eyebrow{flex:none}
-.chip-row{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
-.chip-row::-webkit-scrollbar{display:none}
-.chip{flex:none;font-size:.78rem;font-weight:600;padding:7px 13px;border-radius:99px;background:var(--card);color:var(--label-2);box-shadow:var(--shadow);white-space:nowrap}
-.chip.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(0,122,255,.3)}
-.chip-soon{flex:none;font-size:.74rem;font-weight:500;color:var(--label-3);white-space:nowrap;padding-left:2px}
+.select-wrap{position:relative;flex:1;min-width:0;max-width:340px}
+.select-wrap::after{content:"";position:absolute;right:15px;top:50%;width:7px;height:7px;border-right:2px solid var(--label-3);border-bottom:2px solid var(--label-3);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+#state-select{width:100%;min-height:44px;appearance:none;-webkit-appearance:none;border:0;border-radius:14px;background:var(--card);color:var(--label);box-shadow:var(--shadow);font:inherit;font-weight:600;font-size:.92rem;padding:0 38px 0 16px;cursor:pointer;text-overflow:ellipsis}
+#state-select:invalid,#state-select:has(option[value=""]:checked){color:var(--label-3)}
+#state-select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.picker-note{flex:none;font-size:.74rem;font-weight:500;color:var(--label-3);white-space:nowrap}
+@media (max-width:899px){.picker-note{flex-basis:100%;padding-left:2px}}
+.map-empty-icon{font-size:2.2rem;line-height:1}
 @media (min-width:900px){
   .mode-bar{flex-direction:row;align-items:center;gap:18px}
   .segmented{width:340px;flex:none}
