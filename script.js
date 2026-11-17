@@ -10,13 +10,14 @@
   const AIRPORTS = [
     ['Delhi (Indira Gandhi)',28.5562,77.1000],['Mumbai (Chhatrapati Shivaji Maharaj)',19.0896,72.8656],['Chennai',12.9941,80.1709],['Kolkata (Netaji Subhas Chandra Bose)',22.6547,88.4467],
     ['Bengaluru (Kempegowda)',13.1986,77.7066],['Hyderabad (Rajiv Gandhi)',17.2403,78.4294],['Ahmedabad (Sardar Vallabhbhai Patel)',23.0772,72.6347],['Kochi (Cochin)',10.1520,76.4019],
-    ['Thiruvananthapuram',8.4821,76.9201],['Kozhikode (Calicut)',11.1368,75.9553],['Kannur',11.9186,75.5472],['Goa (Dabolim)',15.3808,73.8314],['Goa (Mopa)',15.7130,73.8643],
+    ['Thiruvananthapuram',8.4821,76.9201],['Kozhikode (Calicut)',11.1368,75.9553],['Kannur',11.9186,75.5472],['Goa (Dabolim)',15.3808,73.8314],['Goa (Mopa)',15.7428,73.8617],
     ['Pune',18.5821,73.9197],['Jaipur',26.8242,75.8122],['Lucknow (Chaudhary Charan Singh)',26.7606,80.8893],['Varanasi (Lal Bahadur Shastri)',25.4524,82.8593],['Ayodhya (Maharishi Valmiki)',26.7433,82.1465],
     ['Kushinagar',26.7761,83.8884],['Gaya',24.7443,84.9512],['Amritsar (Sri Guru Ram Dass Jee)',31.7096,74.7973],['Chandigarh',30.6735,76.7885],['Srinagar (Sheikh ul-Alam)',33.9871,74.7742],
     ['Guwahati (Lokpriya Gopinath Bordoloi)',26.1061,91.5859],['Bagdogra',26.6812,88.3286],['Imphal (Bir Tikendrajit)',24.7600,93.8967],['Agartala (Maharaja Bir Bikram)',23.8870,91.2404],
     ['Port Blair (Veer Savarkar)',11.6412,92.7297],['Tiruchirappalli',10.7654,78.7097],['Coimbatore',11.0300,77.0434],['Madurai',9.8345,78.0934],['Mangaluru',12.9613,74.8901],
-    ['Nagpur (Dr. Babasaheb Ambedkar)',21.0922,79.0472],['Indore (Devi Ahilya Bai Holkar)',22.7218,75.8011],['Surat',21.1141,72.7418],['Rajkot (Hirasar)',22.3792,71.0453],
-    ['Visakhapatnam',17.7212,83.2245],['Vijayawada',16.5304,80.7968]
+    ['Nagpur (Dr. Babasaheb Ambedkar)',21.0922,79.0472],['Indore (Devi Ahilya Bai Holkar)',22.7218,75.8011],['Surat',21.1141,72.7418],['Rajkot (Hirasar)',22.3881,71.0283],
+    ['Visakhapatnam (Alluri Sitarama Raju, Bhogapuram)',17.9715,83.5036],['Vijayawada',16.5304,80.7968],
+    ['Navi Mumbai',18.9846,73.0653],['Noida (Jewar)',28.1799,77.6118],['Tirupati',13.6325,79.5433],['Shirdi (Sai Baba)',19.6886,74.3789],['Bhubaneswar (Biju Patnaik)',20.2444,85.8178]
   ];
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
   const STATES = [
