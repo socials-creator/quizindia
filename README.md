@@ -21,12 +21,18 @@ A mobile-friendly, tap-the-map geography game based on the interaction model of 
 The app checks that all 28 States and 8 Union Territories are available before starting a round. D3.js and topojson-client are loaded from jsDelivr.
 
 ## Gameplay
-- **All regions:** 28 States + 8 Union Territories.
-- **States:** 28 States.
-- **Union Territories:** 8 UTs.
-- A round ends after every region in the selected group is found or after 5 misses.
+Pick a mode with the switch at the top of the page:
+- **States & UTs:** all 28 States + 8 Union Territories (36 regions).
+- **Districts:** point out the districts of one state. Currently **Telangana** only; more states will appear as chips next to the mode switch.
+- A round ends after every region in the mode is found or after 5 misses.
 - Wrong taps and skips reveal the target region.
-- Last 10 rounds and best score are saved on the current device/browser.
+- Last 10 rounds are saved on the current device/browser. Best score is tracked separately for each mode, and your last-used mode is remembered.
+
+## Adding more states to Districts mode
+In `script.js`, add an entry to `DISTRICT_SETS` (state name, boundary-file `slug`, the official district list, and an `aliases` map for older/variant spellings). The state chip, boundary loading, scoring and best-score tracking pick it up automatically. District names are read from the boundary file, so the number of districts in a round follows the data.
+
+## Changelog
+- **v1.8** — New **Districts** mode (Telangana). Mode switcher, per-mode best score, remembered last mode, small-district tap targets, finer borders on district maps.
 
 ## Important
 This is an educational quiz, not a legal or survey-grade boundary product. Map service availability, CORS policy, and map data revisions are controlled by the service provider. Check the official Survey of India reference map for authoritative use.

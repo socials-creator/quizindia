@@ -1,5 +1,6 @@
 /* India Map Quiz — iOS-inspired UI */
 :root{
+  --seg-bg:rgba(118,118,128,.12);
   --bg:#f2f2f7; --card:#ffffff; --card-2:#f9f9fb; --label:#000; --label-2:rgba(60,60,67,.62); --label-3:rgba(60,60,67,.3);
   --sep:rgba(60,60,67,.14); --blue:#007aff; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
   --glass:rgba(255,255,255,.72); --glass-border:rgba(255,255,255,.6);
@@ -9,6 +10,7 @@
 }
 @media (prefers-color-scheme:dark){
   :root{
+    --seg-bg:rgba(118,118,128,.24);
     --bg:#000; --card:#1c1c1e; --card-2:#2c2c2e; --label:#fff; --label-2:rgba(235,235,245,.62); --label-3:rgba(235,235,245,.3);
     --sep:rgba(84,84,88,.55); --blue:#0a84ff; --green:#30d158; --red:#ff453a; --orange:#ff9f0a;
     --glass:rgba(44,44,46,.72); --glass-border:rgba(255,255,255,.08);
@@ -168,3 +170,30 @@ ol,ul{margin:0;padding:0;list-style:none}
 
 /* Invisible enlarged tap area (stroke-only hit testing, no visible outline) */
 .hit-area{fill:none;stroke:transparent;stroke-width:26px;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer}
+
+
+/* v1.8 — mode switcher (States & UTs / Districts) */
+[hidden]{display:none!important}
+.mode-bar{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.segmented{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px;border-radius:14px;background:var(--seg-bg)}
+.seg-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border-radius:11px;font-weight:600;font-size:.9rem;color:var(--label-2);white-space:nowrap}
+.seg-btn.active{background:var(--card);color:var(--label);box-shadow:0 1px 3px rgba(0,0,0,.12),0 3px 8px rgba(0,0,0,.06)}
+.seg-badge{font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:99px;background:var(--blue);color:#fff}
+.region-picker{display:flex;align-items:center;gap:10px;overflow:hidden}
+.region-picker .eyebrow{flex:none}
+.chip-row{display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{flex:none;font-size:.78rem;font-weight:600;padding:7px 13px;border-radius:99px;background:var(--card);color:var(--label-2);box-shadow:var(--shadow);white-space:nowrap}
+.chip.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(0,122,255,.3)}
+.chip-soon{flex:none;font-size:.74rem;font-weight:500;color:var(--label-3);white-space:nowrap;padding-left:2px}
+@media (min-width:900px){
+  .mode-bar{flex-direction:row;align-items:center;gap:18px}
+  .segmented{width:340px;flex:none}
+}
+
+/* District mode: finer borders, smaller invisible tap padding */
+.map-canvas.districts .region{stroke-width:1.2}
+.map-canvas.districts .region.target-reveal{stroke-width:2.4}
+.hit-area.hit-small{stroke-width:12px}
+
+.version-note{text-align:center;font-size:.72rem;font-weight:600;color:var(--label-3);margin:6px 0 0}

@@ -3,6 +3,7 @@
   const MAX_MISSES = 5;
   const HISTORY_KEY = 'indiaMapQuiz.history.v1';
   const BEST_KEY = 'indiaMapQuiz.best.v1';
+  const MODE_KEY = 'indiaMapQuiz.mode.v1';
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
   ];
@@ -15,6 +16,8 @@
   const ALL = [...STATES.map(name => ({name,type:'State'})), ...UTS.map(name => ({name,type:'Union Territory'}))];
   const $ = id => document.getElementById(id);
   let features = [], featureByName = new Map(), queue = [], current = null;
+  let mode = 'country', districtKey = 'Telangana', poolNames = ALL.map(x => x.name), loadToken = 0, gameId = 0;
+  const mapCache = new Map();
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
 
@@ -23,8 +26,11 @@
     if (ALIASES.has(clean)) return ALIASES.get(clean);
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
-  function listForMode() { return ALL.map(x=>x.name); }
-  function typeOf(name) { return STATES.includes(name) ? 'State' : 'Union Territory'; }
+  function listForMode() { return poolNames; }
+  function typeOf(name) { return mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
+  function noun() { return mode==='districts' ? 'district' : 'region'; }
+  function modeLabel() { return mode==='districts' ? `${districtKey} districts` : 'All regions'; }
+  function bestKey() { return mode==='districts' ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>$('toast').classList.remove('show'),1700);
@@ -37,19 +43,19 @@
   function readJSON(key,fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
   function saveHistory(item) {
     const history=readJSON(HISTORY_KEY,[]); history.unshift(item); localStorage.setItem(HISTORY_KEY,JSON.stringify(history.slice(0,10))); renderHistory();
-    const best=readJSON(BEST_KEY,null);
-    if (!best || item.score>best.score || (item.score===best.score && item.misses<best.misses)) {localStorage.setItem(BEST_KEY,JSON.stringify(item));renderBest();}
+    const best=readJSON(bestKey(),null);
+    if (!best || item.score>best.score || (item.score===best.score && item.misses<best.misses)) {localStorage.setItem(bestKey(),JSON.stringify(item));renderBest();}
   }
   function renderHistory() {
     const history=readJSON(HISTORY_KEY,[]); const ol=$('history'); ol.innerHTML='';
     if (!history.length) {ol.innerHTML='<li class="empty-history">No games yet</li>';return;}
     history.forEach(h=>{const li=document.createElement('li');if(h.misses===0&&h.score===h.total)li.className='perfect';li.textContent=`${h.score}/${h.total} · ${h.modeLabel} · ${h.date}`;ol.append(li);});
   }
-  function renderBest() { const b=readJSON(BEST_KEY,null); $('best-score').textContent=b?`${b.score} / ${b.total}`:'—'; $('best-label').textContent=b?`${b.modeLabel} · ${b.date}`:'No completed rounds yet'; }
+  function renderBest() { const b=readJSON(bestKey(),null); $('best-score').textContent=b?`${b.score} / ${b.total}`:'—'; $('best-label').textContent=b?`${b.modeLabel} · ${b.date}`:'No completed rounds yet'; }
   function updateStats() {
     const total=listForMode().length, done=found.size+missed.size, left=Math.max(0,total-done);
-    $('found').textContent=found.size; $('missed').textContent=`${mistakes} / ${MAX_MISSES}`; $('remaining').textContent=left;
-    $('progress-label').textContent=`${found.size} / ${total}`; $('progress-fill').style.width=`${total?found.size/total*100:0}%`;
+    $('found').textContent=found.size; $('missed').textContent=`${mistakes} / ${MAX_MISSES}`; $('remaining').textContent=total?left:'—';
+    $('progress-label').textContent=total?`${found.size} / ${total}`:'0 / —'; $('progress-fill').style.width=`${total?found.size/total*100:0}%`;
   }
   function addRecent(name,ok) {
     const ol=$('recent-answers'); if (ol.children.length===1 && ol.firstElementChild.textContent==='Answers will appear here.') ol.innerHTML='';
@@ -58,19 +64,20 @@
     while(ol.children.length>8)ol.lastElementChild.remove();
   }
   function showPrompt() {
-    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':'Press New game'; $('prompt-kind').textContent='FIND THIS REGION'; $('prompt-hint').textContent='Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent='Find all regions in the selected group by tapping their shapes on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
-    $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent='Tap the matching region on the map.';
-    $('side-prompt').textContent=current; $('side-description').textContent=`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
+    $('side-skip').textContent=`Skip this ${noun()} →`;
+    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':'Press New game'; $('prompt-kind').textContent=mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='districts'?(poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
+    $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=`Tap the matching ${noun()} on the map.`;
+    $('side-prompt').textContent=current; $('side-description').textContent=mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
     const pool=listForMode();
     if (!features.length) {toast('The map is still loading.');return;}
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
-    queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null;
+    gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null;
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
     features.forEach(f=>{const n=f.properties.quizName;const el=mapGroup.selectAll('.region').filter(d=>d.properties.quizName===n);el.classed('found',false).classed('missed',false).classed('target-reveal',false);});
-    $('map-message').textContent='Round in progress · tap a region'; updateStats(); nextQuestion(); resetMapView();
+    $('map-message').textContent=`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
   }
   function nextQuestion() {
     if (!roundActive) return;
@@ -89,7 +96,7 @@
       $('map-message').textContent=`Not quite — the target was ${current}`; toast(`That’s ${name}. Find ${current}.`);
       const reveal=current; current=null; updateStats();
       if (mistakes>=MAX_MISSES) {finishGame(false);return;}
-      setTimeout(()=>{findPath(reveal).classed('target-reveal',false);nextQuestion();},1000);
+      const gid=gameId; setTimeout(()=>{if(gid!==gameId)return;findPath(reveal).classed('target-reveal',false);nextQuestion();},1000);
     }
   }
   function skipQuestion() {
@@ -97,22 +104,22 @@
     const name=current; mistakes++; missed.add(name); findPath(name).classed('missed',true).classed('target-reveal',true); addRecent(`${name} · skipped`,false);
     $('map-message').textContent=`Skipped · ${name} highlighted on the map`; current=null; updateStats();
     if (mistakes>=MAX_MISSES) {finishGame(false);return;}
-    setTimeout(()=>{findPath(name).classed('target-reveal',false);nextQuestion();},1300);
+    const gid=gameId; setTimeout(()=>{if(gid!==gameId)return;findPath(name).classed('target-reveal',false);nextQuestion();},1300);
   }
   function finishGame(completed) {
     roundActive=false; current=null; showPrompt(); updateStats();
-    const total=listForMode().length, score=found.size, modeLabel='All regions';
+    const total=listForMode().length, score=found.size, label=modeLabel();
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
-    saveHistory({score,total,misses:mistakes,modeLabel,date,completed});
-    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?'India mapped!':'Round over';
-    $('result-copy').textContent=completed?'You found every region in this round. Excellent map knowledge.':`You found ${score} of ${total} regions. Review the highlighted misses and try another round.`;
-    $('result-score').textContent=`${score} / ${total}`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
+    saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed});
+    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='districts'?`${districtKey} mapped!`:'India mapped!'):'Round over';
+    $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
+    $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
     $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again';
   }
   function resetMapView() { if(mapSvg&&zoom) mapSvg.transition().duration(450).call(zoom.transform,d3.zoomIdentity); }
   function drawMap(collection) {
-    const host=$('map'); host.innerHTML='';
-    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    const host=$('map'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',mode==='districts'?`Map of ${districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
@@ -124,9 +131,11 @@
       .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
       .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);})
       .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}});
-    // Invisible, wider tap area for Lakshadweep's tiny islands (no visual change).
-    mapGroup.selectAll('path.region').filter(d=>d.properties.quizName==='Lakshadweep').each(function(d){
-      mapGroup.append('path').attr('class','hit-area').attr('d',path(d))
+    // Invisible, wider tap area for tiny regions (Lakshadweep's islands; small districts such as Hyderabad). No visual change.
+    collection.features.forEach(d=>{
+      const [[x0,y0],[x1,y1]]=path.bounds(d), small=Math.min(x1-x0,y1-y0)<26;
+      if (d.properties.quizName!=='Lakshadweep' && !(mode==='districts' && small)) return;
+      mapGroup.append('path').attr('class','hit-area'+(mode==='districts'?' hit-small':'')).attr('d',path(d))
         .on('click',(event)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);});
     });
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',event=>mapGroup.attr('transform',event.transform));
@@ -163,16 +172,95 @@
     if (geom.type==='GeometryCollection') return geom.geometries.flatMap(polysOf);
     return [];
   }
-  function mergeFeatures(items) { // items: [{name, geometry}] -> one MultiPolygon feature per region
+  function mergeFeatures(items, quizType) { // items: [{name, geometry}] -> one MultiPolygon feature per region
     const groups=new Map();
     items.forEach(({name,geometry})=>{ if(!groups.has(name)) groups.set(name,[]); groups.get(name).push(...polysOf(geometry)); });
     const out=new Map();
     groups.forEach((polys,name)=>{
       if(!polys.length) return;
       const coords=polys.map(p=>p.map((ring,i)=>fixRing(ring,i===0)));
-      out.set(name,{type:'Feature',properties:{quizName:name,quizType:typeOf(name)},geometry:{type:'MultiPolygon',coordinates:coords}});
+      out.set(name,{type:'Feature',properties:{quizName:name,quizType:quizType||(STATES.includes(name)?'State':'Union Territory')},geometry:{type:'MultiPolygon',coordinates:coords}});
     });
     return out;
+  }
+
+  // ---- District mode: one entry per state/UT that has a district quiz. Add more states here later. ----
+  const DISTRICT_SETS = {
+    'Telangana': {
+      slug:'telangana',
+      districts:['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem Asifabad','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal-Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
+      // Spelling variants / older names found in public boundary files -> current official name.
+      aliases:{
+        'Hanumakonda':['Hanamkonda','Warangal Urban','Warangal (Urban)'],
+        'Warangal':['Warangal Rural','Warangal (Rural)'],
+        'Rangareddy':['Ranga Reddy','Rangareddi','K.V. Rangareddy','K V Rangareddy'],
+        'Jangaon':['Jangoan'],
+        'Mahabubnagar':['Mahbubnagar','Mahaboobnagar'],
+        'Mahabubabad':['Mahbubabad'],
+        'Komaram Bheem Asifabad':['Kumuram Bheem Asifabad','Komram Bheem Asifabad','Kumurambheem Asifabad','Asifabad'],
+        'Jayashankar Bhupalpally':['Jayashankar Bhupalapally','Jayashankar','Bhupalpally'],
+        'Jogulamba Gadwal':['Jogulamba','Gadwal'],
+        'Bhadradri Kothagudem':['Bhadradri','Kothagudem'],
+        'Yadadri Bhuvanagiri':['Yadadri Bhongir','Yadadri','Bhuvanagiri','Bhongir'],
+        'Rajanna Sircilla':['Rajanna','Sircilla'],
+        'Medchal-Malkajgiri':['Medchal Malkajgiri','Medchal','Malkajgiri'],
+        'Narayanpet':['Narayanapet'],
+        'Nagarkurnool':['Nagar Kurnool']
+      }
+    }
+  };
+  const compact = v => norm(v).replace(/ /g,'');
+  const districtLookupCache = new Map();
+  function districtLookup(key) {
+    if (districtLookupCache.has(key)) return districtLookupCache.get(key);
+    const cfg=DISTRICT_SETS[key], map=new Map();
+    cfg.districts.forEach(n=>map.set(compact(n),n));
+    Object.entries(cfg.aliases||{}).forEach(([official,list])=>list.forEach(a=>map.set(compact(a),official)));
+    districtLookupCache.set(key,map); return map;
+  }
+  function cleanLabel(raw) {
+    const t=String(raw).trim().replace(/\s+/g,' ');
+    return (t===t.toUpperCase()||t===t.toLowerCase()) ? t.toLowerCase().replace(/(^|[\s(-])([a-z])/g,(m,a,b)=>a+b.toUpperCase()) : t;
+  }
+  function pickDistrictName(props, key) {
+    if (!props) return null;
+    const stateKey=norm(key), known=districtLookup(key);
+    const ok=v=>typeof v==='string' && v.trim() && norm(v)!==stateKey && !/^[\d.\s]+$/.test(v);
+    const pref=['district','DISTRICT','District','dtname','DTNAME','dt_name','DT_NAME','dist_name','DIST_NAME','district_name','DISTRICT_NAME','NAME_2','name_2','dname','DNAME','name','NAME','Name'];
+    let raw=null;
+    for (const k of pref) if (ok(props[k])) {raw=props[k];break;}
+    if (!raw) for (const v of Object.values(props)) if (ok(v) && known.has(compact(v))) {raw=v;break;}
+    if (!raw) return null;
+    return known.get(compact(raw)) || cleanLabel(raw);
+  }
+  async function fetchDistricts(key) {
+    const cfg=DISTRICT_SETS[key];
+    const build=feats=>{
+      const items=feats.map(f=>({name:pickDistrictName(f.properties,key),geometry:f.geometry}));
+      const unnamed=items.filter(x=>!x.name).length;
+      if (unnamed) console.warn(`${unnamed} ${key} feature(s) had no readable district name`);
+      const merged=mergeFeatures(items.filter(x=>x.name),'District');
+      return merged.size>=2 ? [...merged.values()] : null;
+    };
+    // 1) The state's own boundary file (GeoJSON, then TopoJSON)
+    for (const [dir,ext] of [['geojson','geojson'],['topojson','json']]) {
+      try {
+        const r=build(toFeatures(await fetchJson(`${dir}/states/${cfg.slug}.${ext}`),['districts',cfg.slug]));
+        if (r) return r;
+      } catch(e) { console.warn('District file failed:',key,dir,e); }
+    }
+    // 2) District layer of the whole-country TopoJSON, filtered to this state
+    try {
+      const data=await fetchJson('topojson/india.json');
+      if (data?.type==='Topology' && window.topojson) {
+        const obj=data.objects.districts||Object.entries(data.objects).find(([k])=>k!=='states')?.[1];
+        if (obj) {
+          const feats=topojson.feature(data,obj).features.filter(f=>Object.values(f.properties||{}).some(v=>typeof v==='string'&&norm(v)===norm(key)));
+          const r=build(feats); if (r) return r;
+        }
+      }
+    } catch(e) { console.warn('Country district layer failed:',e); }
+    throw new Error(`Could not load district boundaries for ${key}`);
   }
   async function fetchJson(path) {
     let lastError;
@@ -185,11 +273,11 @@
     }
     throw lastError;
   }
-  function toFeatures(data) {
+  function toFeatures(data, preferred=['states']) {
     if (data?.type==='Topology') {
       if (!window.topojson) throw new Error('topojson-client failed to load');
       // Use the dissolved 'states' object (36 state/UT outlines), not the district-level object.
-      const o=data.objects.states||Object.values(data.objects)[0];
+      const o=preferred.map(k=>data.objects[k]).find(Boolean)||Object.values(data.objects)[0];
       const f=topojson.feature(data,o);return f.type==='FeatureCollection'?f.features:[f];
     }
     if (data?.type==='FeatureCollection') return data.features;
@@ -222,21 +310,64 @@
     if (still.length) throw new Error(`Could not load map data for: ${still.join(', ')}`);
     return [...collected.values()];
   }
+  function showMapLoading() {
+    const label=mode==='districts'?`Loading ${districtKey}’s districts…`:'Loading India’s map…';
+    $('map').classList.remove('ready','districts');
+    $('map').innerHTML=`<div class="map-loading"><span class="loader"></span><strong>${label}</strong><small>Loading boundary data</small></div>`;
+    $('map-message').textContent='Loading map…';
+  }
   async function loadMap() {
+    const token=++loadToken, m=mode, key=districtKey, cacheKey=m==='districts'?`districts:${key}`:'country';
+    features=[]; featureByName=new Map(); poolNames=m==='districts'?[]:ALL.map(x=>x.name);
+    showMapLoading(); updateStats(); showPrompt();
     try {
-      const mapped=await fetchBoundaries();
+      let mapped=mapCache.get(cacheKey);
+      if (!mapped) { mapped=m==='districts'?await fetchDistricts(key):await fetchBoundaries(); mapCache.set(cacheKey,mapped); }
+      if (token!==loadToken) return; // the player switched mode while this was loading
       featureByName=new Map(mapped.map(f=>[f.properties.quizName,f]));
-      features=mapped; drawMap({type:'FeatureCollection',features:mapped});
-      $('map').classList.add('ready');
+      features=mapped;
+      poolNames=m==='districts'?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
+      drawMap({type:'FeatureCollection',features:mapped});
+      $('map').classList.add('ready'); updateStats(); showPrompt();
     } catch(error) {
+      if (token!==loadToken) return;
       console.error(error);
-      $('map').innerHTML=`<div class="map-loading map-error"><strong>Could not load India’s boundary map</strong><small>${error.message}</small><button class="primary-btn" id="retry-map">Try again</button><small>Check your connection or open the official Survey of India map reference from the menu.</small></div>`;
+      const what=m==='districts'?`${key}’s district map`:'India’s boundary map';
+      $('map').innerHTML=`<div class="map-loading map-error"><strong>Could not load ${what}</strong><small>${error.message}</small><button class="primary-btn" id="retry-map">Try again</button><small>Check your connection or open the official Survey of India map reference from the menu.</small></div>`;
       $('retry-map')?.addEventListener('click',loadMap);
       $('map-message').textContent='Map unavailable';
     }
   }
+  // ---- Mode switching (States & UTs  /  Districts) ----
+  function renderStateChips() {
+    const box=$('state-chips'); box.innerHTML='';
+    Object.keys(DISTRICT_SETS).forEach(k=>{
+      const b=document.createElement('button'); b.type='button'; b.className='chip'+(k===districtKey?' active':''); b.textContent=k; b.dataset.state=k;
+      b.setAttribute('aria-pressed',String(k===districtKey)); b.addEventListener('click',()=>setMode('districts',k)); box.append(b);
+    });
+    const soon=document.createElement('span'); soon.className='chip-soon'; soon.textContent='More states coming soon'; box.append(soon);
+  }
+  function applyModeUI() {
+    document.querySelectorAll('.seg-btn').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
+    $('region-picker').hidden=mode!=='districts'; renderStateChips();
+  }
+  function setMode(newMode,newKey=districtKey) {
+    if (newMode===mode && newKey===districtKey) return;
+    const wasActive=roundActive;
+    mode=newMode; districtKey=newKey;
+    try { localStorage.setItem(MODE_KEY,JSON.stringify({mode,districtKey})); } catch {}
+    gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0;
+    $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
+    $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
+    applyModeUI(); renderBest(); loadMap();
+    if (wasActive) toast('Round ended · mode changed');
+  }
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   function init() {
+    const saved=readJSON(MODE_KEY,null);
+    if (saved && (saved.mode==='country'||saved.mode==='districts') && DISTRICT_SETS[saved.districtKey]) {mode=saved.mode;districtKey=saved.districtKey;}
+    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+    applyModeUI();
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
     $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);
     $('zoom-in').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,2));$('zoom-out').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1/2));$('zoom-reset').addEventListener('click',resetMapView);
