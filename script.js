@@ -5,7 +5,7 @@
   const BEST_KEY = 'indiaMapQuiz.best.v1';
   const MODE_KEY = 'indiaMapQuiz.mode.v1';
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
-  const AIRPORT_RADIUS_KM = 80;
+  const AIRPORT_RADIUS_KM = 40;
   const EARTH_KM = 6371;
   const AIRPORTS = [
     ['Delhi (Indira Gandhi)',28.5562,77.1000],['Mumbai (Chhatrapati Shivaji Maharaj)',19.0896,72.8656],['Chennai',12.9941,80.1709],['Kolkata (Netaji Subhas Chandra Bose)',22.6547,88.4467],
