@@ -165,3 +165,6 @@ ol,ul{margin:0;padding:0;list-style:none}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+
+/* Invisible enlarged tap area (stroke-only hit testing, no visible outline) */
+.hit-area{fill:none;stroke:transparent;stroke-width:26px;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer}

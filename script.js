@@ -124,6 +124,11 @@
       .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
       .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);})
       .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}});
+    // Invisible, wider tap area for Lakshadweep's tiny islands (no visual change).
+    mapGroup.selectAll('path.region').filter(d=>d.properties.quizName==='Lakshadweep').each(function(d){
+      mapGroup.append('path').attr('class','hit-area').attr('d',path(d))
+        .on('click',(event)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);});
+    });
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',event=>mapGroup.attr('transform',event.transform));
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
