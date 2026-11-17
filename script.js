@@ -5,7 +5,10 @@
   const BEST_KEY = 'indiaMapQuiz.best.v1';
   const MODE_KEY = 'indiaMapQuiz.mode.v1';
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
-  const AIRPORT_RADIUS_KM = 40;
+  const AIRPORT_RADIUS_KM = 60;
+  // Smaller tap radius for airports that share a metro area, so their zones overlap less.
+  const AIRPORT_RADIUS_OVERRIDES = {'Delhi (Indira Gandhi)':35,'Noida (Jewar)':35,'Mumbai (Chhatrapati Shivaji Maharaj)':30,'Navi Mumbai':30,'Goa (Dabolim)':30,'Goa (Mopa)':30};
+  const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
     ['Delhi (Indira Gandhi)',28.5562,77.1000],['Mumbai (Chhatrapati Shivaji Maharaj)',19.0896,72.8656],['Chennai',12.9941,80.1709],['Kolkata (Netaji Subhas Chandra Bose)',22.6547,88.4467],
@@ -82,8 +85,8 @@
   function showPrompt() {
     $('side-skip').textContent=`Skip this ${noun()} →`;
     if (!current) { $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':'Press New game'); $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international airports. Tapping within ${AIRPORT_RADIUS_KM} km of an airport counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
-    $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:`Tap the matching ${noun()} on the map.`;
-    $('side-prompt').textContent=current; $('side-description').textContent=mode==='airports'?`International airport · tap within ${AIRPORT_RADIUS_KM} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
+    $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=mode==='airports'?`Tap within about ${radiusFor(current)} km of the airport.`:`Tap the matching ${noun()} on the map.`;
+    $('side-prompt').textContent=current; $('side-description').textContent=mode==='airports'?`International airport · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
     const pool=listForMode();
@@ -134,11 +137,11 @@
     $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again';
   }
   function resetMapView() { if(mapSvg&&zoom) mapSvg.transition().duration(450).call(zoom.transform,d3.zoomIdentity); }
-  function geoCirclePath(lon,lat) { return path(d3.geoCircle().center([lon,lat]).radius(AIRPORT_RADIUS_KM/EARTH_KM*180/Math.PI).precision(4)()); }
+  function geoCirclePath(lon,lat,km) { return path(d3.geoCircle().center([lon,lat]).radius((km||AIRPORT_RADIUS_KM)/EARTH_KM*180/Math.PI).precision(4)()); }
   function nearestAirport(lon,lat) {
     let best=null, bd=Infinity;
-    airportFeatures.forEach(f=>{const d=d3.geoDistance([lon,lat],f.geometry.coordinates)*EARTH_KM; if(d<bd){bd=d;best=f.properties.quizName;}});
-    return bd<=AIRPORT_RADIUS_KM?best:null;
+    airportFeatures.forEach(f=>{const d=d3.geoDistance([lon,lat],f.geometry.coordinates)*EARTH_KM; if(d<=radiusFor(f.properties.quizName)&&d<bd){bd=d;best=f.properties.quizName;}});
+    return best;
   }
   let airportFeatures=[];
   function drawAirportMap(collection) {
@@ -151,7 +154,7 @@
     mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region').attr('d',path);
     mapGroup.selectAll('g.airport-node').data(airportFeatures).join('g').attr('class','airport-node').each(function(d){
       const [lon,lat]=d.geometry.coordinates, [x,y]=projection([lon,lat]), g=d3.select(this);
-      g.append('path').attr('class','airport-zone').attr('d',geoCirclePath(lon,lat));
+      g.append('path').attr('class','airport-zone').attr('d',geoCirclePath(lon,lat,radiusFor(d.properties.quizName)));
       g.append('circle').attr('class','airport-dot').attr('cx',x).attr('cy',y).attr('r',2.2);
     });
     mapSvg.on('click',event=>{
