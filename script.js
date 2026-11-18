@@ -7,7 +7,7 @@
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
-  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':30,'Navi Mumbai Int’l (NMI)':30,'Goa Int’l (GOI)':30,'Manohar Int’l (GOX)':30,'Kushinagar Int’l (KBK)':30,'Gorakhpur (GOP)':30,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50};
+  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35};
   const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
@@ -44,9 +44,25 @@
     ['Dimapur (DMU)',25.8839,93.7711],
     ['Lengpui (AJL)',23.8406,92.6196],
     ['Veer Surendra Sai (JRG)',21.9135,84.0504],
-    ['Thoothukudi (TCR)',8.7241,78.0258]
+    ['Thoothukudi (TCR)',8.7241,78.0258],
+    ['Kadapa (CDP)',14.51,78.7728],
+    ['Uyyalawada Narasimha Reddy (KJB)',15.7186,78.1514],
+    ['Salem (SXV)',11.7833,78.0656],
+    ['Kalaburagi (GBI)',17.308,76.958],
+    ['Kuvempu (RQY)',13.8575,75.689],
+    ['Jindal Vijaynagar (VDY)',15.175,76.635],
+    ['Bidar (IXX)',17.9075,77.4871],
+    ['Jalgaon (JLG)',20.9619,75.6258],
+    ['Shri Guru Gobind Singh Ji (NDC)',19.1833,77.3167],
+    ['Sindhudurg (SDW)',16.001,73.533],
+    ['Gondia (GDB)',21.589,80.295],
+    ['Amravati (AMI)',20.8264,77.6772],
+    ['Solapur (SSE)',17.628,75.9347],
+    ['Puducherry (PNY)',11.968,79.812],
+    ['Agatti (AGX)',10.8237,72.176],
+    ['Diu (DIU)',20.7131,70.9211]
   ];
-  const DOMESTIC_AIRPORTS = new Set(['Warangal (WGC)','Gorakhpur (GOP)','Hubballi (HBX)','Belagavi (IXG)','Mysuru (MYQ)','Rajahmundry (RJA)','Jabalpur (JLR)','Kolhapur (KLH)','Nashik (ISK)','Jamnagar (JGA)','Bhuj (BHJ)','Prayagraj (IXD)','Agra (AGR)','Gwalior (GWL)','Jorhat (JRH)','Silchar (IXS)','Dimapur (DMU)','Lengpui (AJL)','Veer Surendra Sai (JRG)','Thoothukudi (TCR)','Swami Vivekananda (RPR)','Birsa Munda (IXR)','Jolly Grant (DED)','Jammu (IXJ)','Kushok Bakula Rimpochee (IXL)','Dibrugarh (DIB)','Maharana Pratap (UDR)','Jodhpur (JDH)']);
+  const DOMESTIC_AIRPORTS = new Set(['Warangal (WGC)','Gorakhpur (GOP)','Hubballi (HBX)','Belagavi (IXG)','Mysuru (MYQ)','Rajahmundry (RJA)','Jabalpur (JLR)','Kolhapur (KLH)','Nashik (ISK)','Jamnagar (JGA)','Bhuj (BHJ)','Prayagraj (IXD)','Agra (AGR)','Gwalior (GWL)','Jorhat (JRH)','Silchar (IXS)','Dimapur (DMU)','Lengpui (AJL)','Veer Surendra Sai (JRG)','Thoothukudi (TCR)','Kadapa (CDP)','Uyyalawada Narasimha Reddy (KJB)','Salem (SXV)','Kalaburagi (GBI)','Kuvempu (RQY)','Jindal Vijaynagar (VDY)','Bidar (IXX)','Jalgaon (JLG)','Shri Guru Gobind Singh Ji (NDC)','Sindhudurg (SDW)','Gondia (GDB)','Amravati (AMI)','Solapur (SSE)','Puducherry (PNY)','Agatti (AGX)','Diu (DIU)','Swami Vivekananda (RPR)','Birsa Munda (IXR)','Jolly Grant (DED)','Jammu (IXJ)','Kushok Bakula Rimpochee (IXL)','Dibrugarh (DIB)','Maharana Pratap (UDR)','Jodhpur (JDH)']);
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
