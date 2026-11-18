@@ -192,7 +192,12 @@
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
     projection.fitExtent([[65,65],[935,690]],{type:'FeatureCollection',features:collection.features});
-    mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region').attr('d',path);
+    mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class',d=>'base-region'+(d.properties.quizName==='Lakshadweep'?' lk':'')).attr('d',path);
+    // Lakshadweep's islands are only a few pixels wide, so Agatti is easy to miss: thicken the islands and frame the archipelago like an island inset.
+    collection.features.filter(d=>d.properties.quizName==='Lakshadweep').forEach(d=>{
+      const [[x0,y0],[x1,y1]]=path.bounds(d), p=9;
+      mapGroup.append('rect').attr('class','lk-frame').attr('x',x0-p).attr('y',y0-p).attr('width',x1-x0+2*p).attr('height',y1-y0+2*p).attr('rx',10);
+    });
     mapGroup.selectAll('g.airport-node').data(airportFeatures).join('g').attr('class','airport-node').each(function(d){
       const [lon,lat]=d.geometry.coordinates, [x,y]=projection([lon,lat]), g=d3.select(this);
       g.append('path').attr('class','airport-zone').attr('d',geoCirclePath(lon,lat,radiusFor(d.properties.quizName)));

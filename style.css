@@ -204,6 +204,8 @@ ol,ul{margin:0;padding:0;list-style:none}
 /* Airports mode */
 .base-region{fill:var(--land);stroke:var(--border);stroke-width:1.2;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
 .map-canvas.airports svg{cursor:crosshair}
+.base-region.lk{stroke-width:3.4px;stroke:var(--label)}
+.lk-frame{fill:none;stroke:var(--border);stroke-width:1.2px;stroke-dasharray:3 3;vector-effect:non-scaling-stroke;pointer-events:none}
 .airport-node{pointer-events:none}
 .airport-zone{fill:transparent;stroke:none;vector-effect:non-scaling-stroke}
 .airport-dot{fill:none;opacity:0}
