@@ -7,7 +7,7 @@
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
-  const AIRPORT_RADIUS_OVERRIDES = {'Delhi (Indira Gandhi)':35,'Noida (Jewar)':35,'Mumbai (Chhatrapati Shivaji Maharaj)':30,'Navi Mumbai':30,'Goa (Dabolim)':30,'Goa (Mopa)':30};
+  const AIRPORT_RADIUS_OVERRIDES = {'Delhi (Indira Gandhi)':35,'Noida (Jewar)':35,'Mumbai (Chhatrapati Shivaji Maharaj)':30,'Navi Mumbai':30,'Goa (Dabolim)':30,'Goa (Mopa)':30,'Kushinagar':30,'Gorakhpur':30,'Hubballi':35,'Belagavi':35,'Nashik':40,'Shirdi (Sai Baba)':40,'Jamnagar':40,'Agra':45,'Gwalior':45,'Dimapur':50};
   const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
@@ -24,9 +24,29 @@
     ['Patna (Jay Prakash Narayan)',25.5913,85.0880],['Bhopal (Raja Bhoj)',23.2875,77.3374],['Aurangabad (Chhatrapati Sambhajinagar)',19.8627,75.3981],['Vadodara',22.3362,73.2263],
     // Major domestic airports
     ['Raipur (Swami Vivekananda)',21.1804,81.7388],['Ranchi (Birsa Munda)',23.3143,85.3217],['Dehradun (Jolly Grant)',30.1897,78.1803],['Jammu',32.6891,74.8374],
-    ['Leh (Kushok Bakula Rimpochee)',34.1359,77.5465],['Dibrugarh',27.4839,95.0169],['Udaipur (Maharana Pratap)',24.6177,73.8961],['Jodhpur',26.2511,73.0489]
+    ['Leh (Kushok Bakula Rimpochee)',34.1359,77.5465],['Dibrugarh',27.4839,95.0169],['Udaipur (Maharana Pratap)',24.6177,73.8961],['Jodhpur',26.2511,73.0489],
+    ['Warangal (Mamnoor)',17.9167,79.6],
+    ['Gorakhpur',26.7397,83.4497],
+    ['Hubballi',15.3617,75.0849],
+    ['Belagavi',15.8593,74.6183],
+    ['Mysuru',12.23,76.6558],
+    ['Rajahmundry',17.1104,81.8182],
+    ['Jabalpur',23.1778,80.052],
+    ['Kolhapur',16.6647,74.2894],
+    ['Nashik',20.1191,73.9129],
+    ['Jamnagar',22.4655,70.0126],
+    ['Bhuj',23.2878,69.6702],
+    ['Prayagraj',25.4401,81.7339],
+    ['Agra',27.1558,77.9609],
+    ['Gwalior',26.2933,78.2278],
+    ['Jorhat',26.7315,94.1755],
+    ['Silchar',24.9129,92.9788],
+    ['Dimapur',25.8839,93.7711],
+    ['Aizawl (Lengpui)',23.8406,92.6196],
+    ['Jharsuguda',21.9135,84.0504],
+    ['Thoothukudi',8.7241,78.0258]
   ];
-  const DOMESTIC_AIRPORTS = new Set(['Raipur (Swami Vivekananda)','Ranchi (Birsa Munda)','Dehradun (Jolly Grant)','Jammu','Leh (Kushok Bakula Rimpochee)','Dibrugarh','Udaipur (Maharana Pratap)','Jodhpur']);
+  const DOMESTIC_AIRPORTS = new Set(['Warangal (Mamnoor)','Gorakhpur','Hubballi','Belagavi','Mysuru','Rajahmundry','Jabalpur','Kolhapur','Nashik','Jamnagar','Bhuj','Prayagraj','Agra','Gwalior','Jorhat','Silchar','Dimapur','Aizawl (Lengpui)','Jharsuguda','Thoothukudi','Raipur (Swami Vivekananda)','Ranchi (Birsa Munda)','Dehradun (Jolly Grant)','Jammu','Leh (Kushok Bakula Rimpochee)','Dibrugarh','Udaipur (Maharana Pratap)','Jodhpur']);
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
@@ -51,7 +71,7 @@
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
   function listForMode() { return poolNames; }
-  function typeOf(name) { return mode==='airports' ? (DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
+  function typeOf(name) { return mode==='airports' ? (name==='Warangal (Mamnoor)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
   function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : 'region'; }
   function modeLabel() { return mode==='airports' ? 'Airports' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
   function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
