@@ -34,6 +34,7 @@ In `script.js`, add an entry to `DISTRICT_SETS` (state name, boundary-file `slug
 
 ## Changelog
 - **v2.1** — New **Airports** mode: locate India's international airports with a 25 km tap radius.
+- **v2.6** — Airport names now follow the format “Official name without ‘airport’ (IATA code)”, e.g. Rajiv Gandhi Int’l (HYD), Alluri Sitarama Raju Int’l (VTZ), Warangal (WGC). “Int’l” is used where the official name includes “International”.
 - **v2.5** — Airports mode now has 75 airports: added Warangal (Mamnoor, WGC — under redevelopment, no scheduled service yet) and 19 more domestic airports (Gorakhpur, Hubballi, Belagavi, Mysuru, Rajahmundry, Jabalpur, Kolhapur, Nashik, Jamnagar, Bhuj, Prayagraj, Agra, Gwalior, Jorhat, Silchar, Dimapur, Aizawl, Jharsuguda, Thoothukudi). Reduced tap radii for closely spaced pairs (Gorakhpur/Kushinagar, Hubballi/Belagavi, Nashik/Shirdi, Agra/Gwalior, Jamnagar, Dimapur).
 - **v2.4** — Airports mode now has 55 airports: added Patna, Bhopal, Aurangabad (Chhatrapati Sambhajinagar), Vadodara and 8 major domestic airports. Prompts label each airport International or Domestic.
 - **v2.2** — Airports mode: tap radius raised to 60 km (30–35 km for same-city airports); added Navi Mumbai (NMI), Noida/Jewar (DXN), Tirupati, Shirdi, Bhubaneswar; Visakhapatnam (VTZ) moved to the new Alluri Sitarama Raju airport at Bhogapuram; corrected Mopa and Rajkot coordinates. 43 airports.

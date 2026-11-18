@@ -7,46 +7,46 @@
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
-  const AIRPORT_RADIUS_OVERRIDES = {'Delhi (Indira Gandhi)':35,'Noida (Jewar)':35,'Mumbai (Chhatrapati Shivaji Maharaj)':30,'Navi Mumbai':30,'Goa (Dabolim)':30,'Goa (Mopa)':30,'Kushinagar':30,'Gorakhpur':30,'Hubballi':35,'Belagavi':35,'Nashik':40,'Shirdi (Sai Baba)':40,'Jamnagar':40,'Agra':45,'Gwalior':45,'Dimapur':50};
+  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':30,'Navi Mumbai Int’l (NMI)':30,'Goa Int’l (GOI)':30,'Manohar Int’l (GOX)':30,'Kushinagar Int’l (KBK)':30,'Gorakhpur (GOP)':30,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50};
   const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
-    ['Delhi (Indira Gandhi)',28.5562,77.1000],['Mumbai (Chhatrapati Shivaji Maharaj)',19.0896,72.8656],['Chennai',12.9941,80.1709],['Kolkata (Netaji Subhas Chandra Bose)',22.6547,88.4467],
-    ['Bengaluru (Kempegowda)',13.1986,77.7066],['Hyderabad (Rajiv Gandhi)',17.2403,78.4294],['Ahmedabad (Sardar Vallabhbhai Patel)',23.0772,72.6347],['Kochi (Cochin)',10.1520,76.4019],
-    ['Thiruvananthapuram',8.4821,76.9201],['Kozhikode (Calicut)',11.1368,75.9553],['Kannur',11.9186,75.5472],['Goa (Dabolim)',15.3808,73.8314],['Goa (Mopa)',15.7428,73.8617],
-    ['Pune',18.5821,73.9197],['Jaipur',26.8242,75.8122],['Lucknow (Chaudhary Charan Singh)',26.7606,80.8893],['Varanasi (Lal Bahadur Shastri)',25.4524,82.8593],['Ayodhya (Maharishi Valmiki)',26.7433,82.1465],
-    ['Kushinagar',26.7761,83.8884],['Gaya',24.7443,84.9512],['Amritsar (Sri Guru Ram Dass Jee)',31.7096,74.7973],['Chandigarh',30.6735,76.7885],['Srinagar (Sheikh ul-Alam)',33.9871,74.7742],
-    ['Guwahati (Lokpriya Gopinath Bordoloi)',26.1061,91.5859],['Bagdogra',26.6812,88.3286],['Imphal (Bir Tikendrajit)',24.7600,93.8967],['Agartala (Maharaja Bir Bikram)',23.8870,91.2404],
-    ['Port Blair (Veer Savarkar)',11.6412,92.7297],['Tiruchirappalli',10.7654,78.7097],['Coimbatore',11.0300,77.0434],['Madurai',9.8345,78.0934],['Mangaluru',12.9613,74.8901],
-    ['Nagpur (Dr. Babasaheb Ambedkar)',21.0922,79.0472],['Indore (Devi Ahilya Bai Holkar)',22.7218,75.8011],['Surat',21.1141,72.7418],['Rajkot (Hirasar)',22.3881,71.0283],
-    ['Visakhapatnam (Alluri Sitarama Raju, Bhogapuram)',17.9715,83.5036],['Vijayawada',16.5304,80.7968],
-    ['Navi Mumbai',18.9846,73.0653],['Noida (Jewar)',28.1799,77.6118],['Tirupati',13.6325,79.5433],['Shirdi (Sai Baba)',19.6886,74.3789],['Bhubaneswar (Biju Patnaik)',20.2444,85.8178],
-    ['Patna (Jay Prakash Narayan)',25.5913,85.0880],['Bhopal (Raja Bhoj)',23.2875,77.3374],['Aurangabad (Chhatrapati Sambhajinagar)',19.8627,75.3981],['Vadodara',22.3362,73.2263],
+    ['Indira Gandhi Int’l (DEL)',28.5562,77.1000],['Chhatrapati Shivaji Maharaj Int’l (BOM)',19.0896,72.8656],['Chennai Int’l (MAA)',12.9941,80.1709],['Netaji Subhas Chandra Bose Int’l (CCU)',22.6547,88.4467],
+    ['Kempegowda Int’l (BLR)',13.1986,77.7066],['Rajiv Gandhi Int’l (HYD)',17.2403,78.4294],['Sardar Vallabhbhai Patel Int’l (AMD)',23.0772,72.6347],['Cochin Int’l (COK)',10.1520,76.4019],
+    ['Thiruvananthapuram Int’l (TRV)',8.4821,76.9201],['Calicut Int’l (CCJ)',11.1368,75.9553],['Kannur Int’l (CNN)',11.9186,75.5472],['Goa Int’l (GOI)',15.3808,73.8314],['Manohar Int’l (GOX)',15.7428,73.8617],
+    ['Pune Int’l (PNQ)',18.5821,73.9197],['Jaipur Int’l (JAI)',26.8242,75.8122],['Chaudhary Charan Singh Int’l (LKO)',26.7606,80.8893],['Lal Bahadur Shastri Int’l (VNS)',25.4524,82.8593],['Maharishi Valmiki Int’l (AYJ)',26.7433,82.1465],
+    ['Kushinagar Int’l (KBK)',26.7761,83.8884],['Gaya Int’l (GAY)',24.7443,84.9512],['Sri Guru Ram Dass Jee Int’l (ATQ)',31.7096,74.7973],['Shaheed Bhagat Singh Int’l (IXC)',30.6735,76.7885],['Sheikh ul-Alam Int’l (SXR)',33.9871,74.7742],
+    ['Lokpriya Gopinath Bordoloi Int’l (GAU)',26.1061,91.5859],['Bagdogra Int’l (IXB)',26.6812,88.3286],['Bir Tikendrajit Int’l (IMF)',24.7600,93.8967],['Maharaja Bir Bikram (IXA)',23.8870,91.2404],
+    ['Veer Savarkar Int’l (IXZ)',11.6412,92.7297],['Tiruchirappalli Int’l (TRZ)',10.7654,78.7097],['Coimbatore Int’l (CJB)',11.0300,77.0434],['Madurai Int’l (IXM)',9.8345,78.0934],['Mangaluru Int’l (IXE)',12.9613,74.8901],
+    ['Dr. Babasaheb Ambedkar Int’l (NAG)',21.0922,79.0472],['Devi Ahilya Bai Holkar (IDR)',22.7218,75.8011],['Surat Int’l (STV)',21.1141,72.7418],['Rajkot Int’l (HSR)',22.3881,71.0283],
+    ['Alluri Sitarama Raju Int’l (VTZ)',17.9715,83.5036],['Vijayawada Int’l (VGA)',16.5304,80.7968],
+    ['Navi Mumbai Int’l (NMI)',18.9846,73.0653],['Noida Int’l (DXN)',28.1799,77.6118],['Tirupati Int’l (TIR)',13.6325,79.5433],['Shirdi Int’l (SAG)',19.6886,74.3789],['Biju Patnaik Int’l (BBI)',20.2444,85.8178],
+    ['Jay Prakash Narayan Int’l (PAT)',25.5913,85.0880],['Raja Bhoj (BHO)',23.2875,77.3374],['Chhatrapati Sambhajinagar (IXU)',19.8627,75.3981],['Vadodara (BDQ)',22.3362,73.2263],
     // Major domestic airports
-    ['Raipur (Swami Vivekananda)',21.1804,81.7388],['Ranchi (Birsa Munda)',23.3143,85.3217],['Dehradun (Jolly Grant)',30.1897,78.1803],['Jammu',32.6891,74.8374],
-    ['Leh (Kushok Bakula Rimpochee)',34.1359,77.5465],['Dibrugarh',27.4839,95.0169],['Udaipur (Maharana Pratap)',24.6177,73.8961],['Jodhpur',26.2511,73.0489],
-    ['Warangal (Mamnoor)',17.9167,79.6],
-    ['Gorakhpur',26.7397,83.4497],
-    ['Hubballi',15.3617,75.0849],
-    ['Belagavi',15.8593,74.6183],
-    ['Mysuru',12.23,76.6558],
-    ['Rajahmundry',17.1104,81.8182],
-    ['Jabalpur',23.1778,80.052],
-    ['Kolhapur',16.6647,74.2894],
-    ['Nashik',20.1191,73.9129],
-    ['Jamnagar',22.4655,70.0126],
-    ['Bhuj',23.2878,69.6702],
-    ['Prayagraj',25.4401,81.7339],
-    ['Agra',27.1558,77.9609],
-    ['Gwalior',26.2933,78.2278],
-    ['Jorhat',26.7315,94.1755],
-    ['Silchar',24.9129,92.9788],
-    ['Dimapur',25.8839,93.7711],
-    ['Aizawl (Lengpui)',23.8406,92.6196],
-    ['Jharsuguda',21.9135,84.0504],
-    ['Thoothukudi',8.7241,78.0258]
+    ['Swami Vivekananda (RPR)',21.1804,81.7388],['Birsa Munda (IXR)',23.3143,85.3217],['Jolly Grant (DED)',30.1897,78.1803],['Jammu (IXJ)',32.6891,74.8374],
+    ['Kushok Bakula Rimpochee (IXL)',34.1359,77.5465],['Dibrugarh (DIB)',27.4839,95.0169],['Maharana Pratap (UDR)',24.6177,73.8961],['Jodhpur (JDH)',26.2511,73.0489],
+    ['Warangal (WGC)',17.9167,79.6],
+    ['Gorakhpur (GOP)',26.7397,83.4497],
+    ['Hubballi (HBX)',15.3617,75.0849],
+    ['Belagavi (IXG)',15.8593,74.6183],
+    ['Mysuru (MYQ)',12.23,76.6558],
+    ['Rajahmundry (RJA)',17.1104,81.8182],
+    ['Jabalpur (JLR)',23.1778,80.052],
+    ['Kolhapur (KLH)',16.6647,74.2894],
+    ['Nashik (ISK)',20.1191,73.9129],
+    ['Jamnagar (JGA)',22.4655,70.0126],
+    ['Bhuj (BHJ)',23.2878,69.6702],
+    ['Prayagraj (IXD)',25.4401,81.7339],
+    ['Agra (AGR)',27.1558,77.9609],
+    ['Gwalior (GWL)',26.2933,78.2278],
+    ['Jorhat (JRH)',26.7315,94.1755],
+    ['Silchar (IXS)',24.9129,92.9788],
+    ['Dimapur (DMU)',25.8839,93.7711],
+    ['Lengpui (AJL)',23.8406,92.6196],
+    ['Veer Surendra Sai (JRG)',21.9135,84.0504],
+    ['Thoothukudi (TCR)',8.7241,78.0258]
   ];
-  const DOMESTIC_AIRPORTS = new Set(['Warangal (Mamnoor)','Gorakhpur','Hubballi','Belagavi','Mysuru','Rajahmundry','Jabalpur','Kolhapur','Nashik','Jamnagar','Bhuj','Prayagraj','Agra','Gwalior','Jorhat','Silchar','Dimapur','Aizawl (Lengpui)','Jharsuguda','Thoothukudi','Raipur (Swami Vivekananda)','Ranchi (Birsa Munda)','Dehradun (Jolly Grant)','Jammu','Leh (Kushok Bakula Rimpochee)','Dibrugarh','Udaipur (Maharana Pratap)','Jodhpur']);
+  const DOMESTIC_AIRPORTS = new Set(['Warangal (WGC)','Gorakhpur (GOP)','Hubballi (HBX)','Belagavi (IXG)','Mysuru (MYQ)','Rajahmundry (RJA)','Jabalpur (JLR)','Kolhapur (KLH)','Nashik (ISK)','Jamnagar (JGA)','Bhuj (BHJ)','Prayagraj (IXD)','Agra (AGR)','Gwalior (GWL)','Jorhat (JRH)','Silchar (IXS)','Dimapur (DMU)','Lengpui (AJL)','Veer Surendra Sai (JRG)','Thoothukudi (TCR)','Swami Vivekananda (RPR)','Birsa Munda (IXR)','Jolly Grant (DED)','Jammu (IXJ)','Kushok Bakula Rimpochee (IXL)','Dibrugarh (DIB)','Maharana Pratap (UDR)','Jodhpur (JDH)']);
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
@@ -71,7 +71,7 @@
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
   function listForMode() { return poolNames; }
-  function typeOf(name) { return mode==='airports' ? (name==='Warangal (Mamnoor)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
+  function typeOf(name) { return mode==='airports' ? (name==='Warangal (WGC)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
   function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : 'region'; }
   function modeLabel() { return mode==='airports' ? 'Airports' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
   function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
