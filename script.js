@@ -185,18 +185,19 @@
     return best;
   }
   let airportFeatures=[];
-  // Lakshadweep's islands are only a few pixels wide on the map, so mark the two that matter: Kavaratti (capital, 10.57°N 72.64°E; Govt. of Lakshadweep / Wikipedia) and Agatti (airport VOAT, 10.8237°N 72.1760°E).
-  const LK_ISLANDS = [[10.57,72.64],[10.8237,72.176]];
+  // Lakshadweep's islands are only a few pixels wide on the map, so mark the 10 inhabited islands (one per sub-division). Island centres from Wikipedia / Govt. of Lakshadweep island pages (lat, lon).
+  const LK_ISLANDS = [[11.60,72.18],[11.68,72.72],[11.49,73.00],[11.22,72.78],[11.12,72.73],[10.85,72.18],[10.56,72.64],[10.82,73.68],[10.08,73.63],[8.28,73.05]]; // Bitra, Chetlat, Kiltan, Kadmat, Amini, Agatti, Kavaratti, Androth, Kalpeni, Minicoy
+  const LK_R = 2.3;
   let mapK = 1;
   function addLakshadweepMarkers(clickable) {
     mapK = 1;
     LK_ISLANDS.forEach(([lat,lon])=>{
       const [x,y]=projection([lon,lat]);
-      const c=mapGroup.append('circle').attr('class','lk-island').attr('cx',x).attr('cy',y).attr('r',3.6);
+      const c=mapGroup.append('circle').attr('class','lk-island').attr('cx',x).attr('cy',y).attr('r',LK_R);
       if (clickable) c.classed('clickable',true).on('click',event=>{event.stopPropagation();handleRegionTap('Lakshadweep');});
     });
   }
-  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-island').attr('r',3.6/Math.sqrt(mapK)); }
+  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-island').attr('r',LK_R/Math.sqrt(mapK)); }
   function drawAirportMap(collection) {
     const host=$('map'); host.innerHTML=''; host.classList.remove('districts'); host.classList.add('airports');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating airports').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
@@ -293,7 +294,7 @@
   const DISTRICT_SETS = {
     'Telangana': {
       slug:'telangana', expected:33,
-      districts:['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem Asifabad','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal-Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
+      districts:['Adilabad','Bhadradri Kothagudem','Hanumakonda','Hyderabad','Jagtial','Jangaon','Jayashankar Bhupalpally','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Kumuram Bheem','Mahabubabad','Mahabubnagar','Mancherial','Medak','Medchal-Malkajgiri','Mulugu','Nagarkurnool','Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla','Rangareddy','Sangareddy','Siddipet','Suryapet','Vikarabad','Wanaparthy','Warangal','Yadadri Bhuvanagiri'],
       // Spelling variants / older names found in public boundary files -> current official name.
       aliases:{
         'Hanumakonda':['Hanamkonda','Warangal Urban','Warangal (Urban)'],
@@ -302,7 +303,7 @@
         'Jangaon':['Jangoan'],
         'Mahabubnagar':['Mahbubnagar','Mahaboobnagar'],
         'Mahabubabad':['Mahbubabad'],
-        'Komaram Bheem Asifabad':['Kumuram Bheem Asifabad','Komram Bheem Asifabad','Kumurambheem Asifabad','Asifabad'],
+        'Kumuram Bheem':['Kumuram Bheem','Kumuram Bheem Asifabad','Komram Bheem Asifabad','Kumurambheem Asifabad','Asifabad'],
         'Jayashankar Bhupalpally':['Jayashankar Bhupalapally','Jayashankar','Bhupalpally'],
         'Jogulamba Gadwal':['Jogulamba','Gadwal'],
         'Bhadradri Kothagudem':['Bhadradri','Kothagudem'],
