@@ -119,7 +119,8 @@
   function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : mode==='outlines' ? 'outline' : 'region'; }
   // Show the licence plate code in brackets for states/UTs (States & UTs and Outlines modes).
   function lab(n) { return (mode==='country'||mode==='outlines') && PLATE[n] ? `${n} (${codeOf(n)})` : n; }
-  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='outlines' ? 'Outlines' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
+  const dset = () => DISTRICT_SETS[districtKey] || {};
+  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='outlines' ? 'Outlines' : mode==='districts' ? (dset().modeName||`${districtKey||'State'} districts`) : 'All regions'; }
   function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='outlines' ? 'indiaMapQuiz.best.outlines.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
@@ -160,14 +161,14 @@
       $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':mode==='outlines'?'GUESS THE OUTLINE':'FIND THIS REGION';
       $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':mode==='outlines'?'Type the 2-letter licence plate code of the state or UT.':'Tap the matching state or Union Territory on the map.';
       $('side-prompt').textContent='Ready when you are';
-      $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international and major domestic airports. Tapping within the airport’s radius (about ${AIRPORT_RADIUS_KM} km; less for nearby airports) counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):mode==='outlines'?'Recognise the outline of each of the 36 states and Union Territories and type its 2-letter licence plate code (like KA or MH). It submits as soon as you type 2 letters.':'Find all 36 states and Union Territories by tapping them on the map.';
+      $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international and major domestic airports. Tapping within the airport’s radius (about ${AIRPORT_RADIUS_KM} km; less for nearby airports) counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${dset().of||districtKey} by tapping them on the map.`:`Find every district of ${dset().of||districtKey} by tapping it on the map.`):mode==='outlines'?'Recognise the outline of each of the 36 states and Union Territories and type its 2-letter licence plate code (like KA or MH). It submits as soon as you type 2 letters.':'Find all 36 states and Union Territories by tapping them on the map.';
       $('skip').disabled=true; $('side-skip').disabled=true; return;
     }
     $('prompt-name').textContent=mode==='outlines'?'Which state or UT is this?':lab(current);
     $('prompt-kind').textContent=mode==='outlines'?'GUESS THE OUTLINE':typeOf(current).toUpperCase();
     $('prompt-hint').textContent=mode==='airports'?`Tap within about ${radiusFor(current)} km of the airport.`:mode==='outlines'?'Type its 2-letter licence plate code — it submits automatically.':`Tap the matching ${noun()} on the map.`;
     $('side-prompt').textContent=mode==='outlines'?'Guess this outline':lab(current);
-    $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:mode==='outlines'?'State or Union Territory · type its licence plate code.':`${typeOf(current)} · Find it on the map.`;
+    $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${dset().parents?`${dset().parents[current]} (${codeOf(dset().parents[current])})`:districtKey} · Find it on the map.`:mode==='outlines'?'State or Union Territory · type its licence plate code.':`${typeOf(current)} · Find it on the map.`;
     $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
@@ -265,7 +266,7 @@
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
     saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed});
     if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(); renderOutline(null); }
-    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?`${districtKey} mapped!`:'India mapped!'):'Round over';
+    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?(dset().doneTitle||`${districtKey} mapped!`):'India mapped!'):'Round over';
     $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
     $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
     $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again';
@@ -348,7 +349,7 @@
     if (mode==='airports') return drawAirportMap(collection);
     if (mode==='outlines') return drawOutlineMap(collection);
     const host=$('map'); host.classList.remove('airports','outlines'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts');
-    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',mode==='districts'?`Map of ${districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',mode==='districts'?`Map of ${dset().of||districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
@@ -367,6 +368,7 @@
       mapGroup.append('path').attr('class','hit-area'+(mode==='districts'?' hit-small':'')).attr('d',path(d))
         .on('click',(event)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);});
     });
+    if (collection.context?.length) mapGroup.insert('g',':first-child').attr('class','context-layer').selectAll('path').data(collection.context).join('path').attr('class','context-region').attr('d',path);
     if (collection.features.some(d=>d.properties.quizName==='Lakshadweep')) addLakshadweepMarkers(true);
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
     mapSvg.call(zoom).on('dblclick.zoom',null);
@@ -456,6 +458,71 @@
         'Palnadu':['Palnad'],
         'Kurnool':['Kurnul']
       }
+    },
+    'Goa': {
+      slug:'goa', expected:3,
+      districts:['Kushavati','North Goa','South Goa'],
+      aliases:{'North Goa':['Goa North'],'South Goa':['Goa South'],'Kushavati':['Kushawati','Kushavathi']},
+      // Open boundary files predate Kushavati (notified 1 Jan 2026: Dharbandora, Sanguem, Quepem, Canacona talukas, carved out of South Goa).
+      // If the file still has 2 districts, South Goa is cut along an approximate taluka boundary (see splitDistrict). Skipped automatically once the data has Kushavati.
+      split:{from:'South Goa',newName:'Kushavati',ref:[74.12,15.22],
+        line:[[73.85,15.10],[73.99,15.12],[74.02,15.17],[74.04,15.22],[74.03,15.27],[74.05,15.31],[74.08,15.33],[74.13,15.36],[74.12,15.52]]}
+    },
+    'Karnataka': {
+      slug:'karnataka', expected:31,
+      districts:['Bagalkote','Ballari','Belagavi','Bengaluru Rural','Bengaluru South','Bengaluru Urban','Bidar','Chamarajanagar','Chikkaballapura','Chikkamagaluru','Chitradurga','Dakshina Kannada','Davanagere','Dharwad','Gadag','Hassan','Haveri','Kalaburagi','Kodagu','Kolar','Koppal','Mandya','Mysuru','Raichur','Shivamogga','Tumakuru','Udupi','Uttara Kannada','Vijayanagara','Vijayapura','Yadgir'],
+      aliases:{
+        'Bagalkote':['Bagalkot'],'Ballari':['Bellary'],'Belagavi':['Belgaum'],'Bengaluru Rural':['Bangalore Rural'],'Bengaluru Urban':['Bangalore Urban','Bangalore','Bengaluru'],
+        'Bengaluru South':['Ramanagara','Ramanagar','Bangalore South','Bengaluru Dakshina'],'Chamarajanagar':['Chamarajanagara','Chamrajnagar','Chamarajnagar'],
+        'Chikkaballapura':['Chikballapur','Chikkaballapur','Chickballapur'],'Chikkamagaluru':['Chikmagalur','Chikkamagalur'],'Dakshina Kannada':['Dakshin Kannada','South Canara','Dakshina Kannad'],
+        'Davanagere':['Davangere'],'Kalaburagi':['Gulbarga'],'Kodagu':['Coorg'],'Mysuru':['Mysore'],'Shivamogga':['Shimoga'],'Tumakuru':['Tumkur'],
+        'Uttara Kannada':['Uttar Kannada','North Canara','Uttara Kannad'],'Vijayapura':['Bijapur'],'Yadgir':['Yadagiri','Yadgiri'],'Vijayanagara':['Vijayanagar','Hosapete','Hospet']
+      }
+    },
+    'Kerala': {
+      slug:'kerala', expected:14,
+      districts:['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kollam','Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvananthapuram','Thrissur','Wayanad'],
+      aliases:{
+        'Alappuzha':['Alleppey','Alapuzha'],'Ernakulam':['Cochin','Kochi'],'Kasaragod':['Kasargod','Kasaragode'],'Kollam':['Quilon'],'Kozhikode':['Calicut'],'Palakkad':['Palghat'],
+        'Pathanamthitta':['Pathanamtitta','Pattanamtitta'],'Thiruvananthapuram':['Trivandrum','Thiruvanathapuram'],'Thrissur':['Trichur'],'Kannur':['Cannanore'],'Wayanad':['Wynad'],'Malappuram':['Mallapuram']
+      }
+    },
+    'Sikkim': {
+      slug:'sikkim', expected:6,
+      districts:['Gangtok','Gyalshing','Mangan','Namchi','Pakyong','Soreng'],
+      aliases:{'Gangtok':['East Sikkim','East','East District'],'Gyalshing':['West Sikkim','West','Geyzing','West District'],'Mangan':['North Sikkim','North','North District'],'Namchi':['South Sikkim','South','South District']}
+    },
+    'Tamil Nadu': {
+      slug:'tamil-nadu', expected:38,
+      districts:['Ariyalur','Chengalpattu','Chennai','Coimbatore','Cuddalore','Dharmapuri','Dindigul','Erode','Kallakurichi','Kancheepuram','Kanniyakumari','Karur','Krishnagiri','Madurai','Mayiladuthurai','Nagapattinam','Namakkal','Nilgiris','Perambalur','Pudukkottai','Ramanathapuram','Ranipet','Salem','Sivaganga','Tenkasi','Thanjavur','Theni','Thoothukudi','Tiruchirappalli','Tirunelveli','Tirupathur','Tiruppur','Tiruvallur','Tiruvannamalai','Tiruvarur','Vellore','Viluppuram','Virudhunagar'],
+      aliases:{
+        'Kancheepuram':['Kanchipuram','Kanchipuram'],'Kanniyakumari':['Kanyakumari','Kanniyakumari'],'Nilgiris':['Nilgiri','The Nilgiris'],'Pudukkottai':['Pudukottai'],'Thoothukudi':['Tuticorin','Thoothukkudi'],
+        'Tiruchirappalli':['Tiruchirapalli','Trichy','Tiruchchirappalli'],'Tiruppur':['Tirupur'],'Tiruvallur':['Thiruvallur'],'Tiruvannamalai':['Thiruvannamalai'],'Tiruvarur':['Thiruvarur'],
+        'Viluppuram':['Villupuram','Vizhupuram'],'Virudhunagar':['Virudhnagar'],'Tirupathur':['Tirupattur','Thirupathur'],'Thanjavur':['Tanjore'],'Ramanathapuram':['Ramnad'],
+        'Chengalpattu':['Chengalpet','Chengai'],'Kallakurichi':['Kalakurichi'],'Mayiladuthurai':['Mayiladudurai','Mayiladuthurai'],'Sivaganga':['Sivagangai'],'Tirunelveli':['Tirunelveli Kattabo','Nellai']
+      }
+    },
+    'Tripura': {
+      slug:'tripura', expected:8,
+      districts:['Dhalai','Gomati','Khowai','North Tripura','Sepahijala','South Tripura','Unakoti','West Tripura'],
+      aliases:{'Gomati':['Gomoti'],'Sepahijala':['Sipahijala'],'Unakoti':['Unokoti']}
+    },
+    // One dropdown choice for the Union Territories that have no district quiz of their own (Delhi and J&K are left out on purpose).
+    'UTs except DL,JK': {
+      slug:'uts-except-dl-jk', context:true,
+      modeName:'UT districts', doneTitle:'UT districts mapped!', loadName:'UT district map', of:'the Union Territories (except DL, JK)',
+      // Ladakh's five districts created in Apr 2026 (Zanskar, Drass, Sham, Nubra, Changthang) are not in the open boundary data, so Ladakh appears as Leh and Kargil.
+      expected:14,
+      sources:[{slug:'puducherry'},{slug:'andaman-and-nicobar-islands'},{slug:'dnh-and-dd'},{slug:'ladakh'},{slug:'lakshadweep',fallback:'Lakshadweep'},{slug:'chandigarh',fallback:'Chandigarh'}],
+      contextSkip:['Puducherry','Andaman and Nicobar Islands','Dadra and Nagar Haveli and Daman and Diu','Ladakh','Lakshadweep','Chandigarh'],
+      districts:['Puducherry','Karaikal','Mahe','Yanam','Nicobar','North and Middle Andaman','South Andaman','Dadra and Nagar Haveli','Daman','Diu','Leh','Kargil','Lakshadweep','Chandigarh'],
+      parents:{'Puducherry':'Puducherry','Karaikal':'Puducherry','Mahe':'Puducherry','Yanam':'Puducherry','Nicobar':'Andaman and Nicobar Islands','North and Middle Andaman':'Andaman and Nicobar Islands','South Andaman':'Andaman and Nicobar Islands','Dadra and Nagar Haveli':'Dadra and Nagar Haveli and Daman and Diu','Daman':'Dadra and Nagar Haveli and Daman and Diu','Diu':'Dadra and Nagar Haveli and Daman and Diu','Leh':'Ladakh','Kargil':'Ladakh','Lakshadweep':'Lakshadweep','Chandigarh':'Chandigarh'},
+      aliases:{
+        'Puducherry':['Pondicherry','Pondicherry District'],'Karaikal':['Karikal'],'Mahe':['Mahé'],'Yanam':['Yanaon'],
+        'Nicobar':['Nicobars','Nicobar Islands'],'North and Middle Andaman':['North Middle Andaman','North Andaman','Middle Andaman','North and Middle Andaman Islands','Middle and North Andaman'],'South Andaman':['South Andamans'],
+        'Dadra and Nagar Haveli':['Dadra','Nagar Haveli','Dadra Nagar Haveli','DNH'],'Daman':['Daman District'],'Diu':['Diu District'],
+        'Leh':['Leh Ladakh','Leh (Ladakh)'],'Lakshadweep':['Lakshadweep Islands','Laccadive']
+      }
     }
   };
   const compact = v => norm(v).replace(/ /g,'');
@@ -482,15 +549,69 @@
     if (!raw) return null;
     return known.get(compact(raw)) || cleanLabel(raw);
   }
+  // ---- Splitting a district along an approximate line (used for Goa's Kushavati, which postdates the open boundary data) ----
+  function segHit(p,p2,q,q2) {
+    const rx=p2[0]-p[0], ry=p2[1]-p[1], sx=q2[0]-q[0], sy=q2[1]-q[1], d=rx*sy-ry*sx;
+    if (Math.abs(d)<1e-12) return null;
+    const t=((q[0]-p[0])*sy-(q[1]-p[1])*sx)/d, u=((q[0]-p[0])*ry-(q[1]-p[1])*rx)/d;
+    return (t>=0&&t<1&&u>=0&&u<1) ? {t,u,pt:[p[0]+t*rx,p[1]+t*ry]} : null;
+  }
+  function inRing(pt,ring) {
+    let c=false;
+    for (let i=0,j=ring.length-1;i<ring.length;j=i++) {
+      const [xi,yi]=ring[i],[xj,yj]=ring[j];
+      if ((yi>pt[1])!==(yj>pt[1]) && pt[0]<(xj-xi)*(pt[1]-yi)/(yj-yi)+xi) c=!c;
+    }
+    return c;
+  }
+  function splitPolygon(poly,line) { // -> [ringA,ringB] or null unless the line crosses the outer ring exactly twice
+    const ring=poly[0], cuts=[];
+    for (let i=0;i<ring.length-1;i++) for (let j=0;j<line.length-1;j++) { const h=segHit(ring[i],ring[i+1],line[j],line[j+1]); if (h) cuts.push({i,j,...h}); }
+    if (cuts.length!==2) return null;
+    cuts.sort((x,y)=>(x.i+x.t)-(y.i+y.t));
+    const [c1,c2]=cuts, body=ring.slice(0,-1);
+    const along=(a,b)=>(a.j+a.u)<=(b.j+b.u)?[a.pt,...line.slice(a.j+1,b.j+1),b.pt]:[a.pt,...line.slice(b.j+1,a.j+1).reverse(),b.pt];
+    const p12=[c1.pt,...body.slice(c1.i+1,c2.i+1),c2.pt];
+    const p21=[c2.pt,...body.slice(c2.i+1),...body.slice(0,c1.i+1),c1.pt];
+    return [[...p12,...along(c2,c1).slice(1)],[...p21,...along(c1,c2).slice(1)]];
+  }
+  function splitDistrict(items,cfg) {
+    const sp=cfg.split; if (!sp || items.some(x=>x.name===sp.newName)) return items;
+    const out=[]; let made=0;
+    items.forEach(it=>{
+      if (it.name!==sp.from) { out.push(it); return; }
+      polysOf(it.geometry).forEach(poly=>{
+        const parts=splitPolygon(poly,sp.line);
+        if (parts) parts.forEach(r=>{ const inside=inRing(sp.ref,r); if (inside) made++; out.push({name:inside?sp.newName:sp.from,geometry:{type:'Polygon',coordinates:[r]}}); });
+        else { const inside=inRing(sp.ref,poly[0]); out.push({name:inside?sp.newName:sp.from,geometry:{type:'Polygon',coordinates:poly}}); if (inside) made++; }
+      });
+    });
+    if (!made) { console.warn(`Could not carve ${sp.newName} out of ${sp.from}; keeping the original districts`); return items; }
+    return out;
+  }
   async function fetchDistricts(key) {
     const cfg=DISTRICT_SETS[key];
-    const build=feats=>{
-      const items=feats.map(f=>({name:pickDistrictName(f.properties,key),geometry:f.geometry}));
+    const toItems=(feats,fallback)=>feats.map(f=>({name:pickDistrictName(f.properties,key)||fallback||null,geometry:f.geometry}));
+    const finish=items=>{
       const unnamed=items.filter(x=>!x.name).length;
       if (unnamed) console.warn(`${unnamed} ${key} feature(s) had no readable district name`);
-      const merged=mergeFeatures(items.filter(x=>x.name),'District');
+      const merged=mergeFeatures(splitDistrict(items.filter(x=>x.name),cfg),'District');
       return merged.size>=2 ? [...merged.values()] : null;
     };
+    const build=feats=>finish(toItems(feats));
+    // Several boundary files combined into one quiz (e.g. the Union Territories)
+    if (cfg.sources) {
+      const items=[];
+      for (const src of cfg.sources) {
+        let feats=null;
+        for (const [dir,ext] of [['geojson','geojson'],['topojson','json'],['topojson','geojson']]) {
+          try { feats=toFeatures(await fetchJson(`${dir}/states/${src.slug}.${ext}`),['districts',src.slug]); if (feats.length) break; } catch(e) { console.warn('District file failed:',src.slug,dir,e); }
+        }
+        if (feats?.length) items.push(...toItems(feats,src.fallback)); else console.warn('No district data for',src.slug);
+      }
+      const r=finish(items); if (r) return r;
+      throw new Error(`Could not load district boundaries for ${key}`);
+    }
     // 1) The state's own boundary file (GeoJSON, then TopoJSON)
     for (const [dir,ext] of [['geojson','geojson'],['topojson','json']]) {
       try {
@@ -560,7 +681,7 @@
     return [...collected.values()];
   }
   function showMapLoading() {
-    const label=mode==='districts'?`Loading ${districtKey}’s districts…`:mode==='airports'?'Loading airports map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
+    const label=mode==='districts'?`Loading ${dset().loadName?'the '+dset().loadName:districtKey+'’s districts'}…`:mode==='airports'?'Loading airports map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
     $('map').classList.remove('ready','districts','airports','outlines');
     $('map').innerHTML=`<div class="map-loading"><span class="loader"></span><strong>${label}</strong><small>Loading boundary data</small></div>`;
     $('map-message').textContent='Loading map…';
@@ -578,6 +699,8 @@
     try {
       let mapped=mapCache.get(cacheKey);
       if (!mapped) { mapped=m==='districts'?await fetchDistricts(key):await fetchBoundaries(); mapCache.set(cacheKey,mapped); }
+      let context=null;
+      if (m==='districts' && DISTRICT_SETS[key].context) { try { let c=mapCache.get('country'); if (!c) { c=await fetchBoundaries(); mapCache.set('country',c); } context=c.filter(f=>!(DISTRICT_SETS[key].contextSkip||[]).includes(f.properties.quizName)); } catch(e) { console.warn('Context layer unavailable',e); } }
       if (token!==loadToken) return; // the player switched mode while this was loading
       if (m==='airports') { featureByName=new Map(airportFeatures.map(f=>[f.properties.quizName,f])); features=airportFeatures; poolNames=AIRPORT_NAMES.slice(); }
       else {
@@ -585,7 +708,7 @@
       features=mapped;
       poolNames=m==='districts'?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
       }
-      drawMap({type:'FeatureCollection',features:mapped});
+      drawMap({type:'FeatureCollection',features:mapped,context});
       $('map').classList.add('ready'); updateStats(); showPrompt();
       if (m==='districts') {
         const exp=DISTRICT_SETS[key].expected;
@@ -594,7 +717,7 @@
     } catch(error) {
       if (token!==loadToken) return;
       console.error(error);
-      const what=m==='districts'?`${key}’s district map`:'India’s boundary map';
+      const what=m==='districts'?(DISTRICT_SETS[key].loadName||`${key}’s district map`):'India’s boundary map';
       $('map').innerHTML=`<div class="map-loading map-error"><strong>Could not load ${what}</strong><small>${error.message}</small><button class="primary-btn" id="retry-map">Try again</button><small>Check your connection or open the official Survey of India map reference from the menu.</small></div>`;
       $('retry-map')?.addEventListener('click',loadMap);
       $('map-message').textContent='Map unavailable';

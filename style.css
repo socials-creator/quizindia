@@ -272,3 +272,6 @@ body[data-mode=outlines] .map-canvas{height:clamp(400px,58vh,640px)}
 .osk-row{gap:7px}
 .osk-key{max-width:56px;height:56px;border-radius:13px;font-size:1.35rem}
 .osk-key{flex:0 0 calc((100% - 6*7px)/7);max-width:none}
+
+/* v3.5 — faint context states behind the combined Union Territories districts map */
+.context-region{fill:var(--land);fill-opacity:.45;stroke:var(--border);stroke-opacity:.35;stroke-width:.9;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
