@@ -7,7 +7,7 @@
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
-  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35,'Shimla (SLV)':35,'Kangra (DHM)':45,'Kullu-Manali (KUU)':45,'Shillong (SHL)':35,'Pasighat (IXT)':35};
+  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35,'Shimla (SLV)':35,'Kangra (DHM)':45,'Kullu-Manali (KUU)':45,'Shillong (SHL)':35,'Pasighat (IXT)':35,'Shaheed Bhagat Singh Int’l (IXC)':25,'Lokpriya Gopinath Bordoloi Int’l (GAU)':25,'Bagdogra Int’l (IXB)':30,'Pakyong (PYG)':35};
   const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
@@ -94,8 +94,17 @@
     ['NCT of Delhi','Delhi'],['National Capital Territory of Delhi','Delhi'],['Delhi (NCT)','Delhi'],['Andaman & Nicobar Islands','Andaman and Nicobar Islands'],['Andaman and Nicobar','Andaman and Nicobar Islands'],['Jammu & Kashmir','Jammu and Kashmir'],['Jammu & Kashmir (UT)','Jammu and Kashmir'],['Dadra & Nagar Haveli and Daman & Diu','Dadra and Nagar Haveli and Daman and Diu'],['Dadra and Nagar Haveli & Daman and Diu','Dadra and Nagar Haveli and Daman and Diu'],['Dadra and Nagar Haveli','Dadra and Nagar Haveli and Daman and Diu'],['Daman and Diu','Dadra and Nagar Haveli and Daman and Diu'],['Orissa','Odisha'],['Uttaranchal','Uttarakhand']
   ]);
   const ALL = [...STATES.map(name => ({name,type:'State'})), ...UTS.map(name => ({name,type:'Union Territory'}))];
+  // ---- Vehicle registration (licence plate) codes. First code is the current one shown in brackets; extra codes are accepted as answers too. ----
+  const PLATE = {
+    'Andhra Pradesh':['AP'],'Arunachal Pradesh':['AR'],'Assam':['AS'],'Bihar':['BR'],'Chhattisgarh':['CG','CT'],'Goa':['GA'],'Gujarat':['GJ'],'Haryana':['HR'],'Himachal Pradesh':['HP'],'Jharkhand':['JH'],'Karnataka':['KA'],'Kerala':['KL'],'Madhya Pradesh':['MP'],'Maharashtra':['MH'],'Manipur':['MN'],'Meghalaya':['ML'],'Mizoram':['MZ'],'Nagaland':['NL'],'Odisha':['OD','OR'],'Punjab':['PB'],'Rajasthan':['RJ'],'Sikkim':['SK'],'Tamil Nadu':['TN'],'Telangana':['TG','TS'],'Tripura':['TR'],'Uttar Pradesh':['UP'],'Uttarakhand':['UK','UA'],'West Bengal':['WB'],
+    'Andaman and Nicobar Islands':['AN'],'Chandigarh':['CH'],'Dadra and Nagar Haveli and Daman and Diu':['DN','DD'],'Delhi':['DL'],'Jammu and Kashmir':['JK'],'Ladakh':['LA'],'Lakshadweep':['LD'],'Puducherry':['PY']
+  };
+  const CODE_OWNER = new Map(); Object.entries(PLATE).forEach(([n,cs])=>cs.forEach(c=>CODE_OWNER.set(c,n)));
+  const codeOf = n => (PLATE[n]||[])[0] || '';
   const $ = id => document.getElementById(id);
+  const codeInput = $('code-input');
   let features = [], featureByName = new Map(), queue = [], current = null;
+  let awaiting = false, typedShown = '', outlineCollection = null;
   let mode = 'country', districtKey = null, poolNames = ALL.map(x => x.name), loadToken = 0, gameId = 0;
   const mapCache = new Map();
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
@@ -108,9 +117,11 @@
   }
   function listForMode() { return poolNames; }
   function typeOf(name) { return mode==='airports' ? (name==='Warangal (WGC)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? 'District' : (STATES.includes(name) ? 'State' : 'Union Territory'); }
-  function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : 'region'; }
-  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
-  function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
+  function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : mode==='outlines' ? 'outline' : 'region'; }
+  // Show the licence plate code in brackets for states/UTs (States & UTs and Outlines modes).
+  function lab(n) { return (mode==='country'||mode==='outlines') && PLATE[n] ? `${n} (${codeOf(n)})` : n; }
+  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='outlines' ? 'Outlines' : mode==='districts' ? `${districtKey||'State'} districts` : 'All regions'; }
+  function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='outlines' ? 'indiaMapQuiz.best.outlines.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>$('toast').classList.remove('show'),1700);
@@ -145,9 +156,20 @@
   }
   function showPrompt() {
     $('side-skip').textContent=`Skip this ${noun()} →`;
-    if (!current) { $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':'Press New game'); $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':'FIND THIS REGION'; $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':'Tap the matching state or Union Territory on the map.'; $('side-prompt').textContent='Ready when you are'; $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international and major domestic airports. Tapping within the airport’s radius (about ${AIRPORT_RADIUS_KM} km; less for same-city airports) counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):'Find all 36 states and Union Territories by tapping them on the map.'; $('skip').disabled=true; $('side-skip').disabled=true; return; }
-    $('prompt-name').textContent=current; $('prompt-kind').textContent=typeOf(current).toUpperCase(); $('prompt-hint').textContent=mode==='airports'?`Tap within about ${radiusFor(current)} km of the airport.`:`Tap the matching ${noun()} on the map.`;
-    $('side-prompt').textContent=current; $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:`${typeOf(current)} · Find it on the map.`; $('skip').disabled=false; $('side-skip').disabled=false;
+    if (!current) {
+      $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':mode==='outlines'?'Name the outline':'Press New game');
+      $('prompt-kind').textContent=mode==='airports'?'FIND THIS AIRPORT':mode==='districts'?'FIND THIS DISTRICT':mode==='outlines'?'GUESS THE OUTLINE':'FIND THIS REGION';
+      $('prompt-hint').textContent=mode==='airports'?`Tap within about ${AIRPORT_RADIUS_KM} km of the airport.`:mode==='districts'?'Tap the matching district on the map.':mode==='outlines'?'Type the 2-letter licence plate code of the state or UT.':'Tap the matching state or Union Territory on the map.';
+      $('side-prompt').textContent='Ready when you are';
+      $('side-description').textContent=mode==='airports'?`Point out all ${AIRPORTS.length} international and major domestic airports. Tapping within the airport’s radius (about ${AIRPORT_RADIUS_KM} km; less for nearby airports) counts.`:mode==='districts'?(!districtKey?'Choose a state from the menu to practise its districts.':poolNames.length?`Find all ${poolNames.length} districts of ${districtKey} by tapping them on the map.`:`Find every district of ${districtKey} by tapping it on the map.`):mode==='outlines'?'Recognise the outline of each of the 36 states and Union Territories and type its 2-letter licence plate code (like KA or MH). It submits as soon as you type 2 letters.':'Find all 36 states and Union Territories by tapping them on the map.';
+      $('skip').disabled=true; $('side-skip').disabled=true; return;
+    }
+    $('prompt-name').textContent=mode==='outlines'?'Which state or UT is this?':lab(current);
+    $('prompt-kind').textContent=mode==='outlines'?'GUESS THE OUTLINE':typeOf(current).toUpperCase();
+    $('prompt-hint').textContent=mode==='airports'?`Tap within about ${radiusFor(current)} km of the airport.`:mode==='outlines'?'Type its 2-letter licence plate code — it submits automatically.':`Tap the matching ${noun()} on the map.`;
+    $('side-prompt').textContent=mode==='outlines'?'Guess this outline':lab(current);
+    $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`District of ${districtKey} · Find it on the map.`:mode==='outlines'?'State or Union Territory · type its licence plate code.':`${typeOf(current)} · Find it on the map.`;
+    $('skip').disabled=false; $('side-skip').disabled=false;
   }
   function startGame() {
     const pool=listForMode();
@@ -155,44 +177,77 @@
     if (!features.length) {toast('The map is still loading.');return;}
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
-    gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null;
+    gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null; awaiting=false; hideCaption();
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
-    mapGroup.selectAll('.region, .airport-node').classed('found',false).classed('missed',false).classed('target-reveal',false);
-    $('map-message').textContent=`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
+    mapGroup.selectAll('.region, .airport-node, .outline-shape, .base-region, .lk-isl').classed('found',false).classed('missed',false).classed('target-reveal',false);
+    $('map-message').textContent=mode==='outlines'?'Round in progress · type the plate code':`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
   }
   function nextQuestion() {
     if (!roundActive) return;
     if (queue.length===0) {finishGame(found.size===listForMode().length);return;}
     current=queue.shift(); showPrompt(); updateStats();
+    if (mode==='outlines') { renderOutline(current); resetCodeInput(true); }
   }
-  function findPath(name) { return mapGroup.selectAll(mode==='airports'?'.airport-node':'.region').filter(d=>d.properties.quizName===name); }
+  function findPath(name) { return mapGroup.selectAll(mode==='airports'?'.airport-node':mode==='outlines'?'.outline-shape, .lk-isl':'.region, .lk-isl').filter(d=>d.properties.quizName===name); }
   function handleRegionTap(name) {
     if (!roundActive || !current) return;
-    if (name && (found.has(name)||missed.has(name))) {toast(`${name} has already been answered.`);return;}
+    if (name && (found.has(name)||missed.has(name))) {toast(`${lab(name)} has already been answered.`);return;}
     if (name===current) {
-      found.add(name); findPath(name).classed('found',true).classed('target-reveal',false); addRecent(name,true); $('map-message').textContent=`✓ ${name} found`; current=null; updateStats();
+      found.add(name); findPath(name).classed('found',true).classed('target-reveal',false); addRecent(lab(name),true); $('map-message').textContent=`✓ ${lab(name)} found`; current=null; updateStats();
       if (queue.length===0) finishGame(found.size===listForMode().length); else nextQuestion();
     } else {
-      mistakes++; missed.add(current); findPath(current).classed('missed',true); if(name) findPath(name).classed('target-reveal',true); addRecent(name?`${name} · target: ${current}`:`Not near an airport · target: ${current}`,false);
-      $('map-message').textContent=`Not quite — the target was ${current}`; toast(name?`That’s ${name}. Find ${current}.`:`No airport there. Find ${current}.`);
+      mistakes++; missed.add(current); findPath(current).classed('missed',true); if(name) findPath(name).classed('target-reveal',true); addRecent(name?`${lab(name)} · target: ${lab(current)}`:`Not near an airport · target: ${current}`,false);
+      $('map-message').textContent=`Not quite — the target was ${lab(current)}`; toast(name?`That’s ${lab(name)}. Find ${lab(current)}.`:`No airport there. Find ${current}.`);
       const reveal=current; current=null; updateStats();
       if (mistakes>=MAX_MISSES) {finishGame(false);return;}
       const gid=gameId; setTimeout(()=>{if(gid!==gameId)return;findPath(reveal).classed('target-reveal',false);if(name&&!found.has(name)&&!missed.has(name))findPath(name).classed('target-reveal',false);nextQuestion();},1000);
     }
   }
   function skipQuestion() {
-    if (!roundActive || !current) return;
-    const name=current; mistakes++; missed.add(name); findPath(name).classed('missed',true).classed('target-reveal',true); addRecent(`${name} · skipped`,false);
-    $('map-message').textContent=`Skipped · ${name} highlighted on the map`; current=null; updateStats();
+    if (!roundActive || !current || awaiting) return;
+    const name=current; mistakes++; missed.add(name); findPath(name).classed('missed',true).classed('target-reveal',mode!=='outlines'); addRecent(`${lab(name)} · skipped`,false);
+    current=null; updateStats();
+    if (mode==='outlines') { $('map-message').textContent=`Skipped · it was ${lab(name)}`; showCaption(`Skipped · ${lab(name)}`,'bad'); revealThenNext(1700); return; }
+    $('map-message').textContent=`Skipped · ${lab(name)} highlighted on the map`;
     if (mistakes>=MAX_MISSES) {finishGame(false);return;}
     const gid=gameId; setTimeout(()=>{if(gid!==gameId)return;findPath(name).classed('target-reveal',false);nextQuestion();},1300);
+  }
+  // ---- Outlines mode: guess the state/UT from its outline by typing its 2-letter licence plate code ----
+  function showCaption(text,kind) { const el=$('outline-caption'); el.textContent=text; el.className='outline-caption show '+kind; }
+  function hideCaption() { const el=$('outline-caption'); if (el) el.className='outline-caption'; }
+  function renderCode(state) {
+    const v=codeInput.value;
+    [0,1].forEach(i=>{const b=$('cb'+i); b.textContent=v[i]||''; b.className='code-box'+(v[i]?' filled':'')+(!state&&i===v.length?' next':'')+(state?' '+state:'');});
+  }
+  function resetCodeInput(focus) {
+    typedShown=''; codeInput.value=''; codeInput.disabled=!roundActive; renderCode();
+    if (focus && roundActive) { try { codeInput.focus({preventScroll:true}); } catch { codeInput.focus(); } }
+  }
+  function revealThenNext(ms) {
+    awaiting=true; const gid=gameId;
+    setTimeout(()=>{ if(gid!==gameId) return; awaiting=false; hideCaption(); if (mistakes>=MAX_MISSES) {finishGame(false);return;} nextQuestion(); },ms);
+  }
+  function submitCode(typed) {
+    if (mode!=='outlines' || !roundActive || !current || awaiting) return;
+    const target=current, ok=(PLATE[target]||[]).includes(typed);
+    if (ok) {
+      found.add(target); findPath(target).classed('found',true); addRecent(lab(target),true);
+      $('map-message').textContent=`✓ ${lab(target)} found`; showCaption(`✓ ${lab(target)}`,'ok'); renderCode('ok');
+    } else {
+      mistakes++; missed.add(target); findPath(target).classed('missed',true); addRecent(`${lab(target)} · you typed ${typed}`,false);
+      const owner=CODE_OWNER.get(typed);
+      $('map-message').textContent=`Not quite — it was ${lab(target)}`; showCaption(`It was ${lab(target)}`,'bad'); renderCode('bad');
+      toast(owner?`${typed} is the code for ${lab(owner)}.`:`${typed} isn’t a state or UT code.`);
+    }
+    current=null; updateStats(); revealThenNext(ok?800:1800);
   }
   function finishGame(completed) {
     roundActive=false; current=null; showPrompt(); updateStats();
     const total=listForMode().length, score=found.size, label=modeLabel();
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
     saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed});
-    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='districts'?`${districtKey} mapped!`:'India mapped!'):'Round over';
+    if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(false); try{codeInput.blur();}catch{} renderOutline(null); }
+    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?`${districtKey} mapped!`:'India mapped!'):'Round over';
     $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
     $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
     $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again';
@@ -207,19 +262,22 @@
   let airportFeatures=[];
   // Lakshadweep's islands are only a few pixels wide on the map, so mark the 10 inhabited islands (one per sub-division). Island centres from Wikipedia / Govt. of Lakshadweep island pages (lat, lon).
   const LK_ISLANDS = [[11.60,72.18],[11.68,72.72],[11.49,73.00],[11.22,72.78],[11.12,72.73],[10.85,72.18],[10.56,72.64],[10.82,73.68],[10.08,73.63],[8.28,73.05]]; // Bitra, Chetlat, Kiltan, Kadmat, Amini, Agatti, Kavaratti, Androth, Kalpeni, Minicoy
-  const LK_R = 2.3;
+  const LK_LEN = [0.8,1.6,2.5,8,4,7,6,4.5,3.5,10]; // approx. island length in km, same order — used only to vary the drawn size a little
   let mapK = 1;
-  function addLakshadweepMarkers(clickable) {
+  // Each island is drawn like the rest of the map: a tiny land-coloured island with the usual border, sitting in a faint lagoon halo, and it takes the same found/missed colour as its region.
+  function addLakshadweepMarkers(clickable, sizeScale=1) {
     mapK = 1;
-    LK_ISLANDS.forEach(([lat,lon])=>{
-      const [x,y]=projection([lon,lat]);
-      const c=mapGroup.append('circle').attr('class','lk-island').attr('cx',x).attr('cy',y).attr('r',LK_R);
-      if (clickable) c.classed('clickable',true).on('click',event=>{event.stopPropagation();handleRegionTap('Lakshadweep');});
+    LK_ISLANDS.forEach(([lat,lon],i)=>{
+      const [x,y]=projection([lon,lat]), len=LK_LEN[i], ry=(1.7+0.12*len)*sizeScale, rx=(0.95+0.04*len)*sizeScale;
+      const g=mapGroup.append('g').datum({x,y,properties:{quizName:'Lakshadweep'}}).attr('class','lk-isl'+(clickable?' clickable':'')).attr('transform',`translate(${x},${y})`);
+      g.append('ellipse').attr('class','lk-halo').attr('rx',rx*3.4).attr('ry',ry*1.5);
+      g.append('ellipse').attr('class','lk-land').attr('rx',rx).attr('ry',ry);
+      if (clickable) g.on('click',event=>{event.stopPropagation();handleRegionTap('Lakshadweep');});
     });
   }
-  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-island').attr('r',LK_R/Math.sqrt(mapK)); }
+  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); }
   function drawAirportMap(collection) {
-    const host=$('map'); host.innerHTML=''; host.classList.remove('districts'); host.classList.add('airports');
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines'); host.classList.add('airports');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating airports').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
@@ -241,9 +299,37 @@
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
   }
+  const OUT_BOX=[[70,36],[930,590]];
+  function lkStatusClasses() { mapGroup.selectAll('.lk-isl').classed('found',found.has('Lakshadweep')).classed('missed',missed.has('Lakshadweep')); }
+  // name=null: overview of all regions (before a round / after it, coloured by result). Otherwise: just that one outline, scaled to fill the map.
+  function renderOutline(name) {
+    if (!mapGroup||!outlineCollection) return;
+    mapGroup.selectAll('*').remove(); mapGroup.attr('transform',null); mapK=1;
+    if (!name) {
+      projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
+      projection.fitExtent([[65,65],[935,690]],outlineCollection); path=d3.geoPath(projection);
+      mapGroup.selectAll('path.base-region').data(outlineCollection.features).join('path')
+        .attr('class',d=>'base-region'+(found.has(d.properties.quizName)?' found':missed.has(d.properties.quizName)?' missed':'')).attr('d',path);
+      addLakshadweepMarkers(false); lkStatusClasses(); return;
+    }
+    const f=featureByName.get(name); if (!f) return;
+    const lk=name==='Lakshadweep';
+    const extent=lk?{type:'GeometryCollection',geometries:[f.geometry,{type:'MultiPoint',coordinates:LK_ISLANDS.map(([la,lo])=>[lo,la])}]}:f;
+    projection=d3.geoMercator().fitExtent(OUT_BOX,extent); path=d3.geoPath(projection);
+    mapGroup.append('path').datum(f).attr('class','outline-shape').attr('d',path);
+    if (lk) addLakshadweepMarkers(false,5);
+  }
+  function drawOutlineMap(collection) {
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','airports'); host.classList.add('outlines');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Outline of an Indian state or Union Territory').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    mapGroup=mapSvg.append('g').attr('class','map-world'); zoom=null; outlineCollection=collection;
+    renderOutline(null);
+    $('map-message').textContent='Map ready · choose New game';
+  }
   function drawMap(collection) {
     if (mode==='airports') return drawAirportMap(collection);
-    const host=$('map'); host.classList.remove('airports'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts');
+    if (mode==='outlines') return drawOutlineMap(collection);
+    const host=$('map'); host.classList.remove('airports','outlines'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',mode==='districts'?`Map of ${districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
@@ -456,8 +542,8 @@
     return [...collected.values()];
   }
   function showMapLoading() {
-    const label=mode==='districts'?`Loading ${districtKey}’s districts…`:mode==='airports'?'Loading airports map…':'Loading India’s map…';
-    $('map').classList.remove('ready','districts','airports');
+    const label=mode==='districts'?`Loading ${districtKey}’s districts…`:mode==='airports'?'Loading airports map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
+    $('map').classList.remove('ready','districts','airports','outlines');
     $('map').innerHTML=`<div class="map-loading"><span class="loader"></span><strong>${label}</strong><small>Loading boundary data</small></div>`;
     $('map-message').textContent='Loading map…';
   }
@@ -466,7 +552,7 @@
     airportFeatures=AIRPORTS.map(([n,lat,lon])=>({type:'Feature',properties:{quizName:n},geometry:{type:'Point',coordinates:[lon,lat]}}));
     features=[]; featureByName=new Map(); poolNames=m==='districts'?[]:m==='airports'?AIRPORT_NAMES.slice():ALL.map(x=>x.name);
     if (m==='districts' && !key) {
-      $('map').classList.remove('ready','districts');
+      $('map').classList.remove('ready','districts','outlines');
       $('map').innerHTML='<div class="map-loading"><span class="map-empty-icon">🗺️</span><strong>Select a state</strong><small>Choose a state from the menu above to practise its districts.</small></div>';
       $('map-message').textContent='Choose a state to begin'; updateStats(); showPrompt(); return;
     }
@@ -506,6 +592,7 @@
   function applyModeUI() {
     document.querySelectorAll('.seg-btn').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
     $('region-picker').hidden=mode!=='districts'; renderStateSelect();
+    document.body.dataset.mode=mode; $('code-entry').hidden=mode!=='outlines';
   }
   function setMode(newMode,newKey=null) {
     if (newMode!=='districts') newKey=null;
@@ -513,7 +600,7 @@
     const wasActive=roundActive;
     mode=newMode; districtKey=newKey;
     try { localStorage.setItem(MODE_KEY,JSON.stringify({mode})); } catch {}
-    gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0;
+    gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0; awaiting=false; hideCaption(); resetCodeInput(false);
     $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
     applyModeUI(); renderBest(); loadMap();
@@ -522,9 +609,15 @@
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   function init() {
     const saved=readJSON(MODE_KEY,null);
-    if (saved && (saved.mode==='country'||saved.mode==='districts'||saved.mode==='airports')) mode=saved.mode;
+    if (saved && (saved.mode==='country'||saved.mode==='districts'||saved.mode==='airports'||saved.mode==='outlines')) mode=saved.mode;
     document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.mode!==mode) setMode(b.dataset.mode); }));
     $('state-select').addEventListener('change',e=>setMode('districts',e.target.value||null));
+    codeInput.addEventListener('input',()=>{
+      if (awaiting) { codeInput.value=typedShown; return; }
+      const v=codeInput.value.replace(/[^a-z]/gi,'').toUpperCase().slice(0,2);
+      codeInput.value=v; typedShown=v; renderCode();
+      if (v.length===2 && roundActive && current) { const gid=gameId; setTimeout(()=>{ if (gid===gameId && roundActive && current && !awaiting && codeInput.value===v) submitCode(v); },160); }
+    });
     applyModeUI();
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
     $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);

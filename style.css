@@ -204,8 +204,6 @@ ol,ul{margin:0;padding:0;list-style:none}
 /* Airports mode */
 .base-region{fill:var(--land);stroke:var(--border);stroke-width:1.2;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
 .map-canvas.airports svg{cursor:crosshair}
-.lk-island{fill:var(--label);stroke:var(--card);stroke-width:1.4px;vector-effect:non-scaling-stroke;pointer-events:none}
-.lk-island.clickable{pointer-events:all;cursor:pointer}
 .airport-node{pointer-events:none}
 .airport-zone{fill:transparent;stroke:none;vector-effect:non-scaling-stroke}
 .airport-dot{fill:none;opacity:0}
@@ -213,3 +211,34 @@ ol,ul{margin:0;padding:0;list-style:none}
 .airport-node.missed .airport-zone{fill:var(--red);fill-opacity:.5;stroke:var(--red);stroke-width:1.5}
 .airport-node.target-reveal .airport-zone{fill:var(--orange);fill-opacity:.8;stroke:var(--orange);stroke-width:2;animation:pulse .6s ease 2}
 .airport-node.found .airport-dot,.airport-node.missed .airport-dot,.airport-node.target-reveal .airport-dot{fill:var(--label);opacity:1}
+
+
+/* v3.2 — Outlines mode, Lakshadweep islands */
+.segmented{grid-template-columns:repeat(2,1fr)}
+@media (min-width:600px){.segmented{grid-template-columns:repeat(4,1fr)}}
+@media (min-width:900px){.segmented{width:500px}}
+.outline-shape{fill:var(--land);stroke:var(--border);stroke-width:2.2;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 8px 14px rgba(0,0,0,.14));transition:fill .2s}
+@media (prefers-color-scheme:dark){.outline-shape{filter:drop-shadow(0 8px 16px rgba(0,0,0,.6))}}
+.outline-shape.found,.base-region.found{fill:var(--green);fill-opacity:.55}
+.outline-shape.missed,.base-region.missed{fill:var(--red);fill-opacity:.5}
+body[data-mode=outlines] .zoom-controls{display:none}
+.code-entry{position:relative;z-index:5;margin:10px 12px 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.code-field{position:relative;display:flex;gap:10px;cursor:text}
+.code-box{width:54px;height:62px;display:grid;place-items:center;border-radius:16px;background:var(--card);border:.5px solid var(--sep);box-shadow:var(--shadow);font-size:1.9rem;font-weight:700;color:var(--label);transition:box-shadow .15s,background .2s,color .2s}
+.code-field:focus-within .code-box.next{box-shadow:0 0 0 2px var(--blue)}
+.code-box.ok{background:rgba(52,199,89,.2);color:var(--green);box-shadow:0 0 0 2px var(--green)}
+.code-box.bad{background:rgba(255,59,48,.16);color:var(--red);box-shadow:0 0 0 2px var(--red);animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.code-field input{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;border:0;padding:0;background:none;caret-color:transparent}
+.code-hint{font-size:.74rem;font-weight:500;color:var(--label-2)}
+.outline-caption{position:absolute;z-index:6;left:50%;bottom:58px;transform:translate(-50%,10px);max-width:calc(100% - 28px);padding:10px 18px;border-radius:99px;font-weight:700;font-size:1rem;text-align:center;background:var(--glass);border:.5px solid var(--glass-border);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.outline-caption.show{opacity:1;transform:translate(-50%,0)}
+.outline-caption.ok{color:var(--green)}.outline-caption.bad{color:var(--red)}
+/* Lakshadweep: small land-coloured islands in a faint lagoon, coloured like the region */
+.lk-isl{pointer-events:none}
+.lk-halo{fill:var(--land-hover);fill-opacity:.55;stroke:none}
+.lk-land{fill:var(--land);stroke:var(--border);stroke-width:1.1px;vector-effect:non-scaling-stroke}
+.lk-isl.clickable .lk-halo,.lk-isl.clickable .lk-land{pointer-events:all;cursor:pointer}
+.lk-isl.found .lk-land{fill:var(--green);stroke:var(--green)}.lk-isl.found .lk-halo{fill:var(--green);fill-opacity:.25}
+.lk-isl.missed .lk-land{fill:var(--red);stroke:var(--red)}.lk-isl.missed .lk-halo{fill:var(--red);fill-opacity:.22}
+.lk-isl.target-reveal .lk-land{fill:var(--orange);stroke:var(--orange)}.lk-isl.target-reveal .lk-halo{fill:var(--orange);fill-opacity:.4}
