@@ -7,7 +7,7 @@
   // ---- Airports mode: international airports of India. Tap radius is geographic (km), so it scales with zoom. ----
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
-  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35,'Shimla (SLV)':35,'Kangra (DHM)':45,'Kullu-Manali (KUU)':45,'Shillong (SHL)':35,'Pasighat (IXT)':35,'Shaheed Bhagat Singh Int’l (IXC)':25,'Lokpriya Gopinath Bordoloi Int’l (GAU)':25,'Bagdogra Int’l (IXB)':30,'Pakyong (PYG)':35};
+  const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35,'Shimla (SLV)':35,'Kangra (DHM)':45,'Kullu-Manali (KUU)':45,'Shillong (SHL)':35,'Pasighat (IXT)':35,'Shaheed Bhagat Singh Int’l (IXC)':30,'Lokpriya Gopinath Bordoloi Int’l (GAU)':30,'Bagdogra Int’l (IXB)':30,'Pakyong (PYG)':35};
   const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
   const EARTH_KM = 6371;
   const AIRPORTS = [
@@ -102,7 +102,6 @@
   const CODE_OWNER = new Map(); Object.entries(PLATE).forEach(([n,cs])=>cs.forEach(c=>CODE_OWNER.set(c,n)));
   const codeOf = n => (PLATE[n]||[])[0] || '';
   const $ = id => document.getElementById(id);
-  const codeInput = $('code-input');
   let features = [], featureByName = new Map(), queue = [], current = null;
   let awaiting = false, typedShown = '', outlineCollection = null;
   let mode = 'country', districtKey = null, poolNames = ALL.map(x => x.name), loadToken = 0, gameId = 0;
@@ -181,12 +180,13 @@
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
     mapGroup.selectAll('.region, .airport-node, .outline-shape, .base-region, .lk-isl').classed('found',false).classed('missed',false).classed('target-reveal',false);
     $('map-message').textContent=mode==='outlines'?'Round in progress · type the plate code':`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
+    if (mode==='outlines' && window.matchMedia('(hover:none) and (pointer:coarse)').matches) { const p=document.querySelector('.map-panel'); if (p) window.scrollTo({top:Math.max(0,p.getBoundingClientRect().top+window.scrollY-62),behavior:'smooth'}); }
   }
   function nextQuestion() {
     if (!roundActive) return;
     if (queue.length===0) {finishGame(found.size===listForMode().length);return;}
     current=queue.shift(); showPrompt(); updateStats();
-    if (mode==='outlines') { renderOutline(current); resetCodeInput(true); }
+    if (mode==='outlines') { renderOutline(current); resetCodeInput(); }
   }
   function findPath(name) { return mapGroup.selectAll(mode==='airports'?'.airport-node':mode==='outlines'?'.outline-shape, .lk-isl':'.region, .lk-isl').filter(d=>d.properties.quizName===name); }
   function handleRegionTap(name) {
@@ -216,12 +216,30 @@
   function showCaption(text,kind) { const el=$('outline-caption'); el.textContent=text; el.className='outline-caption show '+kind; }
   function hideCaption() { const el=$('outline-caption'); if (el) el.className='outline-caption'; }
   function renderCode(state) {
-    const v=codeInput.value;
+    const v=typedShown;
     [0,1].forEach(i=>{const b=$('cb'+i); b.textContent=v[i]||''; b.className='code-box'+(v[i]?' filled':'')+(!state&&i===v.length?' next':'')+(state?' '+state:'');});
   }
-  function resetCodeInput(focus) {
-    typedShown=''; codeInput.value=''; codeInput.disabled=!roundActive; renderCode();
-    if (focus && roundActive) { try { codeInput.focus({preventScroll:true}); } catch { codeInput.focus(); } }
+  function resetCodeInput() { typedShown=''; renderCode(); }
+  // Letters come from the physical keyboard (desktop) or the on-screen keyboard (touch devices); no native keyboard is ever opened.
+  function typeLetter(ch) {
+    if (mode!=='outlines' || !roundActive || !current || awaiting || typedShown.length>=2) return;
+    typedShown+=ch; renderCode();
+    if (typedShown.length===2) { const v=typedShown, gid=gameId; setTimeout(()=>{ if (gid===gameId && roundActive && current && !awaiting && typedShown===v) submitCode(v); },160); }
+  }
+  function backspaceCode() { if (mode!=='outlines' || !roundActive || !current || awaiting) return; typedShown=typedShown.slice(0,-1); renderCode(); }
+  function buildKeyboard() {
+    const host=$('osk'); if (!host) return;
+    [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M','⌫']].forEach(row=>{
+      const r=document.createElement('div'); r.className='osk-row';
+      row.forEach(k=>{
+        const b=document.createElement('button'); b.type='button'; b.className='osk-key'+(k==='⌫'?' osk-back':''); b.textContent=k; b.setAttribute('aria-label',k==='⌫'?'Backspace':k);
+        const press=()=>k==='⌫'?backspaceCode():typeLetter(k);
+        b.addEventListener('pointerdown',e=>{e.preventDefault();press();});
+        b.addEventListener('click',e=>{if(e.detail===0)press();}); // keyboard/assistive activation
+        r.append(b);
+      });
+      host.append(r);
+    });
   }
   function revealThenNext(ms) {
     awaiting=true; const gid=gameId;
@@ -246,7 +264,7 @@
     const total=listForMode().length, score=found.size, label=modeLabel();
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
     saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed});
-    if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(false); try{codeInput.blur();}catch{} renderOutline(null); }
+    if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(); renderOutline(null); }
     $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?`${districtKey} mapped!`:'India mapped!'):'Round over';
     $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
     $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
@@ -612,11 +630,11 @@
     if (saved && (saved.mode==='country'||saved.mode==='districts'||saved.mode==='airports'||saved.mode==='outlines')) mode=saved.mode;
     document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.mode!==mode) setMode(b.dataset.mode); }));
     $('state-select').addEventListener('change',e=>setMode('districts',e.target.value||null));
-    codeInput.addEventListener('input',()=>{
-      if (awaiting) { codeInput.value=typedShown; return; }
-      const v=codeInput.value.replace(/[^a-z]/gi,'').toUpperCase().slice(0,2);
-      codeInput.value=v; typedShown=v; renderCode();
-      if (v.length===2 && roundActive && current) { const gid=gameId; setTimeout(()=>{ if (gid===gameId && roundActive && current && !awaiting && codeInput.value===v) submitCode(v); },160); }
+    buildKeyboard();
+    document.addEventListener('keydown',e=>{
+      if (mode!=='outlines' || e.ctrlKey || e.metaKey || e.altKey || $('info-drawer').classList.contains('open')) return;
+      if (/^[a-z]$/i.test(e.key)) { e.preventDefault(); typeLetter(e.key.toUpperCase()); }
+      else if (e.key==='Backspace') { e.preventDefault(); backspaceCode(); }
     });
     applyModeUI();
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
