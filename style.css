@@ -266,3 +266,9 @@ body[data-mode=outlines] .map-canvas{height:clamp(400px,58vh,640px)}
   body[data-mode=outlines] #prompt-hint{display:none}
   .code-box{width:48px;height:54px;font-size:1.6rem;border-radius:14px}
 }
+
+/* v3.4 — 20-letter keypad (7/7/6), larger keys */
+.osk{gap:8px;margin-bottom:14px}
+.osk-row{gap:7px}
+.osk-key{max-width:56px;height:56px;border-radius:13px;font-size:1.35rem}
+.osk-key{flex:0 0 calc((100% - 6*7px)/7);max-width:none}

@@ -96,8 +96,8 @@
   const ALL = [...STATES.map(name => ({name,type:'State'})), ...UTS.map(name => ({name,type:'Union Territory'}))];
   // ---- Vehicle registration (licence plate) codes. First code is the current one shown in brackets; extra codes are accepted as answers too. ----
   const PLATE = {
-    'Andhra Pradesh':['AP'],'Arunachal Pradesh':['AR'],'Assam':['AS'],'Bihar':['BR'],'Chhattisgarh':['CG','CT'],'Goa':['GA'],'Gujarat':['GJ'],'Haryana':['HR'],'Himachal Pradesh':['HP'],'Jharkhand':['JH'],'Karnataka':['KA'],'Kerala':['KL'],'Madhya Pradesh':['MP'],'Maharashtra':['MH'],'Manipur':['MN'],'Meghalaya':['ML'],'Mizoram':['MZ'],'Nagaland':['NL'],'Odisha':['OD','OR'],'Punjab':['PB'],'Rajasthan':['RJ'],'Sikkim':['SK'],'Tamil Nadu':['TN'],'Telangana':['TG','TS'],'Tripura':['TR'],'Uttar Pradesh':['UP'],'Uttarakhand':['UK','UA'],'West Bengal':['WB'],
-    'Andaman and Nicobar Islands':['AN'],'Chandigarh':['CH'],'Dadra and Nagar Haveli and Daman and Diu':['DN','DD'],'Delhi':['DL'],'Jammu and Kashmir':['JK'],'Ladakh':['LA'],'Lakshadweep':['LD'],'Puducherry':['PY']
+    'Andhra Pradesh':['AP'],'Arunachal Pradesh':['AR'],'Assam':['AS'],'Bihar':['BR'],'Chhattisgarh':['CG'],'Goa':['GA'],'Gujarat':['GJ'],'Haryana':['HR'],'Himachal Pradesh':['HP'],'Jharkhand':['JH'],'Karnataka':['KA'],'Kerala':['KL'],'Madhya Pradesh':['MP'],'Maharashtra':['MH'],'Manipur':['MN'],'Meghalaya':['ML'],'Mizoram':['MZ'],'Nagaland':['NL'],'Odisha':['OD'],'Punjab':['PB'],'Rajasthan':['RJ'],'Sikkim':['SK'],'Tamil Nadu':['TN'],'Telangana':['TG'],'Tripura':['TR'],'Uttar Pradesh':['UP'],'Uttarakhand':['UK'],'West Bengal':['WB'],
+    'Andaman and Nicobar Islands':['AN'],'Chandigarh':['CH'],'Dadra and Nagar Haveli and Daman and Diu':['DD'],'Delhi':['DL'],'Jammu and Kashmir':['JK'],'Ladakh':['LA'],'Lakshadweep':['LD'],'Puducherry':['PY']
   };
   const CODE_OWNER = new Map(); Object.entries(PLATE).forEach(([n,cs])=>cs.forEach(c=>CODE_OWNER.set(c,n)));
   const codeOf = n => (PLATE[n]||[])[0] || '';
@@ -229,11 +229,11 @@
   function backspaceCode() { if (mode!=='outlines' || !roundActive || !current || awaiting) return; typedShown=typedShown.slice(0,-1); renderCode(); }
   function buildKeyboard() {
     const host=$('osk'); if (!host) return;
-    [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M','⌫']].forEach(row=>{
+    [['A','B','C','D','G','H','J'],['K','L','M','N','O','P','R'],['S','T','U','W','Y','Z']].forEach(row=>{
       const r=document.createElement('div'); r.className='osk-row';
       row.forEach(k=>{
-        const b=document.createElement('button'); b.type='button'; b.className='osk-key'+(k==='⌫'?' osk-back':''); b.textContent=k; b.setAttribute('aria-label',k==='⌫'?'Backspace':k);
-        const press=()=>k==='⌫'?backspaceCode():typeLetter(k);
+        const b=document.createElement('button'); b.type='button'; b.className='osk-key'; b.textContent=k; b.setAttribute('aria-label',k);
+        const press=()=>typeLetter(k);
         b.addEventListener('pointerdown',e=>{e.preventDefault();press();});
         b.addEventListener('click',e=>{if(e.detail===0)press();}); // keyboard/assistive activation
         r.append(b);
