@@ -544,6 +544,51 @@
       districts:['Almora','Bageshwar','Chamoli','Champawat','Dehradun','Haridwar','Nainital','Pauri Garhwal','Pithoragarh','Rudraprayag','Tehri Garhwal','Udham Singh Nagar','Uttarkashi'],
       aliases:{'Pauri Garhwal':['Pauri','Garhwal'],'Udham Singh Nagar':['US Nagar','U.S. Nagar'],'Tehri Garhwal':['Tehri'],'Nainital':['Naini Tal'],'Haridwar':['Hardwar'],'Dehradun':['Dehra Dun']}
     },
+    'Bihar': {
+      slug:'bihar', expected:38,
+      districts:['Araria','Arwal','Aurangabad','Banka','Begusarai','Bhagalpur','Bhojpur','Buxar','Darbhanga','East Champaran','Gaya','Gopalganj','Jamui','Jehanabad','Kaimur','Katihar','Khagaria','Kishanganj','Lakhisarai','Madhepura','Madhubani','Munger','Muzaffarpur','Nalanda','Nawada','Patna','Purnia','Rohtas','Saharsa','Samastipur','Saran','Sheikhpura','Sheohar','Sitamarhi','Siwan','Supaul','Vaishali','West Champaran'],
+      aliases:{'East Champaran':['Purbi Champaran','Purba Champaran','Purvi Champaran','Purba Champaran','Motihari'],'West Champaran':['Pashchim Champaran','Paschim Champaran','Pachim Champaran','Bettiah'],'Kaimur':['Bhabua','Kaimur Bhabua','Kaimur (Bhabua)'],'Sheikhpura':['Shekhpura','Sheikpura'],'Purnia':['Purnea'],'Saran':['Chhapra','Chapra'],'Bhojpur':['Arrah'],'Rohtas':['Sasaram'],'Lakhisarai':['Lakhi Sarai'],'Nalanda':['Bihar Sharif'],'Sheohar':['Sheohar']}
+    },
+    'Jharkhand': {
+      slug:'jharkhand', expected:24,
+      districts:['Bokaro','Chatra','Deoghar','Dhanbad','Dumka','East Singhbhum','Garhwa','Giridih','Godda','Gumla','Hazaribagh','Jamtara','Khunti','Koderma','Latehar','Lohardaga','Pakur','Palamu','Ramgarh','Ranchi','Sahibganj','Seraikela Kharsawan','Simdega','West Singhbhum'],
+      aliases:{'East Singhbhum':['Purbi Singhbhum','Purbi Singhbum','East Singhbum','Jamshedpur'],'West Singhbhum':['Pashchimi Singhbhum','Paschimi Singhbhum','West Singhbum','Chaibasa'],'Seraikela Kharsawan':['Saraikela Kharsawan','Seraikela-Kharsawan','Saraikela-Kharsawan','Saraikela','Seraikela','Seraikella Kharsawan','Saraikella Kharsawan'],'Sahibganj':['Sahebganj','Sahibgunj'],'Palamu':['Palamau'],'Koderma':['Kodarma'],'Hazaribagh':['Hazaribag'],'Pakur':['Pakaur']}
+    },
+    'Maharashtra': {
+      slug:'maharashtra', expected:36,
+      districts:['Ahilyanagar','Akola','Amravati','Beed','Bhandara','Buldhana','Chandrapur','Chhatrapati Sambhajinagar','Dharashiv','Dhule','Gadchiroli','Gondia','Hingoli','Jalgaon','Jalna','Kolhapur','Latur','Mumbai City','Mumbai Suburban','Nagpur','Nanded','Nandurbar','Nashik','Palghar','Parbhani','Pune','Raigad','Ratnagiri','Sangli','Satara','Sindhudurg','Solapur','Thane','Wardha','Washim','Yavatmal'],
+      aliases:{'Ahilyanagar':['Ahmednagar','Ahmadnagar','Ahilya Nagar','Ahilyadevi Nagar'],'Chhatrapati Sambhajinagar':['Aurangabad','Chhatrapati Sambhaji Nagar','Sambhajinagar','Chattrapati Sambhajinagar'],'Dharashiv':['Osmanabad'],'Mumbai City':['Mumbai','Greater Bombay','Bombay','Mumbai (City)'],'Mumbai Suburban':['Mumbai Suburbs','Mumbai Sub','Mumbai (Suburban)'],'Raigad':['Raigarh'],'Buldhana':['Buldana'],'Gondia':['Gondiya'],'Beed':['Bid'],'Washim':['Vashim'],'Nashik':['Nasik'],'Thane':['Thana'],'Sindhudurg':['Sindhudurga']},
+      // The open boundary data should already have Palghar (2014). If it ever shows a single big Thane, Palghar is cut from its northern part; skipped automatically once the data has Palghar.
+      cuts:[{from:'Thane',newName:'Palghar',region:[[72.40,19.28],[72.85,19.31],[73.20,19.47],[73.95,19.80],[73.95,20.45],[72.40,20.45]]}]
+    },
+    'Odisha': {
+      slug:'odisha', expected:30,
+      districts:['Angul','Balangir','Balasore','Bargarh','Bhadrak','Boudh','Cuttack','Deogarh','Dhenkanal','Gajapati','Ganjam','Jagatsinghpur','Jajpur','Jharsuguda','Kalahandi','Kandhamal','Kendrapara','Kendujhar','Khordha','Koraput','Malkangiri','Mayurbhanj','Nabarangpur','Nayagarh','Nuapada','Puri','Rayagada','Sambalpur','Subarnapur','Sundargarh'],
+      aliases:{'Angul':['Anugul'],'Balangir':['Bolangir'],'Balasore':['Baleshwar','Baleswar'],'Bargarh':['Baragarh'],'Boudh':['Baudh'],'Deogarh':['Debagarh'],'Jagatsinghpur':['Jagatsinghapur'],'Jajpur':['Jajapur'],'Kandhamal':['Kondhmal','Phulbani'],'Kendrapara':['Kendrapada'],'Kendujhar':['Keonjhar','Kendujhar (Keonjhar)'],'Khordha':['Khurda','Khorda'],'Nabarangpur':['Nabarangapur','Nowrangpur'],'Nuapada':['Nuapara'],'Rayagada':['Rayagarha'],'Subarnapur':['Sonepur','Sonapur','Subarnpur'],'Sundargarh':['Sundergarh']}
+    },
+    'Punjab': {
+      slug:'punjab', expected:23,
+      districts:['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka','Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Malerkotla','Mansa','Moga','Pathankot','Patiala','Rupnagar','Sahibzada Ajit Singh Nagar','Sangrur','Shahid Bhagat Singh Nagar','Sri Muktsar Sahib','Tarn Taran'],
+      aliases:{'Sahibzada Ajit Singh Nagar':['SAS Nagar','S.A.S. Nagar','S.A.S Nagar','Mohali','Ajitgarh','SAS Nagar (Mohali)','Sahibzada Ajit Singh Nagar (Mohali)'],'Shahid Bhagat Singh Nagar':['Nawanshahr','SBS Nagar','S.B.S. Nagar','Shaheed Bhagat Singh Nagar','Shahid Bhagat Singh Nagar (Nawanshahr)'],'Sri Muktsar Sahib':['Muktsar','Sri Muktsar','Muktsar Sahib'],'Rupnagar':['Ropar','Rupnagar (Ropar)'],'Ferozepur':['Firozpur','Ferozepore'],'Tarn Taran':['Taran Taran','Tarn Taran Sahib'],'Bathinda':['Bhatinda'],'Jalandhar':['Jullundur'],'Fatehgarh Sahib':['Fatehgarh']},
+      // Malerkotla (23rd district, 14 Jun 2021: Malerkotla, Ahmedgarh and Amargarh blocks) postdates the open boundary data, so it is cut out of Sangrur along an approximate border. Skipped automatically once the data has it.
+      cuts:[{from:'Sangrur',newName:'Malerkotla',region:[[75.72,30.50],[75.80,30.41],[75.93,30.40],[76.04,30.45],[76.08,30.56],[76.03,30.70],[75.90,30.76],[75.76,30.68]]}]
+    },
+    'West Bengal': {
+      slug:'west-bengal', expected:27,
+      districts:['Alipurduar','Arambagh','Bankura','Basirhat','Birbhum','Cooch Behar','Dakshin Dinajpur','Darjeeling','Hooghly','Howrah','Jalpaiguri','Jangipur','Jhargram','Kalimpong','Kolkata','Malda','Murshidabad','Nadia','North 24 Parganas','Paschim Bardhaman','Paschim Medinipur','Purba Bardhaman','Purba Medinipur','Purulia','South 24 Parganas','Sundarban','Uttar Dinajpur'],
+      aliases:{'Cooch Behar':['Koch Bihar','Coochbehar','Cooch Bihar','Koch Behar'],'Darjeeling':['Darjiling'],'Dakshin Dinajpur':['South Dinajpur'],'Uttar Dinajpur':['North Dinajpur'],'North 24 Parganas':['Uttar 24 Parganas','North Twenty Four Parganas','North 24-Parganas','24 Parganas North','North 24 Pargana'],'South 24 Parganas':['Dakshin 24 Parganas','South Twenty Four Parganas','South 24-Parganas','24 Parganas South','South 24 Pargana'],'Paschim Medinipur':['West Medinipur','West Midnapore','Paschim Midnapore','Paschim Medinipore'],'Purba Medinipur':['East Medinipur','East Midnapore','Purba Midnapore','Purba Medinipore'],'Paschim Bardhaman':['West Bardhaman','West Burdwan','Paschim Burdwan','Paschim Barddhaman'],'Purba Bardhaman':['East Bardhaman','East Burdwan','Purba Burdwan','Purba Barddhaman','Barddhaman','Bardhaman','Burdwan'],'Hooghly':['Hugli'],'Howrah':['Haora'],'Kolkata':['Calcutta'],'Malda':['Maldah'],'Purulia':['Puruliya'],'Sundarban':['Sundarbans','Sunderban','Sundarbans District'],'Basirhat':['Bashirhat']},
+      // Open boundary data predates the 2026 districts: Basirhat (from North 24 Parganas), Sundarban (Canning + Kakdwip subdivisions of South 24 Parganas), Jangipur (from Murshidabad) and Arambagh (from Hooghly) are cut along approximate subdivision borders (see cutRegions). Kolkata is already its own district.
+      // Fallbacks for much older data (skipped automatically when the data already has the district): Paschim Bardhaman, Jhargram, Kalimpong.
+      cuts:[
+        {from:'North 24 Parganas',newName:'Basirhat',region:[[88.52,21.60],[89.45,21.60],[89.45,22.84],[88.80,22.86],[88.62,22.78],[88.52,22.66]]},
+        {from:'South 24 Parganas',newName:'Sundarban',region:[[87.60,21.20],[87.60,21.94],[88.00,21.98],[88.25,22.03],[88.38,22.10],[88.50,22.17],[88.60,22.26],[88.70,22.37],[88.78,22.45],[89.50,22.45],[89.50,21.20]]},
+        {from:'Murshidabad',newName:'Jangipur',region:[[87.70,25.00],[88.22,25.00],[88.22,24.58],[88.14,24.45],[88.10,24.33],[87.70,24.33]]},
+        {from:'Hooghly',newName:'Arambagh',region:[[87.30,22.50],[87.945,22.50],[87.965,22.80],[87.945,23.05],[87.30,23.30]]},
+        {from:'Purba Bardhaman',newName:'Paschim Bardhaman',region:[[86.20,23.38],[87.20,23.42],[87.50,23.47],[87.52,23.95],[86.20,23.95]]},
+        {from:'Paschim Medinipur',newName:'Jhargram',region:[[86.20,21.90],[87.15,21.90],[87.20,22.40],[87.25,22.80],[87.30,23.00],[86.20,23.00]]},
+        {from:'Darjeeling',newName:'Kalimpong',region:[[88.42,27.35],[88.42,27.05],[88.45,26.95],[88.55,26.82],[89.10,26.82],[89.10,27.35]]}
+      ]
+    },
     // One dropdown choice for all the Union Territories (Delhi, Jammu & Kashmir, Ladakh, Lakshadweep, Puducherry, A&N, DNH&DD, Chandigarh).
     'Union Territories': {
       slug:'union-territories', context:true,
@@ -654,13 +699,86 @@
     if (!made) { console.warn(`Could not carve ${sp.newName} out of ${sp.from}; keeping the original districts`); return items; }
     return out;
   }
+  // ---- Cutting a district with an approximate region (for districts newer than the open boundary data) ----
+  // Weiler–Atherton clipping of a district's outer ring against a simple region polygon: gives (district ∩ region) and (district − region).
+  function ringArea2(r){let a=0;for(let i=0,n=r.length;i<n;i++){const p=r[i],q=r[(i+1)%n];a+=p[0]*q[1]-q[0]*p[1];}return a/2;}
+  function openRing(r){const o=r.slice(); if(o.length>1&&o[0][0]===o[o.length-1][0]&&o[0][1]===o[o.length-1][1]) o.pop(); return ringArea2(o)<0?o.reverse():o;}
+  function wClip(subj,reg) { // -> {inter:[rings], diff:[polygons]} or null if the outlines touch in a degenerate way
+    const A=openRing(subj), B=openRing(reg), na=A.length, nb=B.length;
+    const ea=Array.from({length:na},()=>[]), eb=Array.from({length:nb},()=>[]); let ids=0;
+    for (let i=0;i<na;i++) for (let j=0;j<nb;j++) {
+      const h=segHit(A[i],A[(i+1)%na],B[j],B[(j+1)%nb]);
+      if (h) { ea[i].push({t:h.t,pt:h.pt,id:ids}); eb[j].push({t:h.u,pt:h.pt,id:ids}); ids++; }
+    }
+    const close=r=>[...r,r[0]];
+    if (!ids) {
+      if (inRing(A[0],B)) return {inter:[close(A)],diff:[]};
+      if (inRing(B[0],A)) return {inter:[close(B)],diff:[[close(A),close(B)]]};
+      return {inter:[],diff:[[close(A)]]};
+    }
+    if (ids%2) return null;
+    const build=(P,E)=>{const L=[]; P.forEach((p,i)=>{L.push({pt:p,id:-1}); E[i].sort((x,y)=>x.t-y.t).forEach(e=>L.push({pt:e.pt,id:e.id}));}); return L;};
+    const LA=build(A,ea), LB=build(B,eb), iA=[], iB=[];
+    LA.forEach((n,k)=>{ if (n.id>=0) iA[n.id]=k; }); LB.forEach((n,k)=>{ if (n.id>=0) iB[n.id]=k; });
+    LA.forEach((n,k)=>{ if (n.id<0) return; const m=LA[(k+1)%LA.length].pt; n.enter=inRing([(n.pt[0]+m[0])/2,(n.pt[1]+m[1])/2],B); });
+    const walk=(wantEnter,backB)=>{
+      const used=new Set(), out=[];
+      for (let k=0;k<LA.length;k++) {
+        const s=LA[k]; if (s.id<0||s.enter!==wantEnter||used.has(s.id)) continue;
+        const ring=[s.pt]; let cur=k, onA=true, closed=false;
+        for (let g=0;g<200000;g++) {
+          const L=onA?LA:LB, step=(onA||!backB)?1:-1;
+          cur=(cur+step+L.length)%L.length;
+          const nd=L[cur]; ring.push(nd.pt);
+          if (nd.id>=0) { used.add(nd.id); if (nd.id===s.id) {closed=true;break;} cur=onA?iB[nd.id]:iA[nd.id]; onA=!onA; }
+        }
+        if (!closed) return null;
+        ring.pop(); if (ring.length>=3) out.push(close(ring));
+      }
+      return out;
+    };
+    const inter=walk(true,false), diff=walk(false,true);
+    if (!inter||!diff) return null;
+    return {inter,diff:diff.map(r=>[r])};
+  }
+  // Give a region's straight edges a gentle, repeatable wobble so the cut looks like a real border.
+  function wobble(reg,amp=0.035) {
+    const out=[]; const n=reg.length;
+    for (let i=0;i<n;i++) {
+      const p=reg[i], q=reg[(i+1)%n], dx=q[0]-p[0], dy=q[1]-p[1], len=Math.hypot(dx,dy), k=Math.max(1,Math.round(len/0.06));
+      out.push(p);
+      for (let s=1;s<k;s++) {
+        const t=s/k, h=Math.sin((p[0]*91.7+p[1]*57.3+s*12.9898)*43758.5453)*43758.5453, r=(h-Math.floor(h))-0.5;
+        out.push([p[0]+dx*t+(-dy/len)*r*len*amp*2/Math.sqrt(k), p[1]+dy*t+(dx/len)*r*len*amp*2/Math.sqrt(k)]);
+      }
+    }
+    return out;
+  }
+  // cfg.cuts: [{from, newName, region:[[lon,lat],…]}]. Each cut replaces the parent district by (parent − region) and (parent ∩ region). Skipped automatically if the data already has newName.
+  function cutRegions(items,cfg) {
+    (cfg.cuts||[]).forEach(c=>{
+      if (items.some(x=>x.name===c.newName) || !items.some(x=>x.name===c.from)) return;
+      const reg=wobble(c.region), kept=[], made=[], rest=[]; let ok=true;
+      items.forEach(it=>{
+        if (it.name!==c.from) { kept.push(it); return; }
+        polysOf(it.geometry).forEach(poly=>{
+          const r=wClip(poly[0],reg);
+          if (!r) { ok=false; return; }
+          r.inter.forEach(ring=>made.push([ring])); r.diff.forEach(p=>rest.push(p));
+        });
+      });
+      if (!ok || !made.length || !rest.length) { console.warn(`Could not carve ${c.newName} out of ${c.from}; keeping the original districts`); return; }
+      items=kept; items.push({name:c.newName,geometry:{type:'MultiPolygon',coordinates:made}},{name:c.from,geometry:{type:'MultiPolygon',coordinates:rest}});
+    });
+    return items;
+  }
   async function fetchDistricts(key) {
     const cfg=DISTRICT_SETS[key];
     const toItems=(feats,fallback)=>feats.map(f=>({name:pickDistrictName(f.properties,key)||fallback||null,geometry:f.geometry}));
     const finish=items=>{
       const unnamed=items.filter(x=>!x.name).length;
       if (unnamed) console.warn(`${unnamed} ${key} feature(s) had no readable district name`);
-      const merged=mergeFeatures(splitDistrict(applyPatches(items.filter(x=>x.name),key),cfg),'District');
+      const merged=mergeFeatures(cutRegions(splitDistrict(applyPatches(items.filter(x=>x.name),key),cfg),cfg),'District');
       return merged.size>=2 ? [...merged.values()] : null;
     };
     const build=feats=>finish(toItems(feats));
