@@ -559,7 +559,12 @@
       districts:['Ahilyanagar','Akola','Amravati','Beed','Bhandara','Buldhana','Chandrapur','Chhatrapati Sambhajinagar','Dharashiv','Dhule','Gadchiroli','Gondia','Hingoli','Jalgaon','Jalna','Kolhapur','Latur','Mumbai City','Mumbai Suburban','Nagpur','Nanded','Nandurbar','Nashik','Palghar','Parbhani','Pune','Raigad','Ratnagiri','Sangli','Satara','Sindhudurg','Solapur','Thane','Wardha','Washim','Yavatmal'],
       aliases:{'Ahilyanagar':['Ahmednagar','Ahmadnagar','Ahilya Nagar','Ahilyadevi Nagar'],'Chhatrapati Sambhajinagar':['Aurangabad','Chhatrapati Sambhaji Nagar','Sambhajinagar','Chattrapati Sambhajinagar'],'Dharashiv':['Osmanabad'],'Mumbai City':['Mumbai','Greater Bombay','Bombay','Mumbai (City)'],'Mumbai Suburban':['Mumbai Suburbs','Mumbai Sub','Mumbai (Suburban)'],'Raigad':['Raigarh'],'Buldhana':['Buldana'],'Gondia':['Gondiya'],'Beed':['Bid'],'Washim':['Vashim'],'Nashik':['Nasik'],'Thane':['Thana'],'Sindhudurg':['Sindhudurga']},
       // The open boundary data should already have Palghar (2014). If it ever shows a single big Thane, Palghar is cut from its northern part; skipped automatically once the data has Palghar.
-      cuts:[{from:'Thane',newName:'Palghar',region:[[72.40,19.28],[72.85,19.31],[73.20,19.47],[73.95,19.80],[73.95,20.45],[72.40,20.45]]}]
+      cuts:[
+        {from:'Thane',newName:'Palghar',region:[[72.40,19.28],[72.85,19.31],[73.20,19.47],[73.95,19.80],[73.95,20.45],[72.40,20.45]]},
+        // Mumbai City and Mumbai Suburban are tiny and some files merge them: whichever one is missing is cut from the other along the Mahim–Sion line.
+        {from:'Mumbai Suburban',newName:'Mumbai City',region:[[72.60,18.70],[73.10,18.70],[73.10,19.043],[72.87,19.045],[72.83,19.042],[72.60,19.040]]},
+        {from:'Mumbai City',newName:'Mumbai Suburban',region:[[72.60,19.040],[72.83,19.042],[72.87,19.045],[73.10,19.043],[73.10,19.60],[72.60,19.60]]}
+      ]
     },
     'Odisha': {
       slug:'odisha', expected:30,
@@ -588,6 +593,44 @@
         {from:'Paschim Medinipur',newName:'Jhargram',region:[[86.20,21.90],[87.15,21.90],[87.20,22.40],[87.25,22.80],[87.30,23.00],[86.20,23.00]]},
         {from:'Darjeeling',newName:'Kalimpong',region:[[88.42,27.35],[88.42,27.05],[88.45,26.95],[88.55,26.82],[89.10,26.82],[89.10,27.35]]}
       ]
+    },
+    'Assam': {
+      slug:'assam', expected:35,
+      districts:['Bajali','Baksa','Barpeta','Biswanath','Bongaigaon','Cachar','Charaideo','Chirang','Darrang','Dhemaji','Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Hailakandi','Hojai','Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Kokrajhar','Lakhimpur','Majuli','Morigaon','Nagaon','Nalbari','Sivasagar','Sonitpur','South Salmara-Mankachar','Sribhumi','Tamulpur','Tinsukia','Udalguri','West Karbi Anglong'],
+      aliases:{'Sribhumi':['Karimganj','Sri Bhumi','Sribhumi (Karimganj)'],'Kamrup Metropolitan':['Kamrup Metro','Kamrup (Metropolitan)','Kamrup M','Kamrup Metropolitan District'],'Dima Hasao':['North Cachar Hills','N C Hills','Dima Hasao (North Cachar Hills)'],'Sivasagar':['Sibsagar'],'South Salmara-Mankachar':['South Salmara Mankachar','South Salmara','Salmara South','South Salmara-Mancachar'],'Lakhimpur':['North Lakhimpur'],'Morigaon':['Marigaon'],'Biswanath':['Biswanath Chariali'],'Nagaon':['Nowgong'],'Karbi Anglong':['East Karbi Anglong'],'West Karbi Anglong':['West Karbi-Anglong'],'Hojai':['Hojai District']},
+      // Bajali (2020) and Tamulpur (2022) postdate the open boundary data, so they are cut from Barpeta and Baksa along approximate lines. Skipped automatically once the data has them.
+      cuts:[
+        {from:'Barpeta',newName:'Bajali',region:[[91.02,26.35],[91.45,26.35],[91.45,26.85],[91.02,26.85]]},
+        {from:'Baksa',newName:'Tamulpur',region:[[91.50,26.30],[92.20,26.30],[92.20,27.10],[91.52,27.10]]}
+      ]
+    },
+    'Chhattisgarh': {
+      slug:'chhattisgarh', expected:33,
+      districts:['Balod','Baloda Bazar','Balrampur','Bastar','Bemetara','Bijapur','Bilaspur','Dantewada','Dhamtari','Durg','Gariaband','Gaurela-Pendra-Marwahi','Janjgir-Champa','Jashpur','Kabirdham','Kanker','Khairagarh-Chhuikhadan-Gandai','Kondagaon','Korba','Koriya','Mahasamund','Manendragarh-Chirmiri-Bharatpur','Mohla-Manpur-Ambagarh Chowki','Mungeli','Narayanpur','Raigarh','Raipur','Rajnandgaon','Sakti','Sarangarh-Bilaigarh','Sukma','Surajpur','Surguja'],
+      aliases:{'Baloda Bazar':['Balodabazar','Baloda Bazar-Bhatapara','Balodabazar-Bhatapara','Baloda Bazar Bhatapara'],'Balrampur':['Balrampur-Ramanujganj','Balrampur Ramanujganj'],'Bijapur':['Bijapur (Chhattisgarh)'],'Dantewada':['Dakshin Bastar Dantewada','Dakshin Bastar Dantewada (South Bastar)','South Bastar Dantewada','Dantewara'],'Gariaband':['Gariyaband'],'Gaurela-Pendra-Marwahi':['Gaurela Pendra Marwahi','Gourela-Pendra-Marwahi','Gaurela'],'Janjgir-Champa':['Janjgir Champa','Janjgir'],'Jashpur':['Jashpurnagar'],'Kabirdham':['Kawardha','Kabeerdham','Kabirdham (Kawardha)'],'Kanker':['Uttar Bastar Kanker','North Bastar Kanker','Uttar Bastar Kanker (North Bastar)'],'Khairagarh-Chhuikhadan-Gandai':['Khairagarh Chhuikhadan Gandai','Khairagarh'],'Koriya':['Korea','Koria'],'Manendragarh-Chirmiri-Bharatpur':['Manendragarh Chirmiri Bharatpur','Manendragarh'],'Mohla-Manpur-Ambagarh Chowki':['Mohla Manpur Ambagarh Chowki','Mohla-Manpur','Mohla Manpur'],'Mungeli':['Mungeli'],'Sarangarh-Bilaigarh':['Sarangarh Bilaigarh','Sarangarh'],'Surajpur':['Surajpur'],'Surguja':['Sarguja','Surguja (Ambikapur)'],'Narayanpur':['Narainpur']},
+      // The five districts of Sept 2022 (+ Gaurela-Pendra-Marwahi, 2020) may postdate the open boundary data. If missing, each is cut from its parent(s) along approximate lines. Skipped automatically once the data has them.
+      cuts:[
+        {from:'Bilaspur',newName:'Gaurela-Pendra-Marwahi',region:[[81.30,22.60],[81.70,22.55],[82.05,22.55],[82.40,22.65],[82.40,23.40],[81.30,23.40]]},
+        {from:'Janjgir-Champa',newName:'Sakti',region:[[82.80,21.40],[83.60,21.40],[83.60,22.70],[82.76,22.70]]},
+        {from:['Raigarh','Baloda Bazar'],newName:'Sarangarh-Bilaigarh',region:[[82.35,21.10],[84.20,21.10],[84.20,21.92],[82.90,21.96],[82.35,21.99]]},
+        {from:'Koriya',newName:'Manendragarh-Chirmiri-Bharatpur',region:[[81.50,22.60],[82.43,22.60],[82.46,24.40],[81.50,24.40]]},
+        {from:'Rajnandgaon',newName:'Mohla-Manpur-Ambagarh Chowki',region:[[80.00,20.00],[81.02,20.00],[81.02,20.90],[80.88,21.10],[80.00,21.10]]},
+        {from:'Rajnandgaon',newName:'Khairagarh-Chhuikhadan-Gandai',region:[[80.30,21.32],[81.60,21.32],[81.60,22.10],[80.30,22.10]]}
+      ]
+    },
+    'Gujarat': {
+      slug:'gujarat', expected:34,
+      districts:['Ahmedabad','Amreli','Anand','Aravalli','Banaskantha','Bharuch','Bhavnagar','Botad','Chhota Udaipur','Dahod','Dang','Devbhumi Dwarka','Gandhinagar','Gir Somnath','Jamnagar','Junagadh','Kheda','Kutch','Mahisagar','Mehsana','Morbi','Narmada','Navsari','Panchmahal','Patan','Porbandar','Rajkot','Sabarkantha','Surat','Surendranagar','Tapi','Vadodara','Valsad','Vav-Tharad'],
+      aliases:{'Banaskantha':['Banas Kantha','Banaskanta'],'Sabarkantha':['Sabar Kantha','Sabarkanta'],'Chhota Udaipur':['Chhota Udepur','Chota Udaipur','Chhotaudepur','Chhotaudaipur','Chhota Udepur District'],'Dang':['Dangs','The Dangs','Dangs (Ahwa)','Dang (Ahwa)'],'Devbhumi Dwarka':['Dwarka','Devbhoomi Dwarka','Devbhumi-Dwarka'],'Gir Somnath':['Gir-Somnath','Somnath','Gir Somanth'],'Kutch':['Kachchh','Kutchh','Kachch'],'Panchmahal':['Panchmahals','Panch Mahals','Panch Mahal'],'Mehsana':['Mahesana','Mahesana (Mehsana)'],'Vav-Tharad':['Vav Tharad','Vav–Tharad'],'Mahisagar':['Mahisagar District'],'Kheda':['Kaira']},
+      // Vav-Tharad (established 2 Oct 2025, western Banaskantha: Vav, Tharad, Suigam, Bhabhar, Deodar, Lakhni…) postdates the open boundary data, so it is cut from Banaskantha along an approximate line. Skipped automatically once the data has it.
+      cuts:[{from:'Banaskantha',newName:'Vav-Tharad',region:[[70.50,23.40],[72.12,23.40],[72.14,23.95],[72.10,24.30],[72.12,25.10],[70.50,25.10]]}]
+    },
+    'Haryana': {
+      slug:'haryana', expected:23,
+      districts:['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurugram','Hansi','Hisar','Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh','Nuh','Palwal','Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamunanagar'],
+      aliases:{'Gurugram':['Gurgaon'],'Nuh':['Mewat'],'Charkhi Dadri':['Dadri','Charkhi-Dadri','Charkhi Dadri (Dadri)'],'Mahendragarh':['Mahendergarh','Narnaul'],'Yamunanagar':['Yamuna Nagar'],'Jind':['Jhind'],'Sonipat':['Sonepat'],'Hisar':['Hissar']},
+      // Hansi (notified 22 Dec 2025: Hansi + Narnaund subdivisions of Hisar) postdates the open boundary data, so it is cut from Hisar along an approximate line. Skipped automatically once the data has it.
+      cuts:[{from:'Hisar',newName:'Hansi',region:[[75.86,28.70],[76.60,28.70],[76.60,29.30],[75.98,29.30],[75.86,29.20]]}]
     },
     // One dropdown choice for all the Union Territories (Delhi, Jammu & Kashmir, Ladakh, Lakshadweep, Puducherry, A&N, DNH&DD, Chandigarh).
     'Union Territories': {
@@ -757,18 +800,22 @@
   // cfg.cuts: [{from, newName, region:[[lon,lat],…]}]. Each cut replaces the parent district by (parent − region) and (parent ∩ region). Skipped automatically if the data already has newName.
   function cutRegions(items,cfg) {
     (cfg.cuts||[]).forEach(c=>{
-      if (items.some(x=>x.name===c.newName) || !items.some(x=>x.name===c.from)) return;
-      const reg=wobble(c.region), kept=[], made=[], rest=[]; let ok=true;
+      const froms=[].concat(c.from).filter(f=>items.some(x=>x.name===f));
+      if (items.some(x=>x.name===c.newName) || !froms.length) return;
+      const reg=wobble(c.region), kept=[], made=[], rest=new Map(); let ok=true;
       items.forEach(it=>{
-        if (it.name!==c.from) { kept.push(it); return; }
+        if (!froms.includes(it.name)) { kept.push(it); return; }
         polysOf(it.geometry).forEach(poly=>{
           const r=wClip(poly[0],reg);
           if (!r) { ok=false; return; }
-          r.inter.forEach(ring=>made.push([ring])); r.diff.forEach(p=>rest.push(p));
+          r.inter.forEach(ring=>made.push([ring]));
+          if (!rest.has(it.name)) rest.set(it.name,[]);
+          r.diff.forEach(p=>rest.get(it.name).push(p));
         });
       });
-      if (!ok || !made.length || !rest.length) { console.warn(`Could not carve ${c.newName} out of ${c.from}; keeping the original districts`); return; }
-      items=kept; items.push({name:c.newName,geometry:{type:'MultiPolygon',coordinates:made}},{name:c.from,geometry:{type:'MultiPolygon',coordinates:rest}});
+      if (!ok || !made.length) { console.warn(`Could not carve ${c.newName} out of ${froms.join('/')}; keeping the original districts`); return; }
+      items=kept; items.push({name:c.newName,geometry:{type:'MultiPolygon',coordinates:made}});
+      froms.forEach(f=>{ if (rest.get(f)?.length) items.push({name:f,geometry:{type:'MultiPolygon',coordinates:rest.get(f)}}); });
     });
     return items;
   }
