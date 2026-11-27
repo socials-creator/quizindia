@@ -332,3 +332,11 @@ body[data-mode="learn"] .gamebar,body[data-mode="learn"] .history-row,body[data-
 .progress-list li{display:grid;grid-template-columns:1fr 70px auto;gap:8px;align-items:center;font-size:.85rem;padding:3px 0}
 .progress-list i{height:6px;border-radius:3px;background:linear-gradient(90deg,#2e7d4f var(--pct),rgba(128,128,128,.25) var(--pct))}
 .progress-empty,.trouble-list{font-size:.85rem;opacity:.8}
+
+/* ===== v4.4 ===== */
+.region.learn-dim{opacity:.3}
+.nat-peak .nat-shape{fill:#8b6b4a;stroke:#fff;stroke-width:1.2px}
+.nat-peak .nat-halo{fill:rgba(139,107,74,.12);stroke:rgba(139,107,74,.5)}
+.nat-desert .nat-shape{fill:#d9a441;stroke:#fff;stroke-width:1.2px}
+.nat-desert .nat-halo{fill:rgba(217,164,65,.14);stroke:rgba(217,164,65,.6);stroke-dasharray:4 3}
+.nat-peak.missed .nat-shape,.nat-desert.missed .nat-shape{fill:#d64545}
