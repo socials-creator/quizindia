@@ -8,7 +8,7 @@
   const AIRPORT_RADIUS_KM = 60;
   // Smaller tap radius for airports that share a metro area, so their zones overlap less.
   const AIRPORT_RADIUS_OVERRIDES = {'Indira Gandhi Int’l (DEL)':35,'Noida Int’l (DXN)':35,'Chhatrapati Shivaji Maharaj Int’l (BOM)':35,'Navi Mumbai Int’l (NMI)':35,'Goa Int’l (GOI)':35,'Manohar Int’l (GOX)':35,'Kushinagar Int’l (KBK)':35,'Gorakhpur (GOP)':35,'Hubballi (HBX)':35,'Belagavi (IXG)':35,'Nashik (ISK)':40,'Shirdi Int’l (SAG)':40,'Jamnagar (JGA)':40,'Agra (AGR)':45,'Gwalior (GWL)':45,'Dimapur (DMU)':50,'Sindhudurg (SDW)':35,'Shimla (SLV)':35,'Kangra (DHM)':45,'Kullu-Manali (KUU)':45,'Shillong (SHL)':35,'Pasighat (IXT)':35,'Shaheed Bhagat Singh Int’l (IXC)':30,'Lokpriya Gopinath Bordoloi Int’l (GAU)':30,'Bagdogra Int’l (IXB)':30,'Pakyong (PYG)':35};
-  const radiusFor = n => AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM;
+  const radiusFor = n => mode==='capitals' ? (capInfo(n)?.[4]||CAPITAL_RADIUS_KM) : (AIRPORT_RADIUS_OVERRIDES[n] || AIRPORT_RADIUS_KM);
   const EARTH_KM = 6371;
   const AIRPORTS = [
     ['Indira Gandhi Int’l (DEL)',28.5562,77.1000],['Chhatrapati Shivaji Maharaj Int’l (BOM)',19.0896,72.8656],['Chennai Int’l (MAA)',12.9941,80.1709],['Netaji Subhas Chandra Bose Int’l (CCU)',22.6547,88.4467],
@@ -84,6 +84,72 @@
   ];
   const DOMESTIC_AIRPORTS = new Set(['Warangal (WGC)','Gorakhpur (GOP)','Hubballi (HBX)','Belagavi (IXG)','Mysuru (MYQ)','Rajahmundry (RJA)','Jabalpur (JLR)','Kolhapur (KLH)','Nashik (ISK)','Jamnagar (JGA)','Bhuj (BHJ)','Prayagraj (IXD)','Agra (AGR)','Gwalior (GWL)','Jorhat (JRH)','Silchar (IXS)','Dimapur (DMU)','Lengpui (AJL)','Veer Surendra Sai (JRG)','Thoothukudi (TCR)','Kadapa (CDP)','Uyyalawada Narasimha Reddy (KJB)','Salem (SXV)','Kalaburagi (GBI)','Kuvempu (RQY)','Jindal Vijaynagar (VDY)','Bidar (IXX)','Jalgaon (JLG)','Shri Guru Gobind Singh Ji (NDC)','Sindhudurg (SDW)','Gondia (GDB)','Amravati (AMI)','Solapur (SSE)','Puducherry (PNY)','Agatti (AGX)','Diu (DIU)','Swami Vivekananda (RPR)','Birsa Munda (IXR)','Jolly Grant (DED)','Jammu (IXJ)','Kushok Bakula Rimpochee (IXL)','Dibrugarh (DIB)','Maharana Pratap (UDR)','Jodhpur (JDH)','Kangra (DHM)','Shimla (SLV)','Kullu-Manali (KUU)','Maharaja Agrasen Int’l (HSS)','Pakyong (PYG)','Shillong (SHL)','Pasighat (IXT)','Tezpur (TEZ)','Pantnagar (PGH)','Deoghar (DGH)','Bilaspur (PAB)','Maa Danteswari (JGB)','Kazi Nazrul Islam (RDP)','Darbhanga (DBR)','Kishangarh (KQH)','Bikaner (BKB)','Jaisalmer (JSA)','Khajuraho (HJR)','Porbandar (PBD)','Adampur (AIP)',]);
   const AIRPORT_NAMES = AIRPORTS.map(a=>a[0]);
+  // ---- v4.3: Capitals mode. [city, lat, lon, serves, tap radius in km (optional)] ----
+  const CAPITAL_RADIUS_KM = 45;
+  const CAPITALS = [
+    ['Amaravati',16.573,80.358,'Andhra Pradesh'],['Itanagar',27.0844,93.6053,'Arunachal Pradesh'],['Dispur',26.1433,91.7898,'Assam'],['Patna',25.5941,85.1376,'Bihar'],
+    ['Raipur',21.2514,81.6296,'Chhattisgarh'],['Panaji',15.4909,73.8278,'Goa'],['Gandhinagar',23.2156,72.6369,'Gujarat'],['Chandigarh',30.7333,76.7794,'Punjab, Haryana and the UT of Chandigarh',30],
+    ['Shimla',31.1048,77.1734,'Himachal Pradesh'],['Ranchi',23.3441,85.3096,'Jharkhand'],['Bengaluru',12.9716,77.5946,'Karnataka'],['Thiruvananthapuram',8.5241,76.9366,'Kerala'],
+    ['Bhopal',23.2599,77.4126,'Madhya Pradesh'],['Mumbai',18.975,72.8258,'Maharashtra',30],['Imphal',24.817,93.9368,'Manipur'],['Shillong',25.5788,91.8933,'Meghalaya'],
+    ['Aizawl',23.7271,92.7176,'Mizoram'],['Kohima',25.6751,94.1086,'Nagaland'],['Bhubaneswar',20.2961,85.8245,'Odisha'],['Jaipur',26.9124,75.7873,'Rajasthan'],
+    ['Gangtok',27.3389,88.6065,'Sikkim',35],['Chennai',13.0827,80.2707,'Tamil Nadu'],['Hyderabad',17.385,78.4867,'Telangana'],['Agartala',23.8315,91.2868,'Tripura'],
+    ['Lucknow',26.8467,80.9462,'Uttar Pradesh'],['Dehradun',30.3165,78.0322,'Uttarakhand'],['Kolkata',22.5726,88.3639,'West Bengal'],
+    ['Sri Vijaya Puram',11.6234,92.7265,'Andaman and Nicobar Islands (formerly Port Blair)'],['New Delhi',28.6139,77.209,'Delhi',30],['Srinagar',34.0837,74.7973,'Jammu and Kashmir (summer capital; Jammu in winter)'],
+    ['Leh',34.1526,77.5771,'Ladakh'],['Puducherry',11.9416,79.8083,'Puducherry'],['Daman',20.3974,72.8328,'Dadra and Nagar Haveli and Daman and Diu'],['Kavaratti',10.5626,72.6369,'Lakshadweep']
+  ];
+  const CAPITAL_NAMES = CAPITALS.map(c=>c[0]);
+  const capInfo = n => CAPITALS.find(c=>c[0]===n);
+  // ---- v4.3: Nature mode. Rivers: Natural Earth centre-lines, clipped to India and simplified (about 2 km). Mountain ranges: approximate crest lines. Lakes: approximate outlines. Parks: points. tol = tap distance in km. ----
+  const RIVER_LINES = {"Ganga":[[[79.84,30.89],[79.81,30.82],[79.87,30.69],[79.72,30.51],[79.65,30.5],[79.55,30.57],[79.39,30.42],[79.32,30.4],[79.27,30.3],[79.21,30.28],[79.0,30.31],[78.8,30.24],[78.7,30.24],[78.59,30.15],[78.59,30.07],[78.46,30.07],[78.41,30.13],[78.32,30.14],[78.15,29.93],[78.19,29.71],[78.02,29.62],[77.99,29.57],[78.12,29.25],[78.12,29.19],[78.08,29.14],[78.09,28.84],[78.18,28.69],[78.2,28.57],[78.26,28.49],[78.29,28.31],[78.46,28.11],[78.63,27.99],[78.9,27.91],[78.98,27.83],[79.16,27.82],[79.2,27.69],[79.33,27.64],[79.41,27.65],[79.55,27.54],[79.7,27.24],[79.84,27.15],[79.93,27.14],[80.01,27.03],[80.01,26.97],[80.11,26.87],[80.14,26.74],[80.25,26.68],[80.35,26.49],[80.53,26.36],[80.56,26.24],[80.67,26.11],[80.75,26.11],[80.81,26.03],[80.96,26.08],[81.03,26.06],[81.07,26.0],[81.2,25.94],[81.22,25.87],[81.39,25.77],[81.38,25.7],[81.4,25.67],[81.51,25.63],[81.55,25.58],[81.63,25.59],[81.7,25.49],[81.78,25.48],[81.91,25.51],[81.9,25.41],[81.97,25.32],[82.04,25.34],[82.11,25.28],[82.18,25.32],[82.21,25.3],[82.2,25.19],[82.27,25.19],[82.23,25.22],[82.29,25.28],[82.33,25.22],[82.4,25.26],[82.5,25.17],[82.55,25.16],[82.59,25.17],[82.57,25.22],[82.64,25.22],[82.78,25.12],[82.84,25.12],[82.92,25.19],[83.01,25.21],[83.01,25.29],[83.04,25.32],[83.17,25.35],[83.18,25.41],[83.12,25.45],[83.19,25.53],[83.33,25.47],[83.41,25.49],[83.53,25.4],[83.54,25.44],[83.49,25.52],[83.62,25.6],[83.71,25.61],[83.77,25.52],[83.9,25.52],[84.14,25.74],[84.18,25.75],[84.25,25.68],[84.37,25.77],[84.49,25.7],[84.6,25.69],[84.75,25.75],[84.88,25.71],[85.06,25.73],[85.14,25.64],[85.24,25.62],[85.28,25.55],[85.37,25.51],[85.52,25.58],[85.65,25.46],[85.74,25.51],[85.83,25.5],[86.03,25.33],[86.24,25.33],[86.31,25.29],[86.42,25.33],[86.53,25.48],[86.59,25.46],[86.58,25.38],[86.61,25.3],[86.69,25.26],[86.78,25.28],[86.89,25.35],[87.0,25.28],[87.19,25.23],[87.3,25.38],[87.48,25.4],[87.6,25.27],[87.77,25.24],[87.78,25.09],[87.95,24.99],[87.91,24.84],[87.96,24.72],[88.08,24.6],[88.11,24.5],[88.19,24.46],[88.3,24.49]],[[87.94,24.81],[87.94,24.62],[88.06,24.52],[88.08,24.46],[88.12,24.45],[88.11,24.41],[88.25,24.31],[88.23,24.29],[88.25,24.27],[88.26,24.14],[88.19,24.0],[88.23,23.99],[88.2,23.97],[88.24,23.77],[88.16,23.7],[88.15,23.63],[88.22,23.61],[88.24,23.64],[88.26,23.58],[88.32,23.61],[88.28,23.55],[88.37,23.52],[88.34,23.44],[88.38,23.39],[88.34,23.33],[88.35,23.27],[88.39,23.22],[88.46,23.21],[88.45,23.14],[88.5,23.11],[88.47,23.06],[88.5,23.05],[88.44,23.03],[88.41,22.95]],[[88.41,22.95],[88.35,22.78],[88.37,22.7],[88.34,22.58],[88.25,22.55],[88.13,22.47],[88.14,22.4],[88.11,22.38],[88.07,22.23]],[[88.41,22.95],[88.5,22.93],[88.56,22.99],[88.63,22.94],[88.72,22.94],[88.77,22.86],[88.85,22.83],[88.81,22.72],[88.94,22.64],[88.96,22.59],[88.93,22.55],[88.97,22.53],[89.0,22.45],[89.01,22.29],[89.08,22.18],[89.06,22.13]],[[88.43,24.36],[88.45,24.28],[88.54,24.23],[88.54,24.2],[88.51,24.2],[88.52,24.14],[88.65,24.08],[88.63,23.99],[88.77,23.96]]],"Yamuna":[[[78.34,30.92],[78.22,30.82],[78.1,30.78],[77.96,30.51],[77.89,30.54],[77.58,30.43],[77.58,30.33],[77.54,30.21],[77.28,30.04],[77.22,29.96],[77.18,29.8],[77.09,29.66],[77.1,29.59],[77.06,29.56],[77.07,29.5],[77.12,29.48],[77.07,29.42],[77.15,29.41],[77.13,29.12],[77.2,29.0],[77.18,28.96],[77.22,28.91],[77.2,28.81],[77.22,28.69]],[[77.22,28.69],[77.26,28.59],[77.38,28.46],[77.41,28.47],[77.5,28.39],[77.47,28.32],[77.54,28.24],[77.5,28.21],[77.54,28.18],[77.49,28.15],[77.5,28.09],[77.47,28.11],[77.47,28.05],[77.53,27.97],[77.52,27.9],[77.59,27.85],[77.58,27.8],[77.69,27.8],[77.66,27.76],[77.7,27.63],[77.66,27.61],[77.71,27.59],[77.68,27.51],[77.75,27.38],[77.79,27.39],[77.78,27.33],[77.86,27.27],[77.88,27.3],[77.93,27.26],[77.95,27.3],[77.98,27.25],[77.99,27.27],[78.02,27.26],[78.02,27.18],[78.2,27.19],[78.21,27.09],[78.35,27.13],[78.3,27.06],[78.41,27.06],[78.51,26.93],[78.51,26.98],[78.56,26.98],[78.59,26.93],[78.6,26.95],[78.64,26.89],[78.73,26.92],[78.86,26.8],[78.94,26.78],[78.93,26.76],[79.0,26.76],[78.98,26.74],[79.08,26.6],[79.17,26.59],[79.2,26.55],[79.29,26.52],[79.24,26.5],[79.26,26.48],[79.22,26.43],[79.29,26.44],[79.32,26.4],[79.46,26.44],[79.5,26.35],[79.56,26.36],[79.53,26.29],[79.72,26.19],[79.77,26.11],[79.9,26.1],[79.95,26.16],[79.96,26.07],[80.08,26.07],[80.08,26.0],[80.19,25.93],[80.28,25.93],[80.3,25.89],[80.41,25.91],[80.54,25.87],[80.54,25.84],[80.46,25.84],[80.49,25.79],[80.57,25.79],[80.57,25.73],[80.73,25.69],[80.82,25.73],[80.85,25.68],[80.92,25.69],[80.95,25.61],[81.02,25.63],[81.0,25.57],[81.02,25.54],[81.18,25.49],[81.15,25.41],[81.26,25.33],[81.34,25.34],[81.39,25.28],[81.47,25.27],[81.66,25.36],[81.8,25.33],[81.83,25.42],[81.9,25.41]]],"Brahmaputra":[[[95.46,27.84],[95.29,27.74],[95.1,27.69],[95.08,27.64],[95.14,27.69],[95.14,27.63],[94.92,27.57],[94.87,27.5],[94.76,27.46],[94.76,27.42],[94.65,27.35],[94.67,27.34],[94.63,27.32],[94.62,27.28],[94.66,27.31],[94.68,27.28],[94.62,27.25],[94.6,27.19],[94.57,27.22],[94.55,27.1],[94.5,27.1],[94.43,27.01],[94.31,26.93],[94.2,26.92],[94.12,26.85],[94.14,26.91],[94.11,26.91],[93.75,26.73],[93.66,26.71],[93.44,26.77],[93.37,26.72],[93.27,26.74],[93.12,26.65],[92.9,26.65],[92.85,26.61],[92.71,26.61],[92.59,26.52],[92.4,26.54],[92.08,26.38],[92.06,26.3],[91.53,26.14],[91.14,26.21],[90.85,26.13],[90.49,26.23],[90.42,26.17],[89.95,26.01],[89.8,25.8]],[[95.05,29.18],[95.0,29.17],[94.9,29.02],[94.79,28.93],[94.77,28.85],[94.92,28.82],[94.93,28.74],[95.1,28.54],[95.09,28.41],[94.99,28.29],[95.03,28.17],[95.28,28.16],[95.31,28.1],[95.39,28.05],[95.46,27.84]],[[97.04,28.37],[97.04,28.15],[96.98,27.96],[96.89,27.9],[96.69,27.98],[96.55,28.09],[96.45,28.05],[96.4,27.89],[96.13,27.9],[95.75,27.77],[95.64,27.81],[95.48,27.82],[95.46,27.84]]],"Indus":[[[79.44,32.74],[79.31,32.93],[79.18,32.99],[78.96,33.2],[78.92,33.21],[78.79,33.15],[78.71,33.17],[78.43,33.28],[78.2,33.43],[78.15,33.47],[78.15,33.57],[77.86,33.78],[77.66,34.03],[77.56,34.11],[77.42,34.13],[77.32,34.2],[77.26,34.19],[77.04,34.26],[76.99,34.31],[76.84,34.33],[76.68,34.45],[76.6,34.55],[76.32,34.67],[76.19,34.83],[76.22,34.95],[75.92,35.17],[75.84,35.34],[75.75,35.31],[75.64,35.31],[75.45,35.46],[75.36,35.49],[75.32,35.59],[75.09,35.6],[74.87,35.71],[74.75,35.72],[74.72,35.84],[74.63,35.82],[74.65,35.76],[74.62,35.74],[74.65,35.7],[74.61,35.66],[74.63,35.53],[74.4,35.42],[74.16,35.41],[73.76,35.53],[73.53,35.54]]],"Godavari":[[[73.65,20.01],[73.69,20.04],[73.97,19.98],[74.06,20.05],[74.39,19.93],[74.44,19.88],[74.51,19.89],[74.57,19.81],[74.76,19.76],[74.85,19.66],[75.18,19.59],[75.22,19.55],[75.42,19.46],[75.44,19.42],[75.48,19.44],[75.55,19.39],[75.72,19.35],[75.79,19.4],[75.91,19.39],[75.92,19.3],[76.01,19.34],[76.02,19.3],[76.11,19.31],[76.23,19.26],[76.3,19.27],[76.36,19.23],[76.33,19.11],[76.38,19.13],[76.44,19.06],[76.57,19.11],[76.63,19.07],[76.63,19.01],[76.72,19.02],[76.74,18.98],[76.78,19.05],[76.92,19.05],[76.98,19.1],[77.06,19.09],[77.08,19.12],[77.08,19.07],[77.13,19.07],[77.16,19.12],[77.38,19.16],[77.38,19.09],[77.48,19.01],[77.57,18.99],[77.71,18.88],[77.89,18.83],[78.03,18.87],[78.05,18.91],[78.22,19.0],[78.28,18.98],[78.3,18.93],[78.39,18.99],[78.54,18.94],[78.57,18.98],[78.65,18.99],[78.68,19.03],[78.78,19.01],[78.84,19.06],[78.92,19.04],[78.93,19.07],[79.01,19.08],[79.07,19.05],[79.18,18.88],[79.29,18.81],[79.43,18.85],[79.69,18.68],[79.81,18.72],[79.85,18.79],[79.84,18.88],[80.09,18.7],[80.29,18.71],[80.35,18.59],[80.39,18.6],[80.39,18.48],[80.47,18.42],[80.49,18.29],[80.7,18.16],[80.78,18.02],[80.89,17.94],[80.87,17.78],[80.9,17.64],[80.99,17.64],[81.02,17.59],[81.12,17.61],[81.15,17.57],[81.25,17.56],[81.3,17.49],[81.51,17.46],[81.62,17.39],[81.62,17.34],[81.67,17.31],[81.65,17.2],[81.75,17.03],[81.73,16.89],[81.86,16.58],[81.83,16.48],[81.75,16.42],[81.7,16.43],[81.71,16.31]],[[81.76,16.96],[81.84,16.79],[81.93,16.72],[82.07,16.68],[82.34,16.7]]],"Krishna":[[[73.8,17.99],[73.93,17.91],[74.04,17.77],[74.05,17.69],[74.14,17.61],[74.14,17.54],[74.09,17.47],[74.11,17.39],[74.21,17.28],[74.2,17.15],[74.37,17.1],[74.38,17.03],[74.44,17.04],[74.45,16.99],[74.55,16.88],[74.55,16.83],[74.69,16.74],[74.61,16.7],[74.68,16.63],[74.63,16.62],[74.68,16.57],[74.79,16.6],[74.81,16.65],[74.89,16.67],[74.93,16.63],[74.98,16.68],[75.11,16.51],[75.16,16.55],[75.19,16.63],[75.26,16.59],[75.36,16.6],[75.45,16.51],[75.44,16.43],[75.52,16.47],[75.57,16.43],[75.64,16.45],[75.79,16.35],[75.85,16.36],[76.0,16.31],[76.05,16.27],[76.08,16.2],[76.28,16.15],[76.38,16.25],[76.48,16.25],[76.55,16.34],[76.76,16.43],[76.85,16.44],[76.87,16.48],[76.97,16.51],[76.99,16.57],[77.02,16.51],[77.13,16.48],[77.17,16.44],[77.73,16.33],[77.9,16.22],[77.95,16.12],[78.19,15.95],[78.25,15.99],[78.24,16.04],[78.3,16.02],[78.4,16.08],[78.5,16.09],[78.56,16.06],[78.65,16.07],[78.79,16.03],[78.84,16.07],[78.85,16.15],[78.9,16.14],[79.02,16.25],[79.21,16.24],[79.23,16.33],[79.21,16.49],[79.27,16.57],[79.42,16.59],[79.5,16.64],[79.55,16.63],[79.77,16.73],[79.83,16.69],[79.88,16.7],[79.91,16.63],[79.96,16.63],[80.07,16.82],[80.12,16.79],[80.14,16.66],[80.19,16.61],[80.39,16.57],[80.47,16.59],[80.68,16.44],[80.72,16.36],[80.82,16.26],[80.88,16.01]]],"Narmada":[[[81.57,22.75],[81.46,22.77],[81.41,22.84],[81.16,22.95],[81.04,22.98],[81.0,22.93],[80.89,22.95],[80.9,23.0],[80.84,23.06],[80.8,23.0],[80.77,23.02],[80.52,22.95],[80.53,22.91],[80.48,22.84],[80.51,22.73],[80.48,22.67],[80.51,22.62],[80.41,22.58],[80.34,22.63],[80.33,22.73],[80.29,22.73],[80.27,22.8],[80.06,22.77],[79.93,22.88],[79.94,22.94],[79.91,23.0],[79.94,23.1],[79.79,23.13],[79.69,23.1],[79.52,23.14],[79.43,23.1],[79.13,23.08],[79.09,23.02],[78.96,23.05],[78.73,23.05],[78.47,23.0],[78.29,22.86],[78.17,22.88],[78.12,22.79],[77.99,22.82],[77.94,22.81],[77.92,22.86],[77.88,22.84],[77.86,22.87],[77.76,22.77],[77.31,22.56],[77.26,22.6],[77.05,22.5],[76.92,22.49],[76.8,22.43],[76.76,22.31],[76.57,22.23],[76.48,22.28],[76.48,22.32],[76.42,22.34],[75.95,22.19],[75.34,22.14],[74.98,22.08],[74.77,22.08],[74.57,22.02],[74.53,22.05],[74.43,22.04],[74.25,21.93],[74.06,21.94],[73.79,21.84],[73.7,21.85],[73.54,21.98],[73.44,21.99],[73.41,21.92],[73.37,21.93],[73.34,21.89],[73.27,21.94],[73.23,21.93],[73.25,21.84],[73.14,21.84],[73.16,21.78],[73.13,21.75]]],"Mahanadi":[[[80.63,20.6],[80.63,20.75],[80.76,20.78],[80.9,21.0],[81.03,21.07],[81.09,21.05],[81.13,21.1],[81.23,21.1],[81.24,21.23],[81.36,21.42],[81.36,21.49],[81.43,21.61],[81.59,21.64],[81.61,21.6],[81.67,21.58],[81.7,21.63],[81.67,21.66],[81.72,21.7],[81.7,21.76],[81.88,21.78],[82.03,21.89],[82.17,21.85],[82.2,21.77],[82.32,21.72],[82.44,21.75],[82.67,21.72],[82.81,21.74],[82.85,21.7],[83.02,21.74],[83.39,21.69],[83.47,21.65],[83.58,21.75],[83.71,21.69],[83.86,21.52]],[[83.86,21.52],[83.93,21.49],[83.98,21.43],[83.9,21.31],[83.91,21.2],[83.83,21.05],[83.83,20.93],[83.96,20.84],[84.05,20.81],[84.21,20.89],[84.29,20.88],[84.36,20.76],[84.54,20.72],[84.71,20.63],[84.78,20.52],[84.9,20.52],[85.17,20.38],[85.23,20.4],[85.34,20.36],[85.5,20.38],[85.64,20.46],[85.72,20.44],[85.77,20.47],[85.87,20.45],[85.96,20.36],[86.01,20.37],[86.06,20.26],[86.15,20.21],[86.16,20.14]]],"Cauvery":[[[75.66,12.34],[75.74,12.28],[75.87,12.32],[75.92,12.43],[75.96,12.44],[75.98,12.54],[76.05,12.62],[76.17,12.58],[76.23,12.52],[76.39,12.49],[76.41,12.53],[76.43,12.52]],[[76.43,12.52],[76.5,12.45],[76.78,12.4],[76.91,12.23],[77.02,12.24],[77.01,12.18],[77.04,12.17],[77.12,12.2],[77.2,12.32],[77.42,12.29],[77.48,12.21],[77.72,12.18],[77.73,12.06],[77.67,11.96],[77.83,11.9],[77.69,11.42],[77.85,11.24],[77.89,11.1],[77.92,11.07],[78.03,11.09],[78.12,11.06],[78.2,10.95],[78.36,10.96],[78.68,10.87]],[[78.89,10.82],[79.26,10.93],[79.84,10.91]],[[78.89,10.82],[78.96,10.79],[79.06,10.82],[79.37,10.79],[79.43,10.72],[79.49,10.56],[79.47,10.42],[79.53,10.34]]],"Tapi":[[[78.13,21.7],[78.0,21.68],[77.92,21.73],[77.81,21.73],[77.78,21.81],[77.73,21.82],[77.3,21.8],[77.2,21.73],[77.07,21.71],[76.92,21.62],[76.81,21.6],[76.77,21.51],[76.67,21.45],[76.49,21.45],[76.34,21.4],[76.06,21.14],[75.87,21.06],[75.77,21.06],[75.44,21.17],[75.3,21.15],[75.07,21.17],[74.83,21.28],[74.76,21.36],[74.68,21.4],[74.4,21.44],[74.31,21.52],[74.13,21.52],[73.91,21.46],[73.71,21.31],[73.69,21.25],[73.39,21.28],[73.18,21.23],[73.0,21.31],[72.88,21.23],[72.8,21.24],[72.81,21.19],[72.73,21.15]]]};
+  const NATURE = [
+    {name:'Ganga',kind:'river',tol:35,lines:RIVER_LINES.Ganga,fact:'Flows from the Himalayas (Uttarakhand) to the Bay of Bengal.'},
+    {name:'Yamuna',kind:'river',tol:30,lines:RIVER_LINES.Yamuna,fact:'Joins the Ganga at Prayagraj.'},
+    {name:'Brahmaputra',kind:'river',tol:35,lines:RIVER_LINES.Brahmaputra,fact:'Enters India as the Siang/Dihang in Arunachal Pradesh and crosses Assam.'},
+    {name:'Indus',kind:'river',tol:35,lines:RIVER_LINES.Indus,fact:'In India it flows through Ladakh.'},
+    {name:'Godavari',kind:'river',tol:35,lines:RIVER_LINES.Godavari,fact:'Peninsular India’s longest river, from Maharashtra to the Bay of Bengal.'},
+    {name:'Krishna',kind:'river',tol:35,lines:RIVER_LINES.Krishna,fact:'Rises in the Western Ghats and flows east to the Bay of Bengal.'},
+    {name:'Narmada',kind:'river',tol:30,lines:RIVER_LINES.Narmada,fact:'Flows west to the Arabian Sea through a rift valley.'},
+    {name:'Mahanadi',kind:'river',tol:30,lines:RIVER_LINES.Mahanadi,fact:'Main river of Chhattisgarh and Odisha.'},
+    {name:'Cauvery',kind:'river',tol:30,lines:RIVER_LINES.Cauvery,fact:'Rises in Karnataka (Kodagu) and flows through Tamil Nadu.'},
+    {name:'Tapi',kind:'river',tol:30,lines:RIVER_LINES.Tapi,fact:'Flows west, parallel to the Narmada, to the Arabian Sea at Surat.'},
+    {name:'Himalayas',kind:'mountain',tol:130,lines:[[[74.3,34.3],[75.2,33.7],[76.2,33.0],[77.0,32.5],[77.9,32.0],[78.5,31.5],[79.0,31.0],[79.9,30.4],[80.8,30.1],[82.0,29.5],[83.5,28.8],[85.0,28.3],[86.9,28.0],[88.1,27.7],[89.3,27.7],[91.0,27.9],[92.5,28.0],[93.8,28.5],[95.0,29.0]]],fact:'The world’s highest range; the crest line is approximate.'},
+    {name:'Western Ghats',kind:'mountain',tol:70,lines:[[[73.75,21.0],[73.6,20.0],[73.6,19.2],[73.4,18.4],[73.6,17.9],[73.9,17.0],[74.2,15.9],[74.4,15.3],[74.6,14.6],[74.9,13.9],[75.3,13.2],[75.7,12.4],[75.9,11.7],[76.5,11.3],[76.7,10.5],[77.05,10.15],[77.2,9.3],[77.3,8.6],[77.5,8.2]]],fact:'Runs along the west coast from the Tapi to Kanyakumari; the crest line is approximate.'},
+    {name:'Jim Corbett',kind:'park',tol:45,pt:[78.77,29.53],fact:'Uttarakhand · India’s oldest national park (1936).'},
+    {name:'Kaziranga',kind:'park',tol:45,pt:[93.36,26.62],fact:'Assam · home of the one-horned rhinoceros.'},
+    {name:'Gir',kind:'park',tol:45,pt:[70.8,21.13],fact:'Gujarat · the last home of the Asiatic lion.'},
+    {name:'Kanha',kind:'park',tol:45,pt:[80.62,22.33],fact:'Madhya Pradesh · tiger reserve that inspired The Jungle Book.'},
+    {name:'Vembanad',kind:'lake',tol:40,ring:[[76.277,10.022],[76.394,9.758],[76.435,9.455],[76.435,9.306],[76.535,9.004],[76.528,8.979],[76.508,8.966],[76.484,8.969],[76.468,8.986],[76.366,9.293],[76.365,9.448],[76.326,9.74],[76.217,9.99],[76.216,10.01],[76.228,10.027],[76.253,10.035],[76.277,10.022]],fact:'Kerala · the longest lake in India (about 96 km).'},
+    {name:'Chilika',kind:'lake',tol:45,ring:[[85.45,19.9],[85.58,19.8],[85.52,19.72],[85.4,19.68],[85.35,19.6],[85.22,19.5],[85.1,19.45],[85.05,19.52],[85.12,19.65],[85.2,19.72],[85.28,19.82],[85.38,19.92],[85.45,19.9]],fact:'Odisha · Asia’s largest brackish-water lagoon.'},
+    {name:'Pulicat',kind:'lake',tol:40,ring:[[80.115,13.599],[80.17,13.453],[80.18,13.325],[80.168,13.301],[80.143,13.29],[80.117,13.297],[80.103,13.315],[80.091,13.441],[80.044,13.563],[79.992,13.658],[79.991,13.677],[79.999,13.695],[80.025,13.71],[80.055,13.701],[80.115,13.599]],fact:'Andhra Pradesh / Tamil Nadu · India’s second-largest lagoon.'},
+    {name:'Loktak',kind:'lake',tol:40,ring:[[93.78,24.58],[93.86,24.55],[93.88,24.47],[93.82,24.42],[93.75,24.45],[93.72,24.53],[93.78,24.58]],fact:'Manipur · largest freshwater lake of the North-East, with floating phumdis.'},
+    {name:'Wular',kind:'lake',tol:40,ring:[[74.52,34.4],[74.62,34.4],[74.66,34.33],[74.6,34.27],[74.52,34.28],[74.49,34.34],[74.52,34.4]],fact:'Jammu & Kashmir · among India’s largest freshwater lakes.'}
+  ];
+  const NATURE_SETS = {
+    'Rivers (10)':{kinds:['river'],noun:'river',slug:'rivers'},
+    'Mountain ranges (2)':{kinds:['mountain'],noun:'mountain range',slug:'mountains'},
+    'National parks (4)':{kinds:['park'],noun:'national park',slug:'parks'},
+    'Largest lakes (5)':{kinds:['lake'],noun:'lake',slug:'lakes'},
+    'All 21 features':{kinds:['river','mountain','park','lake'],noun:'feature',slug:'all'}
+  };
+  const NATURE_KIND = {river:'River',mountain:'Mountain range',park:'National park',lake:'Lake'};
+  const natureFor = key => NATURE.filter(f=>(NATURE_SETS[key]?.kinds||[]).includes(f.kind));
+  const natureByName = n => NATURE.find(f=>f.name===n);
+  // ---- v4.3: Learn mode (3 states per direction). Population is Census 2011, rounded; areas are official figures. ----
+  const LEARN_GROUPS = {'North':['Punjab','Haryana','Himachal Pradesh'],'South':['Kerala','Tamil Nadu','Karnataka'],'East':['West Bengal','Odisha','Bihar'],'West':['Gujarat','Maharashtra','Goa']};
+  const LEARN = {
+    'Punjab':{capital:'Chandigarh (shared with Haryana)',largest:'Ludhiana',formed:'1 Nov 1966 (present-day Punjab)',language:'Punjabi',pop:'27.7 million',area:'50,362 km²',neighbours:'Haryana, Himachal Pradesh, Rajasthan, Jammu & Kashmir, Chandigarh; Pakistan',known:'The Golden Temple (Amritsar) and the Green Revolution.'},
+    'Haryana':{capital:'Chandigarh (shared with Punjab)',largest:'Faridabad',formed:'1 Nov 1966',language:'Hindi (Punjabi is the second official language)',pop:'25.4 million',area:'44,212 km²',neighbours:'Punjab, Himachal Pradesh, Uttarakhand, Uttar Pradesh, Rajasthan, Delhi, Chandigarh',known:'Kurukshetra, and the Gurugram–Manesar industrial belt.'},
+    'Himachal Pradesh':{capital:'Shimla (Dharamshala is the winter capital)',largest:'Shimla',formed:'25 Jan 1971 (full statehood)',language:'Hindi (Sanskrit is the second official language)',pop:'6.9 million',area:'55,673 km²',neighbours:'Jammu & Kashmir, Ladakh, Punjab, Haryana, Uttarakhand, Uttar Pradesh; Tibet (China)',known:'Hill stations such as Shimla and Manali, and apple orchards.'},
+    'Kerala':{capital:'Thiruvananthapuram',largest:'Thiruvananthapuram',formed:'1 Nov 1956',language:'Malayalam',pop:'33.4 million',area:'38,863 km²',neighbours:'Karnataka, Tamil Nadu (and the Arabian Sea)',known:'Backwaters, spices and the highest literacy rate among the states.'},
+    'Tamil Nadu':{capital:'Chennai',largest:'Chennai',formed:'Madras State 1950; renamed Tamil Nadu in 1969',language:'Tamil',pop:'72.1 million',area:'130,058 km²',neighbours:'Kerala, Karnataka, Andhra Pradesh, Puducherry',known:'Dravidian temple architecture and a major automobile industry.'},
+    'Karnataka':{capital:'Bengaluru',largest:'Bengaluru',formed:'1 Nov 1956 (as Mysore; renamed Karnataka in 1973)',language:'Kannada',pop:'61.1 million',area:'191,791 km²',neighbours:'Maharashtra, Goa, Telangana, Andhra Pradesh, Tamil Nadu, Kerala',known:'Bengaluru’s IT industry, Mysuru and the ruins of Hampi.'},
+    'West Bengal':{capital:'Kolkata',largest:'Kolkata',formed:'15 Aug 1947 (Partition of Bengal)',language:'Bengali',pop:'91.3 million',area:'88,752 km²',neighbours:'Bihar, Jharkhand, Odisha, Assam, Sikkim; Bangladesh, Nepal, Bhutan',known:'The Sundarbans mangroves and Darjeeling tea.'},
+    'Odisha':{capital:'Bhubaneswar',largest:'Bhubaneswar',formed:'1 Apr 1936 (as Orissa; renamed Odisha in 2011)',language:'Odia',pop:'42.0 million',area:'155,707 km²',neighbours:'West Bengal, Jharkhand, Chhattisgarh, Andhra Pradesh',known:'The Konark Sun Temple, Puri’s Jagannath Temple and Chilika Lake.'},
+    'Bihar':{capital:'Patna',largest:'Patna',formed:'22 Mar 1912 (separated from Bengal)',language:'Hindi (Urdu is the second official language)',pop:'104.1 million',area:'94,163 km²',neighbours:'Uttar Pradesh, Jharkhand, West Bengal; Nepal',known:'Nalanda, Bodh Gaya and the ancient city of Pataliputra.'},
+    'Gujarat':{capital:'Gandhinagar',largest:'Ahmedabad',formed:'1 May 1960',language:'Gujarati',pop:'60.4 million',area:'196,024 km²',neighbours:'Rajasthan, Madhya Pradesh, Maharashtra, Dadra & Nagar Haveli and Daman & Diu; Pakistan',known:'Gir Forest (Asiatic lions), the Rann of Kutch and the Statue of Unity.'},
+    'Maharashtra':{capital:'Mumbai (Nagpur hosts the winter session)',largest:'Mumbai',formed:'1 May 1960',language:'Marathi',pop:'112.4 million',area:'307,713 km²',neighbours:'Gujarat, Madhya Pradesh, Chhattisgarh, Telangana, Karnataka, Goa, Dadra & Nagar Haveli and Daman & Diu',known:'Mumbai, the financial capital, and the Ajanta and Ellora caves.'},
+    'Goa':{capital:'Panaji',largest:'Vasco da Gama',formed:'30 May 1987 (statehood; liberated in 1961)',language:'Konkani',pop:'1.5 million',area:'3,702 km² (the smallest state by area)',neighbours:'Maharashtra, Karnataka',known:'Beaches and Portuguese-era churches and heritage.'}
+  };
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
   ];
@@ -108,32 +174,29 @@
   const mapCache = new Map();
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
+  let reviewRound = false, reviewPool = [], pendingStart = false, learnPicked = null, showLabels = true;
 
   function canonical(raw) {
     const clean = String(raw || '').trim().replace(/\s+/g,' ');
     if (ALIASES.has(clean)) return ALIASES.get(clean);
     return ALL.find(x => x.name.toLowerCase() === clean.toLowerCase())?.name || clean;
   }
-  function listForMode() { return poolNames; }
-  function typeOf(name) { return mode==='airports' ? (name==='Warangal (WGC)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? (LK_NAMES.includes(name)?'Sub-division':'District') : (STATES.includes(name) ? 'State' : 'Union Territory'); }
-  function noun() { return mode==='airports' ? 'airport' : mode==='districts' ? 'district' : mode==='outlines' ? 'outline' : 'region'; }
+  function listForMode() { return reviewRound ? reviewPool : poolNames; }
+  function typeOf(name) { if (mode==='capitals') return 'Capital city'; if (mode==='nature') return NATURE_KIND[natureByName(name)?.kind]||'Feature'; if (mode==='learn') return 'District'; return mode==='airports' ? (name==='Warangal (WGC)'?'Domestic airport (under redevelopment)':DOMESTIC_AIRPORTS.has(name)?'Domestic airport':'International airport') : mode==='districts' ? (LK_NAMES.includes(name)?'Sub-division':'District') : (STATES.includes(name) ? 'State' : 'Union Territory'); }
+  function noun() { return mode==='capitals' ? 'capital' : mode==='nature' ? (NATURE_SETS[districtKey]?.noun||'feature') : mode==='learn' ? 'district' : mode==='airports' ? 'airport' : mode==='districts' ? 'district' : mode==='outlines' ? 'outline' : 'region'; }
   // Show the licence plate code in brackets for states/UTs (States & UTs and Outlines modes).
   function lab(n) { return (mode==='country'||mode==='outlines') && PLATE[n] ? `${n} (${codeOf(n)})` : n; }
   const dset = () => DISTRICT_SETS[districtKey] || {};
-  function modeLabel() { return mode==='airports' ? 'Airports' : mode==='outlines' ? 'Outlines' : mode==='districts' ? (dset().modeName||`${districtKey||'State'} districts`) : 'All regions'; }
-  function bestKey() { return mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='outlines' ? 'indiaMapQuiz.best.outlines.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
+  function modeLabel() { return mode==='capitals' ? 'Capitals' : mode==='nature' ? (districtKey||'Nature') : mode==='learn' ? 'Learn' : mode==='airports' ? 'Airports' : mode==='outlines' ? 'Outlines' : mode==='districts' ? (dset().modeName||`${districtKey||'State'} districts`) : 'All regions'; }
+  function bestKey() { return mode==='capitals' ? 'indiaMapQuiz.best.capitals.v1' : mode==='nature' && districtKey ? `indiaMapQuiz.best.nature.${NATURE_SETS[districtKey].slug}.v1` : mode==='airports' ? 'indiaMapQuiz.best.airports.v1' : mode==='outlines' ? 'indiaMapQuiz.best.outlines.v1' : mode==='districts' && districtKey ? `indiaMapQuiz.best.districts.${DISTRICT_SETS[districtKey].slug}.v1` : BEST_KEY; }
   function toast(message) {
     $('toast').textContent = message; $('toast').classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(()=>$('toast').classList.remove('show'),1700);
   }
-  function setStatus() {
-    const el=$('offline-status');
-    if (!navigator.onLine) {el.textContent='Offline';el.dataset.state='offline';}
-    else {el.textContent='Online';el.dataset.state='online';}
-  }
   function readJSON(key,fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
   function saveHistory(item) {
     const history=readJSON(HISTORY_KEY,[]); history.unshift(item); localStorage.setItem(HISTORY_KEY,JSON.stringify(history.slice(0,10))); renderHistory();
+    if (item.review) return;
     const best=readJSON(bestKey(),null);
     if (!best || item.score>best.score || (item.score===best.score && item.misses<best.misses)) {localStorage.setItem(bestKey(),JSON.stringify(item));renderBest();}
   }
@@ -155,6 +218,7 @@
     while(ol.children.length>8)ol.lastElementChild.remove();
   }
   function showPrompt() {
+    if (mode==='capitals'||mode==='nature'||mode==='learn') return showPromptX();
     $('side-skip').textContent=`Skip this ${noun()} →`;
     if (!current) {
       $('prompt-name').textContent=roundActive?'Round complete':(mode==='districts'&&!districtKey?'Choose a state':mode==='outlines'?'Name the outline':'Press New game');
@@ -171,15 +235,18 @@
     $('side-description').textContent=mode==='airports'?`${typeOf(current)} · tap within ${radiusFor(current)} km of it.`:mode==='districts'?`${typeOf(current)} of ${dset().parents?`${dset().parents[current]} (${codeOf(dset().parents[current])})`:districtKey} · Find it on the map.`:mode==='outlines'?'State or Union Territory · type its licence plate code.':`${typeOf(current)} · Find it on the map.`;
     $('skip').disabled=false; $('side-skip').disabled=false;
   }
-  function startGame() {
-    const pool=listForMode();
-    if (mode==='districts' && !districtKey) {toast('Select a state first.');return;}
+  function startGame(review=false) {
+    if (mode==='learn') return;
+    if ((mode==='districts'||mode==='nature') && !districtKey) {toast(mode==='nature'?'Select a category first.':'Select a state first.');return;}
     if (!features.length) {toast('The map is still loading.');return;}
+    reviewRound=false;
+    if (review===true) { const t=troubleList(); if (!t.length) {toast('No saved mistakes for this mode yet.');renderReview();return;} reviewPool=t; reviewRound=true; }
+    const pool=listForMode();
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
     gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null; awaiting=false; hideCaption();
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
-    mapGroup.selectAll('.region, .airport-node, .outline-shape, .base-region, .lk-isl').classed('found',false).classed('missed',false).classed('target-reveal',false);
+    mapGroup.selectAll('.region, .airport-node, .nat-node, .outline-shape, .base-region, .lk-isl').classed('found',false).classed('missed',false).classed('target-reveal',false);
     $('map-message').textContent=mode==='outlines'?'Round in progress · type the plate code':`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
     if (mode==='outlines' && window.matchMedia('(hover:none) and (pointer:coarse)').matches) { const p=document.querySelector('.map-panel'); if (p) window.scrollTo({top:Math.max(0,p.getBoundingClientRect().top+window.scrollY-62),behavior:'smooth'}); }
   }
@@ -189,16 +256,16 @@
     current=queue.shift(); showPrompt(); updateStats();
     if (mode==='outlines') { renderOutline(current); resetCodeInput(); }
   }
-  function findPath(name) { return mapGroup.selectAll(mode==='airports'?'.airport-node':mode==='outlines'?'.outline-shape, .lk-isl':'.region, .lk-isl').filter(d=>d.properties.quizName===name); }
+  function findPath(name) { return mapGroup.selectAll(mode==='nature'?'.nat-node':pointMode()?'.airport-node':mode==='outlines'?'.outline-shape, .lk-isl':'.region, .lk-isl').filter(d=>d.properties.quizName===name); }
   function handleRegionTap(name) {
     if (!roundActive || !current) return;
     if (name && (found.has(name)||missed.has(name))) {toast(`${lab(name)} has already been answered.`);return;}
     if (name===current) {
-      found.add(name); findPath(name).classed('found',true).classed('target-reveal',false); addRecent(lab(name),true); $('map-message').textContent=`✓ ${lab(name)} found`; current=null; updateStats();
+      found.add(name); recordResult(name,true); findPath(name).classed('found',true).classed('target-reveal',false); addRecent(lab(name),true); $('map-message').textContent=`✓ ${lab(name)} found`; current=null; updateStats();
       if (queue.length===0) finishGame(found.size===listForMode().length); else nextQuestion();
     } else {
-      mistakes++; missed.add(current); findPath(current).classed('missed',true); if(name) findPath(name).classed('target-reveal',true); addRecent(name?`${lab(name)} · target: ${lab(current)}`:`Not near an airport · target: ${current}`,false);
-      $('map-message').textContent=`Not quite — the target was ${lab(current)}`; toast(name?`That’s ${lab(name)}. Find ${lab(current)}.`:`No airport there. Find ${current}.`);
+      mistakes++; missed.add(current); recordResult(current,false); findPath(current).classed('missed',true); if(name) findPath(name).classed('target-reveal',true); addRecent(name?`${lab(name)} · target: ${lab(current)}`:`Nothing there · target: ${current}`,false);
+      $('map-message').textContent=`Not quite — the target was ${lab(current)}`; toast(name?`That’s ${lab(name)}. Find ${lab(current)}.`:`No ${noun()} there. Find ${current}.`);
       const reveal=current; current=null; updateStats();
       if (mistakes>=MAX_MISSES) {finishGame(false);return;}
       const gid=gameId; setTimeout(()=>{if(gid!==gameId)return;findPath(reveal).classed('target-reveal',false);if(name&&!found.has(name)&&!missed.has(name))findPath(name).classed('target-reveal',false);nextQuestion();},1000);
@@ -206,7 +273,7 @@
   }
   function skipQuestion() {
     if (!roundActive || !current || awaiting) return;
-    const name=current; mistakes++; missed.add(name); findPath(name).classed('missed',true).classed('target-reveal',mode!=='outlines'); addRecent(`${lab(name)} · skipped`,false);
+    const name=current; mistakes++; missed.add(name); recordResult(name,false); findPath(name).classed('missed',true).classed('target-reveal',mode!=='outlines'); addRecent(`${lab(name)} · skipped`,false);
     current=null; updateStats();
     if (mode==='outlines') { $('map-message').textContent=`Skipped · it was ${lab(name)}`; showCaption(`Skipped · ${lab(name)}`,'bad'); revealThenNext(1700); return; }
     $('map-message').textContent=`Skipped · ${lab(name)} highlighted on the map`;
@@ -250,10 +317,10 @@
     if (mode!=='outlines' || !roundActive || !current || awaiting) return;
     const target=current, ok=(PLATE[target]||[]).includes(typed);
     if (ok) {
-      found.add(target); findPath(target).classed('found',true); addRecent(lab(target),true);
+      found.add(target); recordResult(target,true); findPath(target).classed('found',true); addRecent(lab(target),true);
       $('map-message').textContent=`✓ ${lab(target)} found`; showCaption(`✓ ${lab(target)}`,'ok'); renderCode('ok');
     } else {
-      mistakes++; missed.add(target); findPath(target).classed('missed',true); addRecent(`${lab(target)} · you typed ${typed}`,false);
+      mistakes++; missed.add(target); recordResult(target,false); findPath(target).classed('missed',true); addRecent(`${lab(target)} · you typed ${typed}`,false);
       const owner=CODE_OWNER.get(typed);
       $('map-message').textContent=`Not quite — it was ${lab(target)}`; showCaption(`It was ${lab(target)}`,'bad'); renderCode('bad');
       toast(owner?`${typed} is the code for ${lab(owner)}.`:`${typed} isn’t a state or UT code.`);
@@ -262,14 +329,14 @@
   }
   function finishGame(completed) {
     roundActive=false; current=null; showPrompt(); updateStats();
-    const total=listForMode().length, score=found.size, label=modeLabel();
+    const total=listForMode().length, score=found.size, label=modeLabel()+(reviewRound?' · review':'');
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
-    saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed});
+    saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed,review:reviewRound});
     if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(); renderOutline(null); }
-    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?(dset().doneTitle||`${districtKey} mapped!`):'India mapped!'):'Round over';
+    $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(reviewRound?'Review complete!':mode==='capitals'?'All capitals found!':mode==='nature'?'All found!':mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?(dset().doneTitle||`${districtKey} mapped!`):'India mapped!'):'Round over';
     $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
     $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
-    $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again';
+    $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again'; renderReview();
   }
   function resetMapView() { if(mapSvg&&zoom) mapSvg.transition().duration(450).call(zoom.transform,d3.zoomIdentity); }
   function geoCirclePath(lon,lat,km) { return path(d3.geoCircle().center([lon,lat]).radius((km||AIRPORT_RADIUS_KM)/EARTH_KM*180/Math.PI).precision(4)()); }
@@ -295,10 +362,10 @@
       if (clickable) g.on('click',event=>{event.stopPropagation();handleRegionTap(perIsland?LK_NAMES[i]:'Lakshadweep');});
     });
   }
-  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); }
+  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.8)})`); }
   function drawAirportMap(collection) {
-    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines'); host.classList.add('airports');
-    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating airports').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines','nature'); host.classList.add('airports');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',(mode==='capitals'?'Map of India for locating state and Union Territory capitals':'Map of India for locating airports')).attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
@@ -340,17 +407,18 @@
     if (lk) addLakshadweepMarkers(false,5);
   }
   function drawOutlineMap(collection) {
-    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','airports'); host.classList.add('outlines');
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','airports','nature'); host.classList.add('outlines');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Outline of an Indian state or Union Territory').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world'); zoom=null; outlineCollection=collection;
     renderOutline(null);
     $('map-message').textContent='Map ready · choose New game';
   }
   function drawMap(collection) {
-    if (mode==='airports') return drawAirportMap(collection);
+    if (pointMode()) return drawAirportMap(collection);
+    if (mode==='nature') return drawNatureMap(collection);
     if (mode==='outlines') return drawOutlineMap(collection);
-    const host=$('map'); host.classList.remove('airports','outlines'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts');
-    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',mode==='districts'?`Map of ${dset().of||districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    const host=$('map'); host.classList.remove('airports','outlines','nature'); host.innerHTML=''; host.classList.toggle('districts',mode==='districts'||mode==='learn');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',(mode==='districts'||mode==='learn')?`Map of ${dset().of||districtKey} showing its districts`:'Map of India showing 28 states and 8 Union Territories').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
     path=d3.geoPath(projection);
@@ -360,18 +428,23 @@
     mapGroup.selectAll('path').data(collection.features).join('path')
       .attr('class','region').attr('d',path)
       .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
-      .on('click',(event,d)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);})
-      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();handleRegionTap(d.properties.quizName);}});
+      .on('click',(event,d)=>{event.stopPropagation();onRegion(d.properties.quizName);})
+      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();onRegion(d.properties.quizName);}});
     // Invisible, wider tap area for tiny regions (Lakshadweep's islands; small districts such as Hyderabad). No visual change.
     collection.features.forEach(d=>{
       const [[x0,y0],[x1,y1]]=path.bounds(d), small=Math.min(x1-x0,y1-y0)<26;
-      if (d.properties.quizName!=='Lakshadweep' && !(mode==='districts' && small)) return;
-      mapGroup.append('path').attr('class','hit-area'+(mode==='districts'?' hit-small':'')).attr('d',path(d))
-        .on('click',(event)=>{event.stopPropagation();handleRegionTap(d.properties.quizName);});
+      if (d.properties.quizName!=='Lakshadweep' && !((mode==='districts'||mode==='learn') && small)) return;
+      mapGroup.append('path').attr('class','hit-area'+((mode==='districts'||mode==='learn')?' hit-small':'')).attr('d',path(d))
+        .on('click',(event)=>{event.stopPropagation();onRegion(d.properties.quizName);});
     });
     if (collection.context?.length) mapGroup.insert('g',':first-child').attr('class','context-layer').selectAll('path').data(collection.context).join('path').attr('class','context-region').attr('d',path);
     if (collection.features.some(d=>d.properties.quizName==='Lakshadweep')) addLakshadweepMarkers(true);
     else if (collection.features.some(d=>LK_NAMES.includes(d.properties.quizName))) addLakshadweepMarkers(true,1,true);
+    if (mode==='learn') {
+      const lg=mapGroup.append('g').attr('class','learn-labels').style('display',showLabels?null:'none');
+      collection.features.forEach(d=>{ const [x,y]=path.centroid(d); if (!isFinite(x)||!isFinite(y)) return;
+        lg.append('text').datum({x,y}).attr('class','learn-label').attr('transform',`translate(${x},${y})`).attr('text-anchor','middle').attr('dy','.32em').text(d.properties.quizName); });
+    }
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
     mapSvg.call(zoom).on('dblclick.zoom',null);
     $('map-message').textContent='Map ready · choose New game';
@@ -931,78 +1004,318 @@
     return [...collected.values()];
   }
   function showMapLoading() {
-    const label=mode==='districts'?`Loading ${dset().loadName?'the '+dset().loadName:districtKey+'’s districts'}…`:mode==='airports'?'Loading airports map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
-    $('map').classList.remove('ready','districts','airports','outlines');
+    const label=(mode==='districts'||mode==='learn')?`Loading ${dset().loadName?'the '+dset().loadName:districtKey+'’s districts'}…`:mode==='airports'?'Loading airports map…':mode==='capitals'||mode==='nature'?'Loading the map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
+    $('map').classList.remove('ready','districts','airports','outlines','nature');
     $('map').innerHTML=`<div class="map-loading"><span class="loader"></span><strong>${label}</strong><small>Loading boundary data</small></div>`;
     $('map-message').textContent='Loading map…';
   }
   async function loadMap() {
-    const token=++loadToken, m=mode, key=districtKey, cacheKey=m==='districts'?`districts:${key}`:'country';
-    airportFeatures=AIRPORTS.map(([n,lat,lon])=>({type:'Feature',properties:{quizName:n},geometry:{type:'Point',coordinates:[lon,lat]}}));
-    features=[]; featureByName=new Map(); poolNames=m==='districts'?[]:m==='airports'?AIRPORT_NAMES.slice():ALL.map(x=>x.name);
-    if (m==='districts' && !key) {
-      $('map').classList.remove('ready','districts','outlines');
-      $('map').innerHTML='<div class="map-loading"><span class="map-empty-icon">🗺️</span><strong>Select a state</strong><small>Choose a state from the menu above to practise its districts.</small></div>';
-      $('map-message').textContent='Choose a state to begin'; updateStats(); showPrompt(); return;
+    const isD=mode==='districts'||mode==='learn';
+    const token=++loadToken, m=mode, key=districtKey, cacheKey=isD?`districts:${key}`:'country';
+    const pts=m==='capitals'?CAPITALS:AIRPORTS;
+    airportFeatures=pts.map(([n,lat,lon])=>({type:'Feature',properties:{quizName:n},geometry:{type:'Point',coordinates:[lon,lat]}}));
+    features=[]; featureByName=new Map(); poolNames=isD||m==='nature'?[]:m==='airports'?AIRPORT_NAMES.slice():m==='capitals'?CAPITAL_NAMES.slice():ALL.map(x=>x.name);
+    if (m==='learn') learnPicked=null;
+    if ((isD||m==='nature') && !key) {
+      $('map').classList.remove('ready','districts','outlines','nature');
+      const msg=m==='nature'?['Select a category','Choose rivers, mountain ranges, national parks or lakes from the menu above.']:m==='learn'?['Select a state','Choose a state from the menu above to browse its districts and facts.']:['Select a state','Choose a state from the menu above to practise its districts.'];
+      $('map').innerHTML=`<div class="map-loading"><span class="map-empty-icon">🗺️</span><strong>${msg[0]}</strong><small>${msg[1]}</small></div>`;
+      $('map-message').textContent=m==='nature'?'Choose a category to begin':'Choose a state to begin'; updateStats(); renderReview(); showPrompt(); if (m==='learn') renderLearnCard(); return;
     }
     showMapLoading(); updateStats(); showPrompt();
     try {
       let mapped=mapCache.get(cacheKey);
-      if (!mapped) { mapped=m==='districts'?await fetchDistricts(key):await fetchBoundaries(); mapCache.set(cacheKey,mapped); }
+      if (!mapped) { mapped=isD?await fetchDistricts(key):await fetchBoundaries(); mapCache.set(cacheKey,mapped); }
       let context=null;
-      if (m==='districts' && DISTRICT_SETS[key].context) { try { let c=mapCache.get('country'); if (!c) { c=await fetchBoundaries(); mapCache.set('country',c); } context=c.filter(f=>!(DISTRICT_SETS[key].contextSkip||[]).includes(f.properties.quizName)); } catch(e) { console.warn('Context layer unavailable',e); } }
+      if (isD && DISTRICT_SETS[key].context) { try { let c=mapCache.get('country'); if (!c) { c=await fetchBoundaries(); mapCache.set('country',c); } context=c.filter(f=>!(DISTRICT_SETS[key].contextSkip||[]).includes(f.properties.quizName)); } catch(e) { console.warn('Context layer unavailable',e); } }
       if (token!==loadToken) return; // the player switched mode while this was loading
-      if (m==='airports') { featureByName=new Map(airportFeatures.map(f=>[f.properties.quizName,f])); features=airportFeatures; poolNames=AIRPORT_NAMES.slice(); }
+      if (m==='airports'||m==='capitals') { featureByName=new Map(airportFeatures.map(f=>[f.properties.quizName,f])); features=airportFeatures; poolNames=(m==='capitals'?CAPITAL_NAMES:AIRPORT_NAMES).slice(); }
+      else if (m==='nature') { const nf=natureFor(key).map(f=>({type:'Feature',properties:{quizName:f.name}})); featureByName=new Map(nf.map(f=>[f.properties.quizName,f])); features=nf; poolNames=nf.map(f=>f.properties.quizName); }
       else {
       featureByName=new Map(mapped.map(f=>[f.properties.quizName,f]));
       features=mapped;
-      poolNames=m==='districts'?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
+      poolNames=isD?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
       }
       drawMap({type:'FeatureCollection',features:mapped,context});
-      $('map').classList.add('ready'); updateStats(); showPrompt();
-      if (m==='districts') {
+      $('map').classList.add('ready'); updateStats(); showPrompt(); renderReview();
+      if (m==='learn') renderLearnCard();
+      if (isD) {
         const exp=DISTRICT_SETS[key].expected;
         if (exp && poolNames.length!==exp) { $('map-message').textContent=`Map ready · boundary data has ${poolNames.length} of ${exp} districts`; console.info(`${key}: boundary data has ${poolNames.length} districts, expected ${exp}`); }
       }
+      if (pendingStart && m==='districts') { pendingStart=false; startGame(); }
     } catch(error) {
       if (token!==loadToken) return;
+      pendingStart=false;
       console.error(error);
-      const what=m==='districts'?(DISTRICT_SETS[key].loadName||`${key}’s district map`):'India’s boundary map';
-      $('map').innerHTML=`<div class="map-loading map-error"><strong>Could not load ${what}</strong><small>${error.message}</small><button class="primary-btn" id="retry-map">Try again</button><small>Check your connection or open the official Survey of India map reference from the menu.</small></div>`;
+      const what=isD?(DISTRICT_SETS[key].loadName||`${key}’s district map`):'India’s boundary map';
+      $('map').innerHTML=`<div class="map-loading map-error"><strong>Could not load ${what}</strong><small>${error.message}</small><button class="primary-btn" id="retry-map">Try again</button><small>Check your connection, or tap “Online · save offline” once to keep the maps on this device.</small></div>`;
       $('retry-map')?.addEventListener('click',loadMap);
       $('map-message').textContent='Map unavailable';
     }
   }
-  // ---- Mode switching (States & UTs  /  Districts) ----
+  // ---- Mode switching ----
   function renderStateSelect() {
     const sel=$('state-select'); sel.innerHTML='';
-    const ph=document.createElement('option'); ph.value=''; ph.textContent='Select a state…'; ph.disabled=true; sel.append(ph);
-    Object.keys(DISTRICT_SETS).sort((x,y)=>x.localeCompare(y)).forEach(k=>{const o=document.createElement('option'); o.value=k; o.textContent=k; sel.append(o);});
+    const ph=document.createElement('option'); ph.value=''; ph.textContent=mode==='nature'?'Select a category…':'Select a state…'; ph.disabled=true; sel.append(ph);
+    const add=(parent,k)=>{const o=document.createElement('option'); o.value=k; o.textContent=k; parent.append(o);};
+    if (mode==='nature') Object.keys(NATURE_SETS).forEach(k=>add(sel,k));
+    else if (mode==='learn') Object.entries(LEARN_GROUPS).forEach(([dir,list])=>{const g=document.createElement('optgroup'); g.label=`${dir} India`; list.forEach(k=>add(g,k)); sel.append(g);});
+    else Object.keys(DISTRICT_SETS).sort((x,y)=>x.localeCompare(y)).forEach(k=>add(sel,k));
     sel.value=districtKey||'';
   }
   function applyModeUI() {
     document.querySelectorAll('.seg-btn').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
-    $('region-picker').hidden=mode!=='districts'; renderStateSelect();
+    $('region-picker').hidden=!(mode==='districts'||mode==='nature'||mode==='learn'); renderStateSelect();
+    $('picker-label').textContent=mode==='nature'?'Category':'State';
+    $('picker-note').textContent=mode==='nature'?'10 rivers · 2 ranges · 4 parks · 5 lakes':mode==='learn'?'12 states for now · 3 in each direction':'All 28 states + the Union Territories';
+    $('state-select').setAttribute('aria-label',mode==='nature'?'Select a category':'Select a state');
     document.body.dataset.mode=mode; $('code-entry').hidden=mode!=='outlines';
   }
-  function setMode(newMode,newKey=null) {
-    if (newMode!=='districts') newKey=null;
+  function setMode(newMode,newKey=null,startAfter=false) {
+    if (!['districts','nature','learn'].includes(newMode)) newKey=null;
     if (newMode===mode && newKey===districtKey) return;
     const wasActive=roundActive;
-    mode=newMode; districtKey=newKey;
+    mode=newMode; districtKey=newKey; reviewRound=false; pendingStart=startAfter; learnPicked=null;
     try { localStorage.setItem(MODE_KEY,JSON.stringify({mode})); } catch {}
     gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0; awaiting=false; hideCaption(); resetCodeInput(false);
     $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
-    applyModeUI(); renderBest(); loadMap();
+    applyModeUI(); renderBest(); renderReview(); loadMap();
     if (wasActive) toast('Round ended · mode changed');
   }
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
+  // ======================= v4.3 additions =======================
+  const TROUBLE_KEY='indiaMapQuiz.trouble.v1', STATS_KEY='indiaMapQuiz.stats.v1';
+  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.3', APP_VERSION='4.3', OFFLINE_MB=26;
+  const writeJSON=(k,v)=>{ try { localStorage.setItem(k,JSON.stringify(v)); } catch {} };
+  const pointMode=()=>mode==='airports'||mode==='capitals';
+  const onRegion=name=>mode==='learn'?learnPick(name):handleRegionTap(name);
+
+  // ---- Review mistakes (all modes): every miss is remembered per mode/state/category and cleared when found later ----
+  function trackKey() {
+    if (mode==='districts'||mode==='nature') return districtKey?`${mode}:${districtKey}`:'';
+    return mode==='learn'?'':mode;
+  }
+  function recordResult(name,ok) {
+    const k=trackKey(); if (!name||!k) return;
+    const tr=readJSON(TROUBLE_KEY,{}), st=readJSON(STATS_KEY,{});
+    const t=tr[k]||(tr[k]={}), s=st[k]||(st[k]={ok:0,miss:0});
+    s.label=modeLabel();
+    if (ok) { s.ok++; if (t[name]) { t[name]--; if (t[name]<=0) delete t[name]; } }
+    else { s.miss++; t[name]=Math.min(9,(t[name]||0)+1); }
+    if (!Object.keys(t).length) delete tr[k];
+    writeJSON(TROUBLE_KEY,tr); writeJSON(STATS_KEY,st);
+    renderReview();
+  }
+  function troubleList() {
+    const k=trackKey(); if (!k) return [];
+    const t=readJSON(TROUBLE_KEY,{})[k]||{};
+    return Object.keys(t).filter(n=>poolNames.includes(n)).sort((a,b)=>t[b]-t[a]||a.localeCompare(b));
+  }
+  function renderReview() {
+    const b=$('review-btn'); if (!b) return;
+    const n=troubleList().length;
+    b.hidden=!n; b.textContent=`Review mistakes (${n})`;
+  }
+  function renderProgress() {
+    const box=$('progress-panel'); if (!box) return;
+    const st=readJSON(STATS_KEY,{}), tr=readJSON(TROUBLE_KEY,{});
+    box.textContent='';
+    const rows=Object.entries(st).filter(([,s])=>s.ok+s.miss>0).sort((a,b)=>(b[1].ok+b[1].miss)-(a[1].ok+a[1].miss));
+    if (!rows.length) { const p=document.createElement('p'); p.className='progress-empty'; p.textContent='Play a round and your accuracy appears here. It is stored only on this device.'; box.append(p); return; }
+    const ul=document.createElement('ul'); ul.className='progress-list';
+    rows.slice(0,14).forEach(([k,s])=>{
+      const n=s.ok+s.miss, pct=Math.round(100*s.ok/n), li=document.createElement('li');
+      const nm=document.createElement('span'); nm.textContent=s.label||k;
+      const bar=document.createElement('i'); bar.style.setProperty('--pct',pct+'%');
+      const val=document.createElement('b'); val.textContent=`${pct}% · ${n}`;
+      li.append(nm,bar,val); ul.append(li);
+    });
+    box.append(ul);
+    const flat=[]; Object.entries(tr).forEach(([k,t])=>Object.entries(t).forEach(([n,c])=>flat.push({n,c,l:st[k]?.label||k})));
+    flat.sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n));
+    if (flat.length) {
+      const h=document.createElement('h4'); h.textContent='Still tricky'; const ol=document.createElement('p'); ol.className='trouble-list';
+      ol.textContent=flat.slice(0,8).map(x=>`${x.n} (${x.l})`).join(' · ');
+      box.append(h,ol);
+    }
+  }
+
+  // ---- Nature mode: distances in km (local flat approximation, fine at these scales) ----
+  function distToSeg(p,a,b) {
+    const kx=111.32*Math.cos(p[1]*Math.PI/180), ky=110.57;
+    const ax=(a[0]-p[0])*kx, ay=(a[1]-p[1])*ky, bx=(b[0]-p[0])*kx, by=(b[1]-p[1])*ky, dx=bx-ax, dy=by-ay, l2=dx*dx+dy*dy;
+    let t=l2?-(ax*dx+ay*dy)/l2:0; t=Math.max(0,Math.min(1,t));
+    return Math.hypot(ax+t*dx,ay+t*dy);
+  }
+  function distToLines(p,lines) { let m=Infinity; lines.forEach(l=>{ for (let i=0;i<l.length-1;i++) { const d=distToSeg(p,l[i],l[i+1]); if (d<m) m=d; } }); return m; }
+  function natureDist(f,p) {
+    if (f.kind==='park') return distToSeg(p,f.pt,f.pt);
+    if (f.kind==='lake') return inRing(p,f.ring)?0:distToLines(p,[f.ring]);
+    return distToLines(p,f.lines);
+  }
+  function nearestNature(lon,lat) {
+    let best=null, score=Infinity;
+    natureFor(districtKey).forEach(f=>{ const d=natureDist(f,[lon,lat]); if (d<=f.tol&&d/f.tol<score) { score=d/f.tol; best=f.name; } });
+    return best;
+  }
+  function drawNatureMap(collection) {
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines'); host.classList.add('airports','nature');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Map of India for locating rivers, mountain ranges, national parks and lakes').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    mapGroup=mapSvg.append('g').attr('class','map-world');
+    projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]);
+    path=d3.geoPath(projection);
+    projection.fitExtent([[65,65],[935,690]],{type:'FeatureCollection',features:collection.features});
+    mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region').attr('d',path);
+    natureFor(districtKey).forEach(f=>{
+      const g=mapGroup.append('g').datum({properties:{quizName:f.name}}).attr('class',`nat-node nat-${f.kind}`);
+      if (f.kind==='river'||f.kind==='mountain') {
+        g.append('path').attr('class','nat-shape').attr('d',path({type:'MultiLineString',coordinates:f.lines}));
+      } else if (f.kind==='lake') {
+        const poly={type:'Polygon',coordinates:[fixRing(f.ring,true)]}, c=path.centroid(poly);
+        g.append('circle').attr('class','nat-halo').attr('cx',c[0]).attr('cy',c[1]).attr('r',10);
+        g.append('path').attr('class','nat-shape').attr('d',path(poly));
+      } else {
+        const [x,y]=projection(f.pt);
+        g.append('circle').attr('class','nat-halo').attr('cx',x).attr('cy',y).attr('r',10);
+        g.append('circle').attr('class','nat-shape').attr('cx',x).attr('cy',y).attr('r',4.5);
+      }
+    });
+    mapSvg.on('click',event=>{
+      const [px,py]=d3.pointer(event,mapGroup.node()), inv=projection.invert([px,py]);
+      if (!inv||!isFinite(inv[0])) return;
+      handleRegionTap(nearestNature(inv[0],inv[1]));
+    });
+    zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
+    mapSvg.call(zoom).on('dblclick.zoom',null);
+    $('map-message').textContent='Map ready · choose New game';
+  }
+  // Prompt card for the three modes added in v4.3
+  function showPromptX() {
+    const skip=$('skip'), sideSkip=$('side-skip');
+    sideSkip.textContent=`Skip this ${noun()} →`;
+    const needKey=(mode==='nature'||mode==='learn')&&!districtKey;
+    if (mode==='learn') {
+      $('prompt-kind').textContent=districtKey?'DISTRICT':'LEARN';
+      $('prompt-name').textContent=!districtKey?'Choose a state':(learnPicked||'Tap a district');
+      $('prompt-hint').textContent=!districtKey?'Pick one of the 12 states from the menu above.':(learnPicked?`A district of ${districtKey}`:'Tap any district to see its name, or read the state facts.');
+      skip.disabled=true; sideSkip.disabled=true; return;
+    }
+    if (!current) {
+      $('prompt-kind').textContent=mode==='capitals'?'FIND THIS CAPITAL':'FIND THIS FEATURE';
+      $('prompt-name').textContent=roundActive?'Round complete':(needKey?'Choose a category':'Press New game');
+      $('prompt-hint').textContent=mode==='capitals'?`Tap within about ${CAPITAL_RADIUS_KM} km of the city.`:(needKey?'Pick rivers, mountain ranges, national parks or lakes above.':'Tap the feature on the map.');
+      $('side-prompt').textContent='Ready when you are';
+      $('side-description').textContent=mode==='capitals'?`Find the capitals of all 28 states and 8 Union Territories (${CAPITALS.length} cities; Chandigarh serves three).`:(needKey?'Choose a category to begin.':`Find the ${natureFor(districtKey).length} ${NATURE_SETS[districtKey].noun==='feature'?'natural features':NATURE_SETS[districtKey].noun+'s'} on the map.`);
+      skip.disabled=true; sideSkip.disabled=true; return;
+    }
+    skip.disabled=false; sideSkip.disabled=false;
+    if (mode==='capitals') {
+      const c=capInfo(current);
+      $('prompt-kind').textContent='FIND THIS CAPITAL'; $('prompt-name').textContent=current;
+      $('prompt-hint').textContent=`Capital of ${c[3]} · tap within about ${radiusFor(current)} km`;
+      $('side-prompt').textContent=current; $('side-description').textContent=`The capital of ${c[3]}. Tap its location on the map.`;
+    } else {
+      const f=natureByName(current), tol=f.tol;
+      $('prompt-kind').textContent=`FIND THIS ${NATURE_KIND[f.kind].toUpperCase()}`; $('prompt-name').textContent=current;
+      $('prompt-hint').textContent=f.kind==='river'?`Tap the river along its course (within about ${tol} km).`:f.kind==='mountain'?'Tap anywhere along the range.':`Tap on or near it (within about ${tol} km).`;
+      $('side-prompt').textContent=current; $('side-description').textContent=`${NATURE_KIND[f.kind]}. Tap it on the map.`;
+    }
+  }
+
+  // ---- Learn mode ----
+  let flashDeck=[], flashIdx=0, flashShown=false;
+  function learnPick(name) {
+    learnPicked=name;
+    mapGroup?.selectAll('.region').classed('learn-picked',d=>d.properties.quizName===name);
+    showPrompt();
+  }
+  function learnCards(key) {
+    const L=LEARN[key]; if (!L) return [];
+    return [
+      {q:`Capital of ${key}?`,a:L.capital},{q:`Largest city of ${key}?`,a:L.largest},{q:`Main language of ${key}?`,a:L.language},
+      {q:`When was ${key} formed?`,a:L.formed},{q:`How many districts does ${key} have in this quiz?`,a:String(DISTRICT_SETS[key].expected)},
+      {q:`Which states or countries border ${key}?`,a:L.neighbours},{q:`What is ${key} known for?`,a:L.known}
+    ];
+  }
+  function renderFlash() {
+    const q=$('flash-q'), a=$('flash-a');
+    if (!flashDeck.length) { q.textContent=''; a.textContent=''; return; }
+    const c=flashDeck[flashIdx%flashDeck.length];
+    q.textContent=c.q; a.textContent=flashShown?c.a:'Tap to reveal the answer'; a.classList.toggle('shown',flashShown);
+    $('flash-count').textContent=`${(flashIdx%flashDeck.length)+1} / ${flashDeck.length}`;
+  }
+  function renderLearnCard() {
+    const L=LEARN[districtKey], facts=$('learn-facts');
+    $('learn-title').textContent=districtKey||'Choose a state';
+    facts.textContent='';
+    if (!L) { $('learn-body').hidden=true; $('learn-empty').hidden=false; return; }
+    $('learn-body').hidden=false; $('learn-empty').hidden=true;
+    const dir=Object.keys(LEARN_GROUPS).find(d=>LEARN_GROUPS[d].includes(districtKey));
+    $('learn-dir').textContent=`${dir} India`;
+    [['Capital',L.capital],['Largest city',L.largest],['Formed',L.formed],['Language',L.language],['Districts',String(DISTRICT_SETS[districtKey].expected)],['Population (2011)',L.pop],['Area',L.area],['Neighbours',L.neighbours],['Known for',L.known]].forEach(([k,v])=>{
+      const dt=document.createElement('dt'), dd=document.createElement('dd'); dt.textContent=k; dd.textContent=v; facts.append(dt,dd);
+    });
+    flashDeck=d3.shuffle(learnCards(districtKey)); flashIdx=0; flashShown=false; renderFlash();
+    $('learn-labels').textContent=showLabels?'Hide names':'Show names';
+  }
+
+  // ---- Offline: save the app and every boundary file for use without a connection ----
+  const offlineSaved=()=>readJSON(OFFLINE_KEY,null);
+  let offlineBusy=false, offlinePct=0;
+  function offlineUrls() {
+    const abs=p=>new URL(p,location.href).href, base=REPO_BASES[0];
+    return [...['./','index.html','style.css?v='+APP_VERSION,'script.js?v='+APP_VERSION,'manifest.webmanifest'].map(abs),
+      'https://cdn.jsdelivr.net/npm/d3@7','https://cdn.jsdelivr.net/npm/topojson-client@3',
+      `${base}/topojson/india.json`, ...[...new Set(Object.values(SLUGS))].map(s=>`${base}/geojson/states/${s}.geojson`)];
+  }
+  function setStatus() {
+    const el=$('offline-status'); if (!el) return;
+    const online=navigator.onLine, saved=offlineSaved(), current=saved&&saved.v===APP_VERSION;
+    let label, state, title;
+    if (offlineBusy) { label=`Saving… ${offlinePct}%`; state='busy'; title='Downloading the app and all maps for offline use'; }
+    else if (!online) { label=saved?'Offline · ready':'Offline'; state=saved?'ready':'off'; title=saved?'No connection, using the files saved on this device':'No connection. Maps that were not saved cannot load'; }
+    else if (current) { label='Online · saved ✓'; state='ready'; title='Everything is saved for offline use. Tap to refresh the saved files'; }
+    else if (saved) { label='Online · update offline'; state='on'; title='A newer version is available. Tap to update the offline files'; }
+    else { label='Online · save offline ⤓'; state='on'; title=`Tap to download about ${OFFLINE_MB} MB so the quiz works without internet`; }
+    el.textContent=label; el.dataset.state=state; el.title=title; el.setAttribute('aria-label',title);
+  }
+  async function saveOffline() {
+    if (offlineBusy) return;
+    if (!('caches' in window)||!('serviceWorker' in navigator)||!window.isSecureContext) { toast('Offline saving needs https (for example GitHub Pages) or localhost.'); return; }
+    if (!navigator.onLine) { toast('Connect to the internet first, then tap to save for offline use.'); return; }
+    if (!offlineSaved() && !window.confirm(`Save the quiz and all its maps for offline use? This downloads about ${OFFLINE_MB} MB.`)) return;
+    offlineBusy=true; offlinePct=0; setStatus();
+    const urls=offlineUrls(), failed=[]; let done=0;
+    try {
+      const cache=await caches.open(OFFLINE_CACHE), queue=urls.slice();
+      const worker=async()=>{
+        while (queue.length) {
+          const u=queue.shift();
+          try { const r=await fetch(u,{cache:'reload',credentials:'omit'}); if (!r.ok) throw new Error(String(r.status)); await cache.put(u,r); }
+          catch(e) { failed.push(u); }
+          done++; offlinePct=Math.round(done/urls.length*100); setStatus();
+        }
+      };
+      await Promise.all([worker(),worker(),worker(),worker()]);
+      if (failed.length) { toast(`Saved ${urls.length-failed.length} of ${urls.length} files. Check your connection and tap again.`); }
+      else {
+        writeJSON(OFFLINE_KEY,{v:APP_VERSION,date:Date.now(),files:urls.length});
+        await navigator.serviceWorker.register('sw.js');
+        (await caches.keys()).filter(k=>k.startsWith('india-map-quiz-')&&k!==OFFLINE_CACHE).forEach(k=>caches.delete(k));
+        toast('Saved for offline use ✓');
+      }
+    } catch(e) { console.warn('Offline save failed',e); toast('Could not save for offline use.'); }
+    finally { offlineBusy=false; setStatus(); }
+  }
+  function resumeOffline() { if (offlineSaved()&&'serviceWorker' in navigator&&window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+  // ===============================================================
   function init() {
     const saved=readJSON(MODE_KEY,null);
-    if (saved && (saved.mode==='country'||saved.mode==='districts'||saved.mode==='airports'||saved.mode==='outlines')) mode=saved.mode;
+    if (saved && ['country','districts','airports','outlines','capitals','nature','learn'].includes(saved.mode)) mode=saved.mode;
     document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.mode!==mode) setMode(b.dataset.mode); }));
-    $('state-select').addEventListener('change',e=>setMode('districts',e.target.value||null));
+    $('state-select').addEventListener('change',e=>setMode(mode,e.target.value||null));
     buildKeyboard();
     document.addEventListener('keydown',e=>{
       if (mode!=='outlines' || e.ctrlKey || e.metaKey || e.altKey || $('info-drawer').classList.contains('open')) return;
@@ -1011,10 +1324,17 @@
     });
     applyModeUI();
     renderHistory();renderBest();setStatus();window.addEventListener('online',setStatus);window.addEventListener('offline',setStatus);
-    $('new-game').addEventListener('click',startGame);$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);
+    $('new-game').addEventListener('click',()=>startGame());$('review-btn').addEventListener('click',()=>startGame(true));$('skip').addEventListener('click',skipQuestion);$('side-skip').addEventListener('click',skipQuestion);
     $('zoom-in').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,2));$('zoom-out').addEventListener('click',()=>mapSvg?.transition().call(zoom.scaleBy,1/2));$('zoom-reset').addEventListener('click',resetMapView);
-    $('info-toggle').addEventListener('click',()=>openDrawer(true));$('drawer-close').addEventListener('click',()=>openDrawer(false));$('drawer-scrim').addEventListener('click',()=>openDrawer(false));
+    $('info-toggle').addEventListener('click',()=>{renderProgress();openDrawer(true);});$('drawer-close').addEventListener('click',()=>openDrawer(false));$('drawer-scrim').addEventListener('click',()=>openDrawer(false));
     $('play-again').addEventListener('click',()=>{$('result-overlay').classList.remove('open');$('result-overlay').setAttribute('aria-hidden','true');startGame();});$('close-result').addEventListener('click',()=>{$('result-overlay').classList.remove('open');$('result-overlay').setAttribute('aria-hidden','true');});
+    $('offline-status').addEventListener('click',saveOffline); resumeOffline();
+    $('reset-progress').addEventListener('click',()=>{ if (window.confirm('Clear your saved accuracy and mistakes on this device?')) { try { localStorage.removeItem(TROUBLE_KEY); localStorage.removeItem(STATS_KEY); } catch {} renderProgress(); renderReview(); toast('Progress cleared'); } });
+    $('learn-quiz').addEventListener('click',()=>{ if (districtKey) setMode('districts',districtKey,true); });
+    $('learn-labels').addEventListener('click',()=>{ showLabels=!showLabels; mapGroup?.select('.learn-labels').style('display',showLabels?null:'none'); $('learn-labels').textContent=showLabels?'Hide names':'Show names'; });
+    $('flash-card').addEventListener('click',()=>{ flashShown=!flashShown; renderFlash(); });
+    $('flash-next').addEventListener('click',()=>{ flashIdx++; flashShown=false; renderFlash(); });
+    renderReview();
     loadMap();
   }
   init();

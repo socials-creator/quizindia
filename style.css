@@ -275,3 +275,60 @@ body[data-mode=outlines] .map-canvas{height:clamp(400px,58vh,640px)}
 
 /* v3.5 — faint context states behind the combined Union Territories districts map */
 .context-region{fill:var(--land);fill-opacity:.45;stroke:var(--border);stroke-opacity:.35;stroke-width:.9;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
+
+/* ===== v4.3 ===== */
+[hidden]{display:none!important}
+.segmented{grid-template-columns:repeat(3,1fr)}
+@media (min-width:600px){.segmented{grid-template-columns:repeat(4,1fr)}}
+.seg-badge{font-size:.62em;margin-left:3px}
+.game-actions{display:flex;flex-direction:column;gap:8px}
+.secondary-btn{border:1.5px solid var(--line,#d8d4c8);background:transparent;color:inherit;border-radius:12px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}
+.secondary-btn:hover{border-color:currentColor}
+/* offline chip is now a button */
+button.offline-status{font:inherit;font-size:.78rem;cursor:pointer;border:1.5px solid currentColor;background:transparent;border-radius:999px;padding:4px 11px;color:inherit}
+.offline-status[data-state="on"]{color:#1f6fb5}
+.offline-status[data-state="ready"]{color:#2e7d4f}
+.offline-status[data-state="busy"]{color:#b7791f}
+.offline-status[data-state="off"],.offline-status[data-state="offline"]{color:#b3402f}
+/* nature mode */
+.nat-shape{pointer-events:none}
+.nat-river .nat-shape{fill:none;stroke:#2f7fc4;stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round}
+.nat-mountain .nat-shape{fill:none;stroke:#9a7456;stroke-width:15px;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
+.nat-lake .nat-shape{fill:#4a9bd8;stroke:#1f5f99;stroke-width:1.2px}
+.nat-park .nat-shape{fill:#2f8f4e;stroke:#fff;stroke-width:1.2px}
+.nat-halo{fill:rgba(47,127,196,.12);stroke:rgba(47,127,196,.5);stroke-width:1px;pointer-events:none}
+.nat-park .nat-halo{fill:rgba(47,143,78,.12);stroke:rgba(47,143,78,.5)}
+.nat-node.found .nat-shape{stroke:#1f9d55!important;fill:#1f9d55}
+.nat-river.found .nat-shape,.nat-mountain.found .nat-shape{fill:none;stroke-width:4px}
+.nat-node.missed .nat-shape{stroke:#d64545!important}
+.nat-park.missed .nat-shape,.nat-lake.missed .nat-shape{fill:#d64545}
+.nat-river.missed .nat-shape,.nat-mountain.missed .nat-shape{fill:none;stroke-width:4px}
+.nat-node.target-reveal .nat-shape{stroke:#e8912d!important}
+.nat-node.found .nat-halo{stroke:#1f9d55;fill:rgba(31,157,85,.18)}
+.nat-node.missed .nat-halo{stroke:#d64545;fill:rgba(214,69,69,.15)}
+/* learn mode */
+.learn-card,body:not([data-mode="learn"]) .learn-card{display:none}
+body[data-mode="learn"] .learn-card{display:block}
+body[data-mode="learn"] .gamebar,body[data-mode="learn"] .history-row,body[data-mode="learn"] .side-card:not(.learn-card),body[data-mode="learn"] .skip-btn{display:none}
+.learn-title{display:block;font-size:1.25rem;margin:2px 0 8px}
+.learn-dir{font-size:.75rem;opacity:.7}
+.learn-empty{font-size:.9rem;opacity:.8;margin:0}
+.learn-facts{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0 0 12px;font-size:.88rem}
+.learn-facts dt{font-weight:600;opacity:.7}
+.learn-facts dd{margin:0}
+.learn-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.learn-actions .primary-btn{flex:1}
+.flash{border-top:1px solid var(--line,#d8d4c8);padding-top:10px}
+.flash-head{display:flex;justify-content:space-between;margin-bottom:6px}
+.flash-count{font-size:.75rem;opacity:.7}
+.flash-card{display:block;width:100%;text-align:left;border:1.5px dashed var(--line,#c9c4b5);background:transparent;color:inherit;border-radius:12px;padding:12px;font:inherit;cursor:pointer;margin-bottom:6px}
+.flash-q{display:block;font-weight:700;margin-bottom:6px}
+.flash-a{display:block;opacity:.55;font-size:.9rem}
+.flash-a.shown{opacity:1;color:#2e7d4f;font-weight:600}
+.learn-label{font-size:8.5px;font-weight:600;fill:#243040;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.4px;pointer-events:none}
+.region.learn-picked{fill:#f2b84b!important}
+/* progress panel */
+.progress-list{list-style:none;padding:0;margin:0 0 8px}
+.progress-list li{display:grid;grid-template-columns:1fr 70px auto;gap:8px;align-items:center;font-size:.85rem;padding:3px 0}
+.progress-list i{height:6px;border-radius:3px;background:linear-gradient(90deg,#2e7d4f var(--pct),rgba(128,128,128,.25) var(--pct))}
+.progress-empty,.trouble-list{font-size:.85rem;opacity:.8}
