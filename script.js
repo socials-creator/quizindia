@@ -114,7 +114,7 @@
     ["Agartala",23.8315,91.2868,"Tripura"],
     ["Lucknow",26.8467,80.9462,"Uttar Pradesh"],
     ["Dehradun",30.3165,78.0322,"Uttarakhand (winter capital)"],
-    ["Gairsain",30.0394,79.2848,"Uttarakhand (summer capital)"],
+    ["Bhararisain (Gairsain)",30.0394,79.2848,"Uttarakhand (summer capital)"],
     ["Kolkata",22.5726,88.3639,"West Bengal"],
     ["Sri Vijaya Puram",11.6234,92.7265,"Andaman and Nicobar Islands (formerly Port Blair)"],
     ["New Delhi",28.6139,77.209,"Delhi",30],
@@ -153,16 +153,16 @@
     {"name":"Aravalli Range","kind":"mountain","tol":45,"lines":[[[77.15,28.6],[76.6,27.8],[76.0,27.2],[75.3,26.6],[74.7,26.4],[74.2,25.7],[73.7,25.0],[73.0,24.6],[72.7,24.6],[72.5,24.1],[72.9,23.7]]],"fact":"One of the oldest fold mountains in the world, running from Delhi to Gujarat; Guru Shikhar on Mount Abu is its highest point. The line is approximate."},
     {"name":"Vindhya Range","kind":"mountain","tol":50,"lines":[[[74.5,23.0],[75.7,22.7],[76.8,22.9],[77.8,23.0],[78.8,23.5],[80.0,23.9],[81.2,24.4],[82.5,24.7],[83.9,24.9]]],"fact":"Hills north of the Narmada valley across Madhya Pradesh; the line is approximate."},
     {"name":"Satpura Range","kind":"mountain","tol":40,"lines":[[[73.8,21.7],[75.0,21.8],[76.5,21.9],[77.8,22.2],[78.43,22.47],[79.5,22.3],[80.5,22.4],[81.75,22.67]]],"fact":"Hills south of the Narmada valley; Dhupgarh near Pachmarhi is the highest peak. The line is approximate."},
-    {"name":"K2","kind":"peak","tol":5,"pt":[76.5133,35.8825],"fact":"8,611 m · Karakoram, Gilgit-Baltistan (claimed by India as part of Ladakh); the second-highest mountain in the world."},
-    {"name":"Kangchenjunga","kind":"peak","tol":8,"pt":[88.1475,27.7025],"fact":"8,586 m · on the Sikkim–Nepal border; the highest peak within India’s administered territory and third-highest in the world."},
-    {"name":"Nanga Parbat","kind":"peak","tol":8,"pt":[74.5892,35.2375],"fact":"8,126 m · western Himalaya, Gilgit-Baltistan (claimed by India as part of Ladakh); the ninth-highest mountain in the world."},
-    {"name":"Gasherbrum I","kind":"peak","tol":4,"pt":[76.6967,35.7244],"fact":"8,080 m · Karakoram, Gilgit-Baltistan (claimed by India); also called Hidden Peak."},
-    {"name":"Broad Peak","kind":"peak","tol":5,"pt":[76.5653,35.8111],"fact":"8,051 m · Karakoram, Gilgit-Baltistan (claimed by India); close to K2."},
-    {"name":"Gasherbrum II","kind":"peak","tol":4,"pt":[76.6533,35.7583],"fact":"8,035 m · Karakoram, Gilgit-Baltistan (claimed by India)."},
-    {"name":"Gasherbrum III","kind":"peak","tol":4,"pt":[76.6411,35.7592],"fact":"7,952 m · Karakoram, Gilgit-Baltistan (claimed by India)."},
-    {"name":"Gasherbrum IV","kind":"peak","tol":4,"pt":[76.615,35.7606],"fact":"7,932 m · Karakoram, Gilgit-Baltistan (claimed by India); famous for its steep faces."},
-    {"name":"Distaghil Sar","kind":"peak","tol":6,"pt":[75.1881,36.3258],"fact":"7,885 m · Karakoram, Gilgit-Baltistan (claimed by India); the highest peak of the Hispar Muztagh."},
-    {"name":"Kunyang Chhish","kind":"peak","tol":6,"pt":[75.2,36.2],"fact":"7,852 m · Karakoram, Gilgit-Baltistan (claimed by India)."},
+    {"name":"K2","kind":"peak","tol":24,"pt":[76.5133,35.8825],"fact":"8,611 m · Karakoram, Gilgit-Baltistan (claimed by India as part of Ladakh); the second-highest mountain in the world."},
+    {"name":"Kangchenjunga","kind":"peak","tol":24,"pt":[88.1475,27.7025],"fact":"8,586 m · on the Sikkim–Nepal border; the highest peak in India and the third-highest in the world."},
+    {"name":"Nanga Parbat","kind":"peak","tol":24,"pt":[74.5892,35.2375],"fact":"8,126 m · Gilgit-Baltistan (claimed by India as part of Ladakh); the ninth-highest mountain in the world."},
+    {"name":"Distaghil Sar","kind":"peak","tol":24,"pt":[75.1881,36.3258],"fact":"7,885 m · Karakoram, Gilgit-Baltistan (claimed by India); the highest peak of the Hispar Muztagh."},
+    {"name":"Nanda Devi","kind":"peak","tol":24,"pt":[79.9712,30.3753],"fact":"7,816 m · Uttarakhand; the highest peak entirely within India."},
+    {"name":"Kamet","kind":"peak","tol":24,"pt":[79.5917,30.9206],"fact":"7,756 m · Uttarakhand, near the Tibet border; the second-highest peak of the Garhwal Himalaya."},
+    {"name":"Saser Kangri I","kind":"peak","tol":24,"pt":[77.75,34.8667],"fact":"7,672 m · Ladakh; the highest peak of the Saser Muztagh in the eastern Karakoram."},
+    {"name":"Nun","kind":"peak","tol":24,"pt":[76.05,33.9833],"fact":"7,135 m · Ladakh (Kargil); the highest peak of the Nun Kun massif."},
+    {"name":"Anamudi","kind":"peak","tol":24,"pt":[77.0603,10.1667],"fact":"2,695 m · Kerala; the highest peak of the Western Ghats and of peninsular India."},
+    {"name":"Guru Shikhar","kind":"peak","tol":24,"pt":[72.7783,24.6522],"fact":"1,722 m · Rajasthan (Mount Abu); the highest point of the Aravalli Range."},
     {"name":"Jim Corbett","kind":"park","tol":45,"pt":[78.77,29.53],"fact":"Uttarakhand · India’s oldest national park (1936)."},
     {"name":"Kaziranga","kind":"park","tol":45,"pt":[93.36,26.62],"fact":"Assam · home of the one-horned rhinoceros."},
     {"name":"Gir","kind":"park","tol":45,"pt":[70.8,21.13],"fact":"Gujarat · the last home of the Asiatic lion."},
@@ -188,7 +188,7 @@
     {"name":"Tso Moriri","kind":"lake","tol":35,"ring":[[78.357,32.892],[78.359,32.872],[78.345,32.854],[78.322,32.851],[78.306,32.862],[78.251,32.983],[78.252,33.001],[78.262,33.014],[78.285,33.02],[78.304,33.008],[78.357,32.892]],"fact":"Ladakh · a high-altitude lake in Changthang."},
     {"name":"Thar Desert","kind":"desert","tol":150,"pt":[71.5,27.0],"fact":"Rajasthan · India’s great desert (centre point shown; tap within about 150 km)."},
     {"name":"Rann of Kutch","kind":"desert","tol":90,"pt":[69.8,23.9],"fact":"Gujarat · a vast seasonal salt marsh (centre point shown; tap within about 90 km)."}];
-  const NATURE_SETS = {"Rivers (20)":{"kinds":["river"],"noun":"river","slug":"rivers"},"Mountain ranges (6)":{"kinds":["mountain"],"noun":"mountain range","slug":"mountains"},"Top 10 highest peaks":{"kinds":["peak"],"noun":"mountain peak","slug":"peaks"},"National parks (14)":{"kinds":["park"],"noun":"national park","slug":"parks"},"Lakes (9)":{"kinds":["lake"],"noun":"lake","slug":"lakes"},"Deserts & salt flats (2)":{"kinds":["desert"],"noun":"desert","slug":"deserts"},"All 61 features":{"kinds":["river","mountain","peak","park","lake","desert"],"noun":"feature","slug":"all"}};
+  const NATURE_SETS = {"Rivers (20)":{"kinds":["river"],"noun":"river","slug":"rivers"},"Mountain ranges (6)":{"kinds":["mountain"],"noun":"mountain range","slug":"mountains"},"Major peaks (10)":{"kinds":["peak"],"noun":"mountain peak","slug":"peaks"},"National parks (14)":{"kinds":["park"],"noun":"national park","slug":"parks"},"Lakes (9)":{"kinds":["lake"],"noun":"lake","slug":"lakes"},"Deserts & salt flats (2)":{"kinds":["desert"],"noun":"desert","slug":"deserts"},"All 61 features":{"kinds":["river","mountain","peak","park","lake","desert"],"noun":"feature","slug":"all"}};
   const NATURE_KIND = {river:'River',mountain:'Mountain range',peak:'Mountain peak',park:'National park',lake:'Lake',desert:'Desert / salt flat'};
   const natureFor = key => NATURE.filter(f=>{ const s=NATURE_SETS[key]; return s && s.kinds.includes(f.kind) && (!s.names || s.names.includes(f.name)); });
   const natureByName = n => NATURE.find(f=>f.name===n);
@@ -199,7 +199,7 @@
     "Himachal Pradesh":{"capital":"Shimla (summer); Dharamshala (winter)","formed":"25 Jan 1971 (full statehood)","language":"Hindi (Sanskrit is the second official language)","pop":"6.9 million","area":"55,673 km²","neighbours":"Jammu & Kashmir, Ladakh, Punjab, Haryana, Uttarakhand, Uttar Pradesh; Tibet (China)","known":"Hill stations such as Shimla and Manali, and apple orchards."},
     "Rajasthan":{"capital":"Jaipur","formed":"1 Nov 1956 (present-day Rajasthan)","language":"Hindi","pop":"68.5 million","area":"342,239 km² (the largest state by area)","neighbours":"Punjab, Haryana, Uttar Pradesh, Madhya Pradesh, Gujarat; Pakistan","known":"The Thar Desert, forts and palaces (Jaipur, Jaisalmer, Udaipur) and Ranthambore."},
     "Uttar Pradesh":{"capital":"Lucknow","formed":"24 Jan 1950 (as Uttar Pradesh, renamed from the United Provinces)","language":"Hindi (Urdu is the second official language)","pop":"199.8 million (the most populous state)","area":"240,928 km²","neighbours":"Uttarakhand, Himachal Pradesh, Haryana, Delhi, Rajasthan, Madhya Pradesh, Chhattisgarh, Jharkhand, Bihar; Nepal","known":"The Taj Mahal (Agra), Varanasi and Ayodhya."},
-    "Uttarakhand":{"capital":"Dehradun (winter); Gairsain (summer)","formed":"9 Nov 2000","language":"Hindi (Sanskrit is the second official language)","pop":"10.1 million","area":"53,483 km²","neighbours":"Himachal Pradesh, Haryana, Uttar Pradesh; Nepal, Tibet (China)","known":"The Char Dham pilgrimages, Jim Corbett National Park and the sources of the Ganga and Yamuna."},
+    "Uttarakhand":{"capital":"Dehradun (winter); Bhararisain (Gairsain) (summer)","formed":"9 Nov 2000","language":"Hindi (Sanskrit is the second official language)","pop":"10.1 million","area":"53,483 km²","neighbours":"Himachal Pradesh, Haryana, Uttar Pradesh; Nepal, Tibet (China)","known":"The Char Dham pilgrimages, Jim Corbett National Park and the sources of the Ganga and Yamuna."},
     "Madhya Pradesh":{"capital":"Bhopal","formed":"1 Nov 1956 (present-day Madhya Pradesh, after Chhattisgarh split off in 2000)","language":"Hindi","pop":"72.6 million","area":"308,252 km²","neighbours":"Rajasthan, Uttar Pradesh, Chhattisgarh, Maharashtra, Gujarat","known":"Khajuraho temples, the Sanchi Stupa and tiger reserves such as Kanha and Bandhavgarh."},
     "Chhattisgarh":{"capital":"Raipur","formed":"1 Nov 2000","language":"Hindi (Chhattisgarhi is widely spoken)","pop":"25.5 million","area":"135,194 km²","neighbours":"Madhya Pradesh, Maharashtra, Telangana, Andhra Pradesh, Odisha, Jharkhand, Uttar Pradesh","known":"Dense forests, tribal culture, rice farming and coal and iron-ore deposits."},
     "Bihar":{"capital":"Patna","formed":"Province created on 22 Mar 1912; a state since 1950","language":"Hindi (Urdu is the second official language)","pop":"104.1 million","area":"94,163 km²","neighbours":"Uttar Pradesh, Jharkhand, West Bengal; Nepal","known":"Nalanda, Bodh Gaya and the ancient city of Pataliputra."},
@@ -255,6 +255,7 @@
   const mapCache = new Map();
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
+  let roundStart = 0, timerId = null, mapStarted = false;
   let reviewRound = false, reviewPool = [], pendingStart = false, learnPicked = null, showLabels = true;
 
   function canonical(raw) {
@@ -325,7 +326,7 @@
     const pool=listForMode();
     const missing=pool.filter(n=>!featureByName.has(n));
     if (missing.length) {toast(`Map data missing: ${missing.join(', ')}`);console.warn('Unmatched map regions',missing);return;}
-    gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null; awaiting=false; hideCaption();
+    gameId++; queue=d3.shuffle([...pool]); found=new Set(); missed=new Set(); mistakes=0; roundActive=true; current=null; awaiting=false; hideCaption(); startTimer();
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
     mapGroup.selectAll('.region, .airport-node, .nat-node, .outline-shape, .base-region, .lk-isl').classed('found',false).classed('missed',false).classed('target-reveal',false);
     $('map-message').textContent=mode==='outlines'?'Round in progress · type the plate code':`Round in progress · tap a ${noun()}`; updateStats(); nextQuestion(); resetMapView();
@@ -410,13 +411,15 @@
   }
   function finishGame(completed) {
     roundActive=false; current=null; showPrompt(); updateStats();
+    const secs=stopTimer();
     const total=listForMode().length, score=found.size, label=modeLabel()+(reviewRound?' · review':'');
     const date=new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'});
     saveHistory({score,total,misses:mistakes,modeLabel:label,date,completed,review:reviewRound});
     if (mode==='outlines') { hideCaption(); awaiting=false; resetCodeInput(); renderOutline(null); }
     $('result-icon').textContent=completed?'🎉':'🗺️'; $('result-title').textContent=completed?(reviewRound?'Review complete!':mode==='capitals'?'All capitals found!':mode==='nature'?'All found!':mode==='airports'?'All airports found!':mode==='outlines'?'All outlines named!':mode==='districts'?(dset().doneTitle||`${districtKey} mapped!`):'India mapped!'):'Round over';
     $('result-copy').textContent=completed?`You found every ${noun()} in this round. Excellent map knowledge.`:`You found ${score} of ${total} ${noun()}s. Review the highlighted misses and try another round.`;
-    $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`; $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
+    $('result-score').textContent=`${score} / ${total}`; $('result-unit').textContent=`${noun()}s found`;
+    lastShare={label,score,total,misses:mistakes,secs}; $('result-time').textContent=`⏱ ${fmtTime(secs)} · ${total?Math.round(100*score/total):0}% accuracy`; if (completed) { confetti(); buzz(true); } $('result-overlay').classList.add('open'); $('result-overlay').setAttribute('aria-hidden','false');
     $('map-message').textContent=completed?'All regions found!':'Round ended · start a new game to try again'; renderReview();
   }
   function resetMapView() { if(mapSvg&&zoom) mapSvg.transition().duration(450).call(zoom.transform,d3.zoomIdentity); }
@@ -440,7 +443,7 @@
       const g=mapGroup.append('g').datum({x,y,properties:{quizName:perIsland?LK_NAMES[i]:'Lakshadweep'}}).attr('class','lk-isl'+(clickable?' clickable':'')).attr('transform',`translate(${x},${y})`);
       g.append('ellipse').attr('class','lk-halo').attr('rx',rx*3.4).attr('ry',ry*1.5);
       g.append('ellipse').attr('class','lk-land').attr('rx',rx).attr('ry',ry);
-      if (clickable) g.on('click',event=>{event.stopPropagation();handleRegionTap(perIsland?LK_NAMES[i]:'Lakshadweep');});
+      if (clickable) g.on('click',event=>{event.stopPropagation();onRegion(perIsland?LK_NAMES[i]:'Lakshadweep');});
     });
   }
   function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.8)})`); }
@@ -508,19 +511,21 @@
     projection.fitExtent([[65,65],[935,690]],fc);
     mapGroup.selectAll('path').data(collection.features).join('path')
       .attr('class',d=>'region'+(focus(d)?'':' learn-dim')).attr('d',path)
-      .attr('tabindex',0).attr('role','button').attr('aria-label','Map region')
-      .on('click',(event,d)=>{event.stopPropagation();onRegion(d.properties.quizName);})
-      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();onRegion(d.properties.quizName);}});
+      .attr('tabindex',d=>focus(d)?0:-1).attr('role','button').attr('aria-label',d=>focus(d)?'Map region':null).attr('aria-hidden',d=>focus(d)?null:'true')
+      .on('click',(event,d)=>{event.stopPropagation();if(focus(d))onRegion(d.properties.quizName);})
+      .on('keydown',(event,d)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();if(focus(d))onRegion(d.properties.quizName);}});
     // Invisible, wider tap area for tiny regions (Lakshadweep's islands; small districts such as Hyderabad). No visual change.
     collection.features.forEach(d=>{
-      const [[x0,y0],[x1,y1]]=path.bounds(d), small=Math.min(x1-x0,y1-y0)<26;
+      if(!focus(d)) return; const [[x0,y0],[x1,y1]]=path.bounds(d), small=Math.min(x1-x0,y1-y0)<26;
       if (d.properties.quizName!=='Lakshadweep' && !((mode==='districts'||mode==='learn') && small)) return;
       mapGroup.append('path').attr('class','hit-area'+((mode==='districts'||mode==='learn')?' hit-small':'')).attr('d',path(d))
-        .on('click',(event)=>{event.stopPropagation();onRegion(d.properties.quizName);});
+        .on('click',(event)=>{event.stopPropagation();if(focus(d))onRegion(d.properties.quizName);});
     });
     if (collection.context?.length) mapGroup.insert('g',':first-child').attr('class','context-layer').selectAll('path').data(collection.context).join('path').attr('class','context-region').attr('d',path);
-    if (collection.features.some(d=>d.properties.quizName==='Lakshadweep')) addLakshadweepMarkers(true);
-    else if (collection.features.some(d=>LK_NAMES.includes(d.properties.quizName))) addLakshadweepMarkers(true,1,true);
+    if (!learnUT||districtKey==='Lakshadweep') {
+      if (collection.features.some(d=>d.properties.quizName==='Lakshadweep')) addLakshadweepMarkers(true);
+      else if (collection.features.some(d=>LK_NAMES.includes(d.properties.quizName))) addLakshadweepMarkers(true,1,true);
+    }
     if (mode==='learn') {
       const lg=mapGroup.append('g').attr('class','learn-labels').style('display',showLabels?null:'none');
       collection.features.forEach(d=>{ if (!focus(d)) return; const [x,y]=path.centroid(d); if (!isFinite(x)||!isFinite(y)) return;
@@ -1147,7 +1152,7 @@
     sel.value=districtKey||'';
   }
   function applyModeUI() {
-    document.querySelectorAll('.seg-btn').forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));});
+    $('mode-title').textContent=MODE_TITLES[mode]||'';
     $('region-picker').hidden=!(mode==='districts'||mode==='nature'||mode==='learn'); renderStateSelect();
     $('picker-label').textContent=mode==='nature'?'Category':'State';
     $('picker-note').textContent=mode==='nature'?'10 rivers · 2 ranges · 4 parks · 5 lakes':mode==='learn'?'All 28 states + 8 Union Territories':'All 28 states + the Union Territories';
@@ -1160,7 +1165,7 @@
     const wasActive=roundActive;
     mode=newMode; districtKey=newKey; reviewRound=false; pendingStart=startAfter; learnPicked=null;
     try { localStorage.setItem(MODE_KEY,JSON.stringify({mode})); } catch {}
-    gameId++; roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0; awaiting=false; hideCaption(); resetCodeInput(false);
+    gameId++; stopTimer(); renderTimer(0); roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0; awaiting=false; hideCaption(); resetCodeInput(false);
     $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
     $('recent-answers').innerHTML='<li>Answers will appear here.</li>';
     applyModeUI(); renderBest(); renderReview(); loadMap();
@@ -1169,7 +1174,7 @@
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   // ======================= v4.3 additions =======================
   const TROUBLE_KEY='indiaMapQuiz.trouble.v1', STATS_KEY='indiaMapQuiz.stats.v1';
-  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.5', APP_VERSION='4.5', OFFLINE_MB=26;
+  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.6', APP_VERSION='4.6', OFFLINE_MB=26;
   const writeJSON=(k,v)=>{ try { localStorage.setItem(k,JSON.stringify(v)); } catch {} };
   const pointMode=()=>mode==='airports'||mode==='capitals';
   const onRegion=name=>mode==='learn'?learnPick(name):handleRegionTap(name);
@@ -1181,6 +1186,7 @@
   }
   function recordResult(name,ok) {
     const k=trackKey(); if (!name||!k) return;
+    buzz(ok);
     const tr=readJSON(TROUBLE_KEY,{}), st=readJSON(STATS_KEY,{});
     const t=tr[k]||(tr[k]={}), s=st[k]||(st[k]={ok:0,miss:0});
     s.label=modeLabel();
@@ -1251,6 +1257,7 @@
     path=d3.geoPath(projection);
     projection.fitExtent([[65,65],[935,690]],{type:'FeatureCollection',features:collection.features});
     mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region').attr('d',path);
+    addLakshadweepMarkers(false);
     natureFor(districtKey).forEach(f=>{
       const g=mapGroup.append('g').datum({properties:{quizName:f.name}}).attr('class',`nat-node nat-${f.kind}`);
       if (f.kind==='river'||f.kind==='mountain') {
@@ -1301,7 +1308,7 @@
     } else {
       const f=natureByName(current), tol=f.tol;
       $('prompt-kind').textContent=`FIND THIS ${NATURE_KIND[f.kind].toUpperCase()}`; $('prompt-name').textContent=current;
-      $('prompt-hint').textContent=f.kind==='river'?`Tap the river along its course (within about ${tol} km).`:f.kind==='mountain'?'Tap anywhere along the range.':f.kind==='peak'?`Tap the summit (within about ${tol} km). Zoom in: several peaks are only a few km apart.`:f.kind==='desert'?`Tap in the desert (within about ${tol} km of the point shown after answering).`:`Tap on or near it (within about ${tol} km).`;
+      $('prompt-hint').textContent=f.kind==='river'?`Tap the river along its course (within about ${tol} km).`:f.kind==='mountain'?'Tap anywhere along the range.':f.kind==='peak'?`Tap on or near the summit (within about ${tol} km).`:f.kind==='desert'?`Tap in the desert (within about ${tol} km of the point shown after answering).`:`Tap on or near it (within about ${tol} km).`;
       $('side-prompt').textContent=current; $('side-description').textContent=`${NATURE_KIND[f.kind]}. Tap it on the map.`;
     }
   }
@@ -1309,6 +1316,7 @@
   // ---- Learn mode ----
   let flashDeck=[], flashIdx=0, flashShown=false;
   function learnPick(name) {
+    if (name && !DISTRICT_SETS[districtKey] && dset().parents?.[name]!==districtKey) return;
     learnPicked=name;
     mapGroup?.selectAll('.region').classed('learn-picked',d=>d.properties.quizName===name);
     showPrompt();
@@ -1349,7 +1357,7 @@
   let offlineBusy=false, offlinePct=0;
   function offlineUrls() {
     const abs=p=>new URL(p,location.href).href, base=REPO_BASES[0];
-    return [...['./','index.html','style.css?v='+APP_VERSION,'script.js?v='+APP_VERSION,'manifest.webmanifest'].map(abs),
+    return [...['./','index.html','style.css?v='+APP_VERSION,'script.js?v='+APP_VERSION,'manifest.webmanifest','icon-192.png','icon-512.png'].map(abs),
       'https://cdn.jsdelivr.net/npm/d3@7','https://cdn.jsdelivr.net/npm/topojson-client@3',
       `${base}/topojson/india.json`, ...[...new Set(Object.values(SLUGS))].map(s=>`${base}/geojson/states/${s}.geojson`)];
   }
@@ -1394,10 +1402,75 @@
   }
   function resumeOffline() { if (offlineSaved()&&'serviceWorker' in navigator&&window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(()=>{}); }
   // ===============================================================
+  // ======================= v4.6: menu, settings and polish =======================
+  const SETTINGS_KEY='indiaMapQuiz.settings.v1';
+  const MODE_TITLES={country:'States & UTs',districts:'Districts',airports:'Airports',outlines:'Outlines',capitals:'Capitals',nature:'Nature',learn:'Learn'};
+  let settings=Object.assign({theme:'auto',haptics:true},readJSON(SETTINGS_KEY,{}));
+  let lastShare=null, deferredInstall=null;
+  const reduceMotion=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function buzz(ok) { if (settings.haptics&&navigator.vibrate) try { navigator.vibrate(ok?12:[30,40,30]); } catch {} }
+  const fmtTime=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  function renderTimer(secs) { const t=$('timer'); if (t) t.textContent=fmtTime(secs); }
+  function startTimer() { stopTimer(); roundStart=Date.now(); renderTimer(0); timerId=setInterval(()=>renderTimer(Math.round((Date.now()-roundStart)/1000)),1000); }
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId=null; const s=Math.round((Date.now()-roundStart)/1000); renderTimer(s); return s; } return 0; }
+  function confetti() {
+    if (reduceMotion()) return;
+    const box=$('result-overlay'), colors=['#34c759','#ff9500','#007aff','#ff3b30','#ffcc00'];
+    for (let i=0;i<36;i++) { const p=document.createElement('i'); p.className='confetti'; p.style.left=Math.random()*100+'%'; p.style.background=colors[i%colors.length]; p.style.animationDelay=(Math.random()*.4)+'s'; p.style.animationDuration=(1.6+Math.random()*1.2)+'s'; p.style.setProperty('--dx',(Math.random()*160-80)+'px'); box.append(p); setTimeout(()=>p.remove(),3400); }
+  }
+  async function shareResult() {
+    if (!lastShare) return;
+    const r=lastShare, text=`India Map Quiz · ${r.label}: ${r.score}/${r.total} found, ${r.misses} missed, ${fmtTime(r.secs)}. Can you beat it?`;
+    try {
+      if (navigator.share) { await navigator.share({title:'India Map Quiz',text,url:location.href.split('#')[0]}); return; }
+      await navigator.clipboard.writeText(text+' '+location.href.split('#')[0]); toast('Result copied to the clipboard');
+    } catch (e) { if (e&&e.name!=='AbortError') toast('Sharing is not available here'); }
+  }
+  function applyTheme() {
+    const root=document.documentElement;
+    if (settings.theme==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',settings.theme);
+    const dark=settings.theme==='dark'||(settings.theme==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+    document.querySelector('meta[name=theme-color]')?.setAttribute('content',dark?'#000000':'#f2f2f7');
+    document.querySelectorAll('#theme-seg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===settings.theme)));
+    const h=$('haptics-toggle'); if (h) h.setAttribute('aria-checked',String(settings.haptics));
+  }
+  // ---- Menu (home) and play views ----
+  function showHome() {
+    document.body.dataset.view='home';
+    document.querySelectorAll('.home-card').forEach(c=>{ if (c.dataset.mode===mode&&mapStarted) c.dataset.last='1'; else delete c.dataset.last; });
+    window.scrollTo(0,0);
+  }
+  function openMode(m) {
+    document.body.dataset.view='play';
+    try { localStorage.setItem(MODE_KEY,JSON.stringify({mode:m})); } catch {}
+    if (m!==mode) { mapStarted=true; setMode(m); }
+    else if (!mapStarted) { mapStarted=true; applyModeUI(); renderBest(); loadMap(); }
+    window.scrollTo(0,0);
+  }
+  function initUX() {
+    document.querySelectorAll('.home-card').forEach(c=>c.addEventListener('click',()=>openMode(c.dataset.mode)));
+    $('back-home').addEventListener('click',showHome);
+    document.querySelector('.brand')?.addEventListener('click',e=>{ e.preventDefault(); showHome(); });
+    document.querySelectorAll('#theme-seg button').forEach(b=>b.addEventListener('click',()=>{ settings.theme=b.dataset.theme; writeJSON(SETTINGS_KEY,settings); applyTheme(); }));
+    $('haptics-toggle').addEventListener('click',()=>{ settings.haptics=!settings.haptics; writeJSON(SETTINGS_KEY,settings); applyTheme(); if (settings.haptics) buzz(true); });
+    $('share-result').addEventListener('click',shareResult);
+    window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e; $('install-row').hidden=false; });
+    window.addEventListener('appinstalled',()=>{ deferredInstall=null; $('install-row').hidden=true; toast('App installed'); });
+    $('install-btn').addEventListener('click',async()=>{ if (!deferredInstall) return; deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch {} deferredInstall=null; $('install-row').hidden=true; });
+    document.addEventListener('keydown',e=>{
+      if (e.ctrlKey||e.metaKey||e.altKey) return;
+      const tag=(e.target&&e.target.tagName)||''; if (/INPUT|SELECT|TEXTAREA/.test(tag)) return;
+      if (e.key==='Escape') { openDrawer(false); $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true'); return; }
+      if (mode==='outlines'&&document.body.dataset.view==='play') return; // letters are used to type the plate code
+      const k=e.key.toLowerCase();
+      if (document.body.dataset.view==='home') { const idx=Number(k)-1, cards=document.querySelectorAll('.home-card'); if (idx>=0&&idx<cards.length) openMode(cards[idx].dataset.mode); return; }
+      if (k==='n') startGame(); else if (k==='s'&&roundActive) skipQuestion(); else if (k==='m') showHome();
+    });
+    applyTheme();
+  }
   function init() {
     const saved=readJSON(MODE_KEY,null);
     if (saved && ['country','districts','airports','outlines','capitals','nature','learn'].includes(saved.mode)) mode=saved.mode;
-    document.querySelectorAll('.seg-btn').forEach(b=>b.addEventListener('click',()=>{ if (b.dataset.mode!==mode) setMode(b.dataset.mode); }));
     $('state-select').addEventListener('change',e=>setMode(mode,e.target.value||null));
     buildKeyboard();
     document.addEventListener('keydown',e=>{
@@ -1418,7 +1491,7 @@
     $('flash-card').addEventListener('click',()=>{ flashShown=!flashShown; renderFlash(); });
     $('flash-next').addEventListener('click',()=>{ flashIdx++; flashShown=false; renderFlash(); });
     renderReview();
-    loadMap();
+    initUX(); showHome();
   }
   init();
 })();
