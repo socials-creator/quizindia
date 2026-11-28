@@ -325,7 +325,9 @@ body[data-mode="learn"] .gamebar,body[data-mode="learn"] .history-row,body[data-
 .flash-q{display:block;font-weight:700;margin-bottom:6px}
 .flash-a{display:block;opacity:.55;font-size:.9rem}
 .flash-a.shown{opacity:1;color:#2e7d4f;font-weight:600}
-.learn-label{font-size:8.5px;font-weight:600;fill:#243040;paint-order:stroke;stroke:rgba(255,255,255,.85);stroke-width:2.4px;pointer-events:none}
+.learn-label{font-weight:700;fill:#1c2a3a;paint-order:stroke;stroke:rgba(255,255,255,.92);stroke-linejoin:round;pointer-events:none}
+:root[data-theme="dark"] .learn-label{fill:#f2f2f7;stroke:rgba(0,0,0,.8)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .learn-label{fill:#f2f2f7;stroke:rgba(0,0,0,.8)}}
 .region.learn-picked{fill:#f2b84b!important}
 /* progress panel */
 .progress-list{list-style:none;padding:0;margin:0 0 8px}
@@ -400,3 +402,8 @@ kbd{font:inherit;font-size:.74rem;padding:1px 6px;border-radius:6px;border:.5px 
 @keyframes confetti-fall{to{transform:translate(var(--dx,0),105vh) rotate(540deg);opacity:.8}}
 .region.learn-dim{pointer-events:none}
 @media (max-width:480px){.stats{grid-template-columns:repeat(4,1fr)}.stats small{font-size:.62rem}.home{padding-top:14px}}
+
+/* ===== v4.7 ===== */
+.nat-hpoint .nat-shape{fill:#7a5c8f;stroke:#fff;stroke-width:1.2px}
+.nat-hpoint .nat-halo{fill:rgba(122,92,143,.12);stroke:rgba(122,92,143,.5)}
+.nat-hpoint.missed .nat-shape{fill:#d64545}

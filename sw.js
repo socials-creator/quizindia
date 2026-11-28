@@ -1,6 +1,6 @@
-/* India Map Quiz service worker (v4.6). Installed only after the person taps "save offline".
+/* India Map Quiz service worker (v4.7). Installed only after the person taps "save offline".
    The page downloads the app files, libraries and boundary maps into this cache; the worker serves them when there is no connection. */
-const CACHE='india-map-quiz-v4.6';
+const CACHE='india-map-quiz-v4.7';
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(
   caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('india-map-quiz-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())
