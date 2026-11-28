@@ -325,9 +325,19 @@ body[data-mode="learn"] .gamebar,body[data-mode="learn"] .history-row,body[data-
 .flash-q{display:block;font-weight:700;margin-bottom:6px}
 .flash-a{display:block;opacity:.55;font-size:.9rem}
 .flash-a.shown{opacity:1;color:#2e7d4f;font-weight:600}
-.learn-label{font-weight:700;fill:#1c2a3a;paint-order:stroke;stroke:rgba(255,255,255,.92);stroke-linejoin:round;pointer-events:none}
-:root[data-theme="dark"] .learn-label{fill:#f2f2f7;stroke:rgba(0,0,0,.8)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .learn-label{fill:#f2f2f7;stroke:rgba(0,0,0,.8)}}
+/* v4.9: Learn-mode label colours: one colour per kind, and a rotating palette for states and districts */
+:root{--lc-base:#1c2a3a;--lc-d0:#c0392b;--lc-d1:#1e6fd9;--lc-d2:#1b8a4b;--lc-d3:#b9650a;--lc-d4:#7b3fb5;--lc-d5:#0e7c86;--lc-d6:#b0306a;
+  --lc-capital:#d12a20;--lc-airport:#4a48c4;--lc-river:#1f6fb2;--lc-mountain:#8a5a36;--lc-peak:#c2410c;--lc-hpoint:#7a3fb0;--lc-park:#1b7f3e;--lc-lake:#0e7c9a;--lc-desert:#a9730a}
+:root[data-theme="dark"]{--lc-base:#f2f2f7;--lc-d0:#ff8a7a;--lc-d1:#6db3ff;--lc-d2:#5fd68a;--lc-d3:#ffb55c;--lc-d4:#c79bff;--lc-d5:#55d3dc;--lc-d6:#ff8fbd;
+  --lc-capital:#ff7a70;--lc-airport:#9d9bff;--lc-river:#6db3ff;--lc-mountain:#d9a77c;--lc-peak:#ff9a5c;--lc-hpoint:#c79bff;--lc-park:#5fd68a;--lc-lake:#55d3dc;--lc-desert:#f0c15a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--lc-base:#f2f2f7;--lc-d0:#ff8a7a;--lc-d1:#6db3ff;--lc-d2:#5fd68a;--lc-d3:#ffb55c;--lc-d4:#c79bff;--lc-d5:#55d3dc;--lc-d6:#ff8fbd;
+  --lc-capital:#ff7a70;--lc-airport:#9d9bff;--lc-river:#6db3ff;--lc-mountain:#d9a77c;--lc-peak:#ff9a5c;--lc-hpoint:#c79bff;--lc-park:#5fd68a;--lc-lake:#55d3dc;--lc-desert:#f0c15a}}
+.learn-label{font-weight:700;fill:var(--lc-base);paint-order:stroke;stroke:rgba(255,255,255,.92);stroke-linejoin:round;pointer-events:none}
+:root[data-theme="dark"] .learn-label{stroke:rgba(0,0,0,.8)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .learn-label{stroke:rgba(0,0,0,.8)}}
+.learn-label.lc-d0{fill:var(--lc-d0)}.learn-label.lc-d1{fill:var(--lc-d1)}.learn-label.lc-d2{fill:var(--lc-d2)}.learn-label.lc-d3{fill:var(--lc-d3)}.learn-label.lc-d4{fill:var(--lc-d4)}.learn-label.lc-d5{fill:var(--lc-d5)}.learn-label.lc-d6{fill:var(--lc-d6)}
+.learn-label.lc-capital{fill:var(--lc-capital)}.learn-label.lc-airport{fill:var(--lc-airport)}.learn-label.lc-river{fill:var(--lc-river)}.learn-label.lc-mountain{fill:var(--lc-mountain)}.learn-label.lc-peak{fill:var(--lc-peak)}
+.learn-label.lc-hpoint{fill:var(--lc-hpoint)}.learn-label.lc-park{fill:var(--lc-park)}.learn-label.lc-lake{fill:var(--lc-lake)}.learn-label.lc-desert{fill:var(--lc-desert)}
 .region.learn-picked{fill:#f2b84b!important}
 /* progress panel */
 .progress-list{list-style:none;padding:0;margin:0 0 8px}

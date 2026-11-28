@@ -471,6 +471,34 @@
   const LK_NAMES = ['Bitra','Chetlat','Kiltan','Kadmat','Amini','Agatti','Kavaratti','Androth','Kalpeni','Minicoy']; // the 10 sub-divisions (Wikipedia), same order as LK_ISLANDS
   const LK_LEN = [0.8,1.6,2.5,8,4,7,6,4.5,3.5,10]; // approx. island length in km, same order — used only to vary the drawn size a little
   let mapK = 1;
+  // v4.9: label colours and overlap-free placement for Learn mode
+  let lblList = [], lblDots = [], lblExp = 0.3;
+  const LBL_PX = 11, LBL_W = 0.6, N_PALETTE = 7;
+  const lblFontU = host => LBL_PX*1000/Math.max(320,host.clientWidth||800);
+  // give neighbouring shapes different colours: a greedy colouring over overlapping bounding boxes
+  function pickColors(boundsList) {
+    const out=[]; const near=(a,b)=>a[0][0]<=b[1][0]+4&&a[1][0]>=b[0][0]-4&&a[0][1]<=b[1][1]+4&&a[1][1]>=b[0][1]-4;
+    boundsList.forEach((b,i)=>{ const used=new Set(); if (b&&isFinite(b[0][0])) for (let k=0;k<i;k++) if (boundsList[k]&&near(b,boundsList[k])) used.add(out[k]); let c=i%N_PALETTE; for (let t=0;t<N_PALETTE;t++) { const cand=(i+t)%N_PALETTE; if (!used.has(cand)) { c=cand; break; } } out.push(c); });
+    return out;
+  }
+  // Show the most important labels first and hide any label that would cover one already placed (or a map marker)
+  function declutterLabels() {
+    if (!mapSvg||!lblList.length) return;
+    const T=d3.zoomTransform(mapSvg.node()), k=T.k, z=k/Math.pow(k,lblExp), placed=[], PAD=2.5;
+    const hit=(a,b)=>a[0]<b[2]&&a[2]>b[0]&&a[1]<b[3]&&a[3]>b[1];
+    const box=e=>{ const ax=T.x+k*e.x, ay=T.y+k*e.y, l=ax+z*e.ox; return [l-PAD,ay-z*e.h/2-PAD,l+z*e.w+PAD,ay+z*e.h/2+PAD]; };
+    const onScreen=b=>b[2]>-20&&b[0]<1020&&b[3]>-20&&b[1]<780;
+    const visible=e=>!e.it||e.it.kind==='state'||lxMatch(e.it);
+    const dots=lblDots.filter(d=>visible(d)).map(d=>{ const ax=T.x+k*d.x, ay=T.y+k*d.y, r=d.r*z; return {it:d.it,b:[ax-r,ay-r,ax+r,ay+r]}; });
+    const on=e=>{ if (!e.it) return true; if (e.it.sel&&e.last) return true; return lxLabels&&k>=e.min&&k<e.max; };
+    const shown=new Set();
+    const tryPlace=(e,force)=>{ if (!visible(e)||!on(e)) return; const b=box(e); if (!onScreen(b)) return;
+      if (!force) { if (placed.some(p=>hit(b,p))) return; if (dots.some(d=>d.it!==e.it&&hit(b,d.b))) return; }
+      placed.push(b); shown.add(e); };
+    lblList.forEach(e=>{ if (e.it&&e.it.sel&&e.last) tryPlace(e,true); });
+    lblList.forEach(e=>{ if (!shown.has(e)) tryPlace(e,false); });
+    lblList.forEach(e=>{ e.node.style.display=shown.has(e)?'':'none'; });
+  }
   // Each island is drawn like the rest of the map: a tiny land-coloured island with the usual border, sitting in a faint lagoon halo, and it takes the same found/missed colour as its region.
   function addLakshadweepMarkers(clickable, sizeScale=1, perIsland=false) {
     mapK = 1;
@@ -482,7 +510,7 @@
       if (clickable) g.on('click',event=>{event.stopPropagation();onRegion(perIsland?LK_NAMES[i]:'Lakshadweep');});
     });
   }
-  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.3)})`); lxOnZoom(); }
+  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-labels .learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.3)})`); lxOnZoom(); if (mode==='learn'&&learnTab==='districts') declutterLabels(); }
   function drawAirportMap(collection) {
     const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines','nature'); host.classList.add('airports');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',(mode==='capitals'?'Map of India for locating state and Union Territory capitals':'Map of India for locating airports')).attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
@@ -563,13 +591,19 @@
       else if (collection.features.some(d=>LK_NAMES.includes(d.properties.quizName))) addLakshadweepMarkers(true,1,true);
     }
     if (mode==='learn') {
-      const learnFont=12*1000/Math.max(320,host.clientWidth||800); // about 12 screen pixels at the start
+      const learnFont=lblFontU(host); // about 11 screen pixels at the start
+      lblList=[]; lblDots=[]; lblExp=0.3;
       const lg=mapGroup.append('g').attr('class','learn-labels').style('display',showLabels?null:'none');
-      collection.features.forEach(d=>{ if (!focus(d)) return; const [x,y]=path.centroid(d); if (!isFinite(x)||!isFinite(y)) return;
-        lg.append('text').datum({x,y}).attr('class','learn-label').attr('font-size',learnFont).attr('stroke-width',learnFont*0.3).attr('transform',`translate(${x},${y})`).attr('text-anchor','middle').attr('dy','.32em').text(d.properties.quizName); });
+      const lfeats=collection.features.filter(d=>{ if (!focus(d)) return false; const [x,y]=path.centroid(d); return isFinite(x)&&isFinite(y); });
+      const lcols=pickColors(lfeats.map(d=>path.bounds(d)));
+      lfeats.forEach((d,i)=>{ const [x,y]=path.centroid(d), name=d.properties.quizName, w=name.length*learnFont*LBL_W;
+        const t=lg.append('text').datum({x,y}).attr('class','learn-label lc-d'+lcols[i]).attr('font-size',learnFont).attr('stroke-width',learnFont*0.3).attr('transform',`translate(${x},${y})`).attr('text-anchor','middle').attr('dy','.32em').text(name);
+        lblList.push({node:t.node(),x,y,w,h:learnFont*1.2,ox:-w/2,pr:path.area(d),min:0,max:99}); });
+      lblList.sort((a,b)=>b.pr-a.pr);
     }
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
     mapSvg.call(zoom).on('dblclick.zoom',null);
+    if (mode==='learn') declutterLabels(); else lblList=[];
     $('map-message').textContent='Map ready · choose New game';
   }
   // ---- Boundary data: https://github.com/udit-001/india-maps-data (GeoJSON / TopoJSON) ----
@@ -1212,7 +1246,7 @@
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   // ======================= v4.3 additions =======================
   const TROUBLE_KEY='indiaMapQuiz.trouble.v1', STATS_KEY='indiaMapQuiz.stats.v1';
-  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.8', APP_VERSION='4.8', OFFLINE_MB=26;
+  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.9', APP_VERSION='4.9', OFFLINE_MB=26;
   const writeJSON=(k,v)=>{ try { localStorage.setItem(k,JSON.stringify(v)); } catch {} };
   const pointMode=()=>mode==='airports'||mode==='capitals';
   const onRegion=name=>mode==='learn'?(learnTab==='districts'?learnPick(name):lxSelect(name)):handleRegionTap(name);
@@ -1451,7 +1485,7 @@
   function lxOnZoom() {
     if (!mapGroup) return;
     mapGroup.selectAll('.lx-p').attr('transform',d=>`translate(${d.anchor[0]},${d.anchor[1]}) scale(${1/Math.pow(mapK,0.55)})`);
-    mapGroup.selectAll('.lx-label').style('display',d=>{ const it=d.it; return lxLabels&&mapK>=d.min&&mapK<d.max||(it.sel&&d.last)?null:'none'; });
+    if (mode==='learn'&&learnTab!=='districts') declutterLabels();
   }
   function drawLearnExplorer(collection) {
     const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines','nature','airports');
@@ -1459,11 +1493,13 @@
     mapGroup=mapSvg.append('g').attr('class','map-world');
     projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]); path=d3.geoPath(projection);
     projection.fitExtent([[65,65],[935,690]],{type:'FeatureCollection',features:collection.features});
-    const fontU=12*1000/Math.max(320,host.clientWidth||800), states=learnTab==='states';
+    const fontU=lblFontU(host), states=learnTab==='states';
     mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region'+(states?' lx-state':'')).attr('d',path)
       .on('click',(event,d)=>{ if (!states) return; event.stopPropagation(); lxSelect(d.properties.quizName); });
     addLakshadweepMarkers(states&&collection.features.some(d=>d.properties.quizName==='Lakshadweep'));
-    lxItems=buildLxItems(collection); learnSel=null;
+    lxItems=buildLxItems(collection); learnSel=null; lblList=[]; lblDots=[]; lblExp=0.55;
+    const areaOf={}; collection.features.forEach(f=>{ areaOf[f.properties.quizName]=path.area(f); });
+    const stColor={}; if (states) { const cols=pickColors(collection.features.map(f=>path.bounds(f))); collection.features.forEach((f,i)=>{ stColor[f.properties.quizName]=cols[i]; }); }
     const layer=mapGroup.append('g').attr('class','lx-layer');
     lxItems.forEach(it=>{
       const cls=it.tab==='nature'?`nat-node nat-${it.kind}`:it.kind==='state'?'lx-stitem':`lx-${it.kind}`;
@@ -1478,15 +1514,24 @@
         anchor=path.centroid(geo); it.bounds=path.bounds(geo);
       } else anchor=projection(it.pt);
       it.anchor=anchor;
+      it.pr = it.kind==='state' ? (areaOf[it.id]||0)
+        : it.kind==='capital' ? (it.id==='New Delhi'?1e12:(areaOf[(CAPITAL_STATES[it.id]||[])[0]]||0))
+        : it.kind==='airport' ? (/Int/.test(it.name)?1e9:0)+(areaOf[AIRPORT_STATE[it.name]]||0)
+        : (8-(KIND_ORDER[it.kind]||0))*1e9+(it.bounds&&isFinite(it.bounds[0][0])?Math.hypot(it.bounds[1][0]-it.bounds[0][0],it.bounds[1][1]-it.bounds[0][1]):0);
       it.p=layer.append('g').attr('class','lx-p '+cls).datum(it);
       if (it.pt) { // point markers: capitals, airports, peaks, parks, deserts
         it.p.append('circle').attr('class','lx-dot nat-shape').attr('r',it.kind==='airport'?3.4:4.6);
         it.p.append('circle').attr('class','lx-hit').attr('r',13);
       }
-      it.labels.forEach((l,i)=>{ if (!l.t) return; it.p.append('text').attr('class','learn-label lx-label').datum({it,min:l.min,max:l.max,last:i===it.labels.length-1}).attr('font-size',fontU).attr('stroke-width',fontU*0.3)
-        .attr('x',it.pt?fontU*0.6:0).attr('text-anchor',it.pt?'start':'middle').attr('dy','.32em').text(l.t); });
+      if (it.pt) lblDots.push({it,x:anchor[0],y:anchor[1],r:(it.kind==='airport'?3.4:4.6)+1.5});
+      const lcls=it.kind==='state'?'lc-d'+stColor[it.id]:'lc-'+it.kind;
+      it.labels.forEach((l,i)=>{ if (!l.t) return; const last=i===it.labels.length-1;
+        const t=it.p.append('text').attr('class','learn-label lx-label '+lcls).datum({it,min:l.min,max:l.max,last}).attr('font-size',fontU).attr('stroke-width',fontU*0.3)
+          .attr('x',it.pt?fontU*0.6:0).attr('text-anchor',it.pt?'start':'middle').attr('dy','.32em').text(l.t);
+        const w=l.t.length*fontU*LBL_W; lblList.push({node:t.node(),it,x:anchor[0],y:anchor[1],w,h:fontU*1.2,ox:it.pt?fontU*0.6:-w/2,pr:it.pr,min:l.min,max:l.max,last}); });
       [it.g,it.p].forEach(sel=>sel.on('click',event=>{ event.stopPropagation(); lxSelect(it.id); }));
     });
+    lblList.sort((a,b)=>b.pr-a.pr);
     mapSvg.on('click',()=>{ if (learnSel) lxSelect(null); });
     zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
     mapSvg.call(zoom).on('dblclick.zoom',null);
@@ -1575,7 +1620,7 @@
   let offlineBusy=false, offlinePct=0;
   function offlineUrls() {
     const abs=p=>new URL(p,location.href).href, base=REPO_BASES[0];
-    return [...['./','index.html','style.css?v='+APP_VERSION,'script.js?v='+APP_VERSION,'manifest.webmanifest','icon-192.png','icon-512.png'].map(abs),
+    return [...['./','index.html','style.css?v='+APP_VERSION,'script.js?v='+APP_VERSION,'manifest.webmanifest','icon-192.png','icon-512.png','icon-180.png','icon-32.png','icon.svg'].map(abs),
       'https://cdn.jsdelivr.net/npm/d3@7','https://cdn.jsdelivr.net/npm/topojson-client@3',
       `${base}/topojson/india.json`, ...[...new Set(Object.values(SLUGS))].map(s=>`${base}/geojson/states/${s}.geojson`)];
   }
