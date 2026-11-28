@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#f2f2f7">
-  <meta name="version" content="4.7">
+  <meta name="version" content="4.8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>India Map Quiz — States & Union Territories</title>
-  <link rel="stylesheet" href="style.css?v=4.7">
+  <link rel="stylesheet" href="style.css?v=4.8">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='85'%3E🇮🇳%3C/text%3E%3C/svg%3E">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -32,7 +32,7 @@
         <button type="button" class="home-card" data-mode="outlines"><span class="hc-icon" aria-hidden="true">🔤</span><span class="hc-text"><strong>Outlines</strong><small>Recognise a state or UT from its shape</small></span><span class="hc-chev" aria-hidden="true">›</span></button>
         <button type="button" class="home-card" data-mode="capitals"><span class="hc-icon" aria-hidden="true">📍</span><span class="hc-text"><strong>Capitals</strong><small>Place 38 capital cities on the map</small></span><span class="hc-chev" aria-hidden="true">›</span></button>
         <button type="button" class="home-card" data-mode="nature"><span class="hc-icon" aria-hidden="true">🏔️</span><span class="hc-text"><strong>Nature</strong><small>30 rivers, ranges, peaks, parks, lakes and deserts</small></span><span class="hc-chev" aria-hidden="true">›</span></button>
-        <button type="button" class="home-card" data-mode="learn"><span class="hc-icon" aria-hidden="true">📚</span><span class="hc-text"><strong>Learn</strong><small>Facts, district names and flashcards for every state and UT</small></span><span class="hc-chev" aria-hidden="true">›</span></button>
+        <button type="button" class="home-card" data-mode="learn"><span class="hc-icon" aria-hidden="true">📚</span><span class="hc-text"><strong>Learn</strong><small>Study hub: states, districts, capitals, airports and nature, with facts and search</small></span><span class="hc-chev" aria-hidden="true">›</span></button>
       </nav>
       <p class="home-tip">Tip: press 1–7 to open a mode. Your progress stays on this device.</p>
     </section>
@@ -40,6 +40,7 @@
     <section class="controls">
       <div class="mode-bar">
         <div class="mode-head"><button type="button" class="back-btn" id="back-home" aria-label="Back to the menu">‹ Menu</button><strong id="mode-title" class="mode-title">States &amp; UTs</strong></div>
+        <div class="learn-tabs" id="learn-tabs" role="tablist" aria-label="Learn categories" hidden><button type="button" class="learn-tab" role="tab" data-ltab="states" aria-selected="false"><span aria-hidden="true">🗺️</span> States &amp; UTs</button><button type="button" class="learn-tab" role="tab" data-ltab="districts" aria-selected="false"><span aria-hidden="true">🏘️</span> Districts</button><button type="button" class="learn-tab" role="tab" data-ltab="capitals" aria-selected="false"><span aria-hidden="true">📍</span> Capitals</button><button type="button" class="learn-tab" role="tab" data-ltab="airports" aria-selected="false"><span aria-hidden="true">✈️</span> Airports</button><button type="button" class="learn-tab" role="tab" data-ltab="nature" aria-selected="false"><span aria-hidden="true">🏔️</span> Nature</button></div>
         <div class="region-picker" id="region-picker" hidden><span class="eyebrow" id="picker-label">State</span><div class="select-wrap"><select id="state-select" aria-label="Select a state"></select></div><span class="picker-note" id="picker-note">All 28 states + the Union Territories</span></div>
       </div>
       <div class="gamebar">
@@ -74,16 +75,26 @@
       </section>
       <aside class="side-panel">
         <div class="side-card learn-card" id="learn-card">
-          <div class="card-heading"><span class="eyebrow">LEARN</span><span class="learn-dir" id="learn-dir"></span></div>
-          <strong id="learn-title" class="learn-title">Choose a state</strong>
-          <p id="learn-empty" class="learn-empty">Pick any state or Union Territory above. Read its facts, tap its districts to see their names, then try the flashcards or start the district quiz.</p>
-          <div id="learn-body" hidden>
-            <dl class="learn-facts" id="learn-facts"></dl>
-            <div class="learn-actions"><button type="button" class="secondary-btn" id="learn-labels">Hide names</button><button type="button" class="primary-btn" id="learn-quiz">Start district quiz</button></div>
-            <div class="flash"><div class="flash-head"><span class="eyebrow">FLASHCARDS</span><span id="flash-count" class="flash-count"></span></div><button type="button" class="flash-card" id="flash-card" aria-live="polite"><span id="flash-q" class="flash-q"></span><span id="flash-a" class="flash-a"></span></button><button type="button" class="text-btn" id="flash-next">Next card →</button></div>
+          <div class="card-heading"><span class="eyebrow" id="learn-eyebrow">LEARN</span><span class="learn-dir" id="learn-dir"></span></div>
+          <div id="learn-districts">
+            <div class="ld-head"><svg id="learn-outline" class="lx-outline" aria-hidden="true"></svg><strong id="learn-title" class="learn-title">Choose a state</strong></div>
+            <p id="learn-empty" class="learn-empty">Pick any state or Union Territory above. Read its facts, tap its districts to see their names, then try the flashcards or start the district quiz.</p>
+            <div id="learn-body" hidden>
+              <dl class="learn-facts" id="learn-facts"></dl>
+              <div class="lk-box" id="learn-links"></div>
+              <div class="learn-actions"><button type="button" class="secondary-btn" id="learn-labels">Hide names</button><button type="button" class="primary-btn" id="learn-quiz">Start district quiz</button></div>
+              <div class="flash"><div class="flash-head"><span class="eyebrow">FLASHCARDS</span><span id="flash-count" class="flash-count"></span></div><button type="button" class="flash-card" id="flash-card" aria-live="polite"><span id="flash-q" class="flash-q"></span><span id="flash-a" class="flash-a"></span></button><button type="button" class="text-btn" id="flash-next">Next card →</button></div>
+            </div>
+          </div>
+          <div id="learn-explore" hidden>
+            <div class="lx-tools"><input id="learn-search" type="search" class="lx-search" placeholder="Search…" aria-label="Search" autocomplete="off"><button type="button" class="secondary-btn" id="learn-names">Hide names</button></div>
+            <div class="lx-cats" id="learn-cats" role="group" aria-label="Nature categories" hidden></div>
+            <div class="lx-detail" id="learn-detail"></div>
+            <div class="lx-listhead"><span class="eyebrow">LIST</span><span id="learn-count" class="lx-count"></span></div>
+            <ul class="lx-list" id="learn-list"></ul>
           </div>
         </div>
-        <div class="side-card current-card"><span class="eyebrow">YOUR CHALLENGE</span><strong id="side-prompt">Ready when you are</strong><p id="side-description">Find all 36 states and Union Territories by tapping them on the map.</p><button id="side-skip" class="text-btn" disabled>Skip this region →</button></div>
+<div class="side-card current-card"><span class="eyebrow">YOUR CHALLENGE</span><strong id="side-prompt">Ready when you are</strong><p id="side-description">Find all 36 states and Union Territories by tapping them on the map.</p><button id="side-skip" class="text-btn" disabled>Skip this region →</button></div>
         <div class="side-card"><div class="card-heading"><span class="eyebrow">ROUND PROGRESS</span><strong id="progress-label">0 / 36</strong></div><div class="progress-track"><div id="progress-fill"></div></div><div class="progress-legend"><span><i class="dot found-dot"></i> Found</span><span><i class="dot missed-dot"></i> Missed</span><span><i class="dot left-dot"></i> Left</span></div></div>
         <div class="side-card"><span class="eyebrow">RECENT ANSWERS</span><ol id="recent-answers" class="recent-answers"><li>Answers will appear here.</li></ol></div>
       </aside>
@@ -101,11 +112,11 @@
       <p class="shortcuts">Shortcuts: <kbd>N</kbd> new game · <kbd>S</kbd> skip · <kbd>M</kbd> menu · <kbd>Esc</kbd> close</p>
     </section>
     <section class="drawer-section"><h3>Your progress</h3><div id="progress-panel"></div><button type="button" class="text-btn" id="reset-progress">Clear my progress</button></section>
-    <section class="drawer-section"><h3>What’s included</h3><ul><li><b>28 States</b> of India</li><li><b>8 Union Territories</b></li><li>One quiz with every State and Union Territory</li><li><b>Districts mode:</b> all 28 States — Andhra Pradesh, Arunachal Pradesh, Assam, Bihar, Chhattisgarh, Goa, Gujarat, Haryana, Himachal Pradesh, Jharkhand, Karnataka, Kerala, Madhya Pradesh (55), Maharashtra, Manipur, Meghalaya, Mizoram, Nagaland, Odisha, Punjab, Rajasthan (41), Sikkim, Tamil Nadu, Telangana, Tripura, Uttar Pradesh (75), Uttarakhand and West Bengal — plus one choice for all the Union Territories (incl. Delhi’s 13 districts, J&amp;K’s 22 (incl. Muzaffarabad and Mirpur, PoJK), Ladakh’s 8 and Lakshadweep’s 10 sub-divisions)</li><li><b>Airports mode:</b> 111 airports (international plus major domestic), with a 60 km tap radius (never less than 35 km; 35–50 km where airports are close together) around each</li><li><b>Outlines mode:</b> guess all 36 states and UTs from their outlines by typing the licence plate code (e.g. TN, MH)</li><li><b>Capitals mode:</b> 38 capital cities — every state and Union Territory (Chandigarh serves Punjab, Haryana and the UT of Chandigarh) plus the second or seasonal capitals: Jammu, Dharamshala, Bhararisain (Gairsain) and Nagpur. The question shows only the city; the state appears after you answer</li><li><b>Nature mode:</b> 92 features — 30 rivers, 6 mountain ranges, 10 major peaks and the highest peak of 25 states/UTs (where a verified highest point is available), 14 national parks, 9 lakes and 2 deserts/salt flats; pick a category or take them all</li><li><b>Learn mode:</b> facts, district names and flashcards for all 28 states and 8 Union Territories</li><li><b>Review mistakes:</b> every wrong answer is remembered per mode, and a button starts a round of just those</li><li>Recent games, personal bests and your accuracy saved on this device</li></ul></section>
+    <section class="drawer-section"><h3>What’s included</h3><ul><li><b>28 States</b> of India</li><li><b>8 Union Territories</b></li><li>One quiz with every State and Union Territory</li><li><b>Districts mode:</b> all 28 States — Andhra Pradesh, Arunachal Pradesh, Assam, Bihar, Chhattisgarh, Goa, Gujarat, Haryana, Himachal Pradesh, Jharkhand, Karnataka, Kerala, Madhya Pradesh (55), Maharashtra, Manipur, Meghalaya, Mizoram, Nagaland, Odisha, Punjab, Rajasthan (41), Sikkim, Tamil Nadu, Telangana, Tripura, Uttar Pradesh (75), Uttarakhand and West Bengal — plus one choice for all the Union Territories (incl. Delhi’s 13 districts, J&amp;K’s 22 (incl. Muzaffarabad and Mirpur, PoJK), Ladakh’s 8 and Lakshadweep’s 10 sub-divisions)</li><li><b>Airports mode:</b> 111 airports (international plus major domestic), with a 60 km tap radius (never less than 35 km; 35–50 km where airports are close together) around each</li><li><b>Outlines mode:</b> guess all 36 states and UTs from their outlines by typing the licence plate code (e.g. TN, MH)</li><li><b>Capitals mode:</b> 38 capital cities — every state and Union Territory (Chandigarh serves Punjab, Haryana and the UT of Chandigarh) plus the second or seasonal capitals: Jammu, Dharamshala, Bhararisain (Gairsain) and Nagpur. The question shows only the city; the state appears after you answer</li><li><b>Nature mode:</b> 92 features — 30 rivers, 6 mountain ranges, 10 major peaks and the highest peak of 25 states/UTs (where a verified highest point is available), 14 national parks, 9 lakes and 2 deserts/salt flats; pick a category or take them all</li><li><b>Learn mode:</b> a study hub with everything from the other modes — States &amp; UTs (facts, outline, registration code), Districts (names and flashcards), Capitals, Airports and Nature — with maps, search, and links between a state and its capital, airports, rivers, peaks, parks and lakes</li><li><b>Review mistakes:</b> every wrong answer is remembered per mode, and a button starts a round of just those</li><li>Recent games, personal bests and your accuracy saved on this device</li></ul></section>
     <section class="drawer-section"><h3>Map source & reference</h3><p>Clickable boundaries come from the open <a href="https://github.com/udit-001/india-maps-data" target="_blank" rel="noopener">india-maps-data</a> GeoJSON/TopoJSON collection. Official names and the national political-map reference follow Survey of India and Government of India sources.</p><p><a href="https://surveyofindia.gov.in/pages/political-map-of-india" target="_blank" rel="noopener">Survey of India — Political Map of India ↗</a></p><p><a href="https://www.mha.gov.in/union-territories-divisions" target="_blank" rel="noopener">Ministry of Home Affairs — Union Territories ↗</a></p></section>
     <section class="drawer-section"><h3>Map note</h3><p>This is an educational pointing game, not a legal or survey-grade boundary product. District boundaries and names may not reflect the very latest reorganisations. Tap the status chip at the top (“Online · save offline”) once to download the app and every map (about 26 MB) so it works without internet; this needs https, such as GitHub Pages. River lines are simplified Natural Earth data; mountain crest lines and lake outlines are approximate.</p></section>
     <div class="best-score"><span class="eyebrow">BEST SCORE · THIS MODE</span><strong id="best-score">—</strong><small id="best-label">No completed rounds yet</small></div>
-  <p class="version-note">India Map Quiz · v4.7</p>
+  <p class="version-note">India Map Quiz · v4.8</p>
   </aside>
 
   <div class="result-overlay" id="result-overlay" aria-hidden="true">
@@ -115,6 +126,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-  <script src="script.js?v=4.7"></script>
+  <script src="script.js?v=4.8"></script>
 </body>
 </html>

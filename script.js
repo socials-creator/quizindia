@@ -262,6 +262,10 @@
     "Lakshadweep":{"capital":"Kavaratti","formed":"1 Nov 1956","language":"Malayalam (Mahl on Minicoy)","pop":"0.06 million","area":"32 km² (the smallest UT by area)","neighbours":"Coral islands in the Arabian Sea, off Kerala","known":"India’s only coral atolls."},
     "Puducherry":{"capital":"Puducherry","formed":"16 Aug 1962 (de jure transfer from France)","language":"Tamil, English, French (Telugu in Yanam, Malayalam in Mahé)","pop":"1.2 million","area":"479 km²","neighbours":"Four enclaves: Puducherry and Karaikal (Tamil Nadu), Mahé (Kerala), Yanam (Andhra Pradesh)","known":"The French Quarter and nearby Auroville."}};
   const mapKeyOf = k => DISTRICT_SETS[k] ? k : 'Union Territories';
+  // v4.8: which state/UT each airport, nature feature and capital lies in (computed from the boundary data; used by Learn)
+  const AIRPORT_STATE = {"Indira Gandhi Int’l (DEL)":"Delhi","Chhatrapati Shivaji Maharaj Int’l (BOM)":"Maharashtra","Chennai Int’l (MAA)":"Tamil Nadu","Netaji Subhas Chandra Bose Int’l (CCU)":"West Bengal","Kempegowda Int’l (BLR)":"Karnataka","Rajiv Gandhi Int’l (HYD)":"Telangana","Sardar Vallabhbhai Patel Int’l (AMD)":"Gujarat","Cochin Int’l (COK)":"Kerala","Thiruvananthapuram Int’l (TRV)":"Kerala","Calicut Int’l (CCJ)":"Kerala","Kannur Int’l (CNN)":"Kerala","Goa Int’l (GOI)":"Goa","Manohar Int’l (GOX)":"Goa","Pune Int’l (PNQ)":"Maharashtra","Jaipur Int’l (JAI)":"Rajasthan","Chaudhary Charan Singh Int’l (LKO)":"Uttar Pradesh","Lal Bahadur Shastri Int’l (VNS)":"Uttar Pradesh","Maharishi Valmiki Int’l (AYJ)":"Uttar Pradesh","Kushinagar Int’l (KBK)":"Uttar Pradesh","Gaya Int’l (GAY)":"Bihar","Sri Guru Ram Dass Jee Int’l (ATQ)":"Punjab","Shaheed Bhagat Singh Int’l (IXC)":"Chandigarh","Sheikh ul-Alam Int’l (SXR)":"Jammu and Kashmir","Lokpriya Gopinath Bordoloi Int’l (GAU)":"Assam","Bagdogra Int’l (IXB)":"West Bengal","Bir Tikendrajit Int’l (IMF)":"Manipur","Maharaja Bir Bikram (IXA)":"Tripura","Veer Savarkar Int’l (IXZ)":"Andaman and Nicobar Islands","Tiruchirappalli Int’l (TRZ)":"Tamil Nadu","Coimbatore Int’l (CJB)":"Tamil Nadu","Madurai Int’l (IXM)":"Tamil Nadu","Mangaluru Int’l (IXE)":"Karnataka","Dr. Babasaheb Ambedkar Int’l (NAG)":"Maharashtra","Devi Ahilya Bai Holkar (IDR)":"Madhya Pradesh","Surat Int’l (STV)":"Gujarat","Rajkot Int’l (HSR)":"Gujarat","Alluri Sitarama Raju Int’l (VTZ)":"Andhra Pradesh","Vijayawada Int’l (VGA)":"Andhra Pradesh","Navi Mumbai Int’l (NMI)":"Maharashtra","Noida Int’l (DXN)":"Uttar Pradesh","Tirupati Int’l (TIR)":"Andhra Pradesh","Shirdi Int’l (SAG)":"Maharashtra","Biju Patnaik Int’l (BBI)":"Odisha","Jay Prakash Narayan Int’l (PAT)":"Bihar","Raja Bhoj (BHO)":"Madhya Pradesh","Chhatrapati Sambhajinagar (IXU)":"Maharashtra","Vadodara (BDQ)":"Gujarat","Swami Vivekananda (RPR)":"Chhattisgarh","Birsa Munda (IXR)":"Jharkhand","Jolly Grant (DED)":"Uttarakhand","Jammu (IXJ)":"Jammu and Kashmir","Kushok Bakula Rimpochee (IXL)":"Ladakh","Dibrugarh (DIB)":"Assam","Maharana Pratap (UDR)":"Rajasthan","Jodhpur (JDH)":"Rajasthan","Warangal (WGC)":"Telangana","Gorakhpur (GOP)":"Uttar Pradesh","Hubballi (HBX)":"Karnataka","Belagavi (IXG)":"Karnataka","Mysuru (MYQ)":"Karnataka","Rajahmundry (RJA)":"Andhra Pradesh","Jabalpur (JLR)":"Madhya Pradesh","Kolhapur (KLH)":"Maharashtra","Nashik (ISK)":"Maharashtra","Jamnagar (JGA)":"Gujarat","Bhuj (BHJ)":"Gujarat","Prayagraj (IXD)":"Uttar Pradesh","Agra (AGR)":"Uttar Pradesh","Gwalior (GWL)":"Madhya Pradesh","Jorhat (JRH)":"Assam","Silchar (IXS)":"Assam","Dimapur (DMU)":"Assam","Lengpui (AJL)":"Mizoram","Veer Surendra Sai (JRG)":"Odisha","Thoothukudi (TCR)":"Tamil Nadu","Kadapa (CDP)":"Andhra Pradesh","Uyyalawada Narasimha Reddy (KJB)":"Andhra Pradesh","Salem (SXV)":"Tamil Nadu","Kalaburagi (GBI)":"Karnataka","Kuvempu (RQY)":"Karnataka","Jindal Vijaynagar (VDY)":"Karnataka","Bidar (IXX)":"Karnataka","Jalgaon (JLG)":"Maharashtra","Shri Guru Gobind Singh Ji (NDC)":"Maharashtra","Sindhudurg (SDW)":"Maharashtra","Gondia (GDB)":"Madhya Pradesh","Amravati (AMI)":"Maharashtra","Solapur (SSE)":"Maharashtra","Puducherry (PNY)":"Puducherry","Agatti (AGX)":"Lakshadweep","Diu (DIU)":"Dadra and Nagar Haveli and Daman and Diu","Kangra (DHM)":"Himachal Pradesh","Shimla (SLV)":"Himachal Pradesh","Kullu-Manali (KUU)":"Himachal Pradesh","Maharaja Agrasen Int’l (HSS)":"Haryana","Pakyong (PYG)":"Sikkim","Shillong (SHL)":"Meghalaya","Pasighat (IXT)":"Arunachal Pradesh","Tezpur (TEZ)":"Assam","Pantnagar (PGH)":"Uttarakhand","Deoghar (DGH)":"Jharkhand","Bilaspur (PAB)":"Chhattisgarh","Maa Danteswari (JGB)":"Chhattisgarh","Kazi Nazrul Islam (RDP)":"West Bengal","Darbhanga (DBR)":"Bihar","Kishangarh (KQH)":"Rajasthan","Bikaner (BKB)":"Rajasthan","Jaisalmer (JSA)":"Rajasthan","Khajuraho (HJR)":"Madhya Pradesh","Porbandar (PBD)":"Gujarat","Adampur (AIP)":"Punjab"};
+  const NATURE_STATES = {"Ganga":["Uttar Pradesh","West Bengal","Bihar","Uttarakhand","Jharkhand"],"Yamuna":["Uttar Pradesh","Haryana","Uttarakhand","Delhi","Himachal Pradesh"],"Brahmaputra":["Assam","Arunachal Pradesh"],"Indus":["Ladakh"],"Godavari":["Maharashtra","Telangana","Andhra Pradesh","Chhattisgarh"],"Krishna":["Karnataka","Telangana","Andhra Pradesh","Maharashtra"],"Narmada":["Madhya Pradesh","Gujarat","Maharashtra"],"Mahanadi":["Odisha","Chhattisgarh"],"Cauvery":["Tamil Nadu","Karnataka"],"Tapi":["Maharashtra","Madhya Pradesh","Gujarat"],"Sutlej":["Himachal Pradesh","Punjab"],"Beas":["Himachal Pradesh","Punjab"],"Ravi":["Himachal Pradesh","Punjab","Jammu and Kashmir"],"Chenab":["Jammu and Kashmir","Himachal Pradesh"],"Jhelum":["Jammu and Kashmir"],"Chambal":["Madhya Pradesh","Rajasthan","Uttar Pradesh"],"Ghaghara":["Uttar Pradesh","Bihar"],"Gandak":["Bihar","Uttar Pradesh"],"Son":["Madhya Pradesh","Bihar","Uttar Pradesh","Jharkhand","Chhattisgarh"],"Tungabhadra":["Karnataka","Andhra Pradesh","Telangana"],"Mahi":["Gujarat","Rajasthan","Madhya Pradesh"],"Betwa":["Uttar Pradesh","Madhya Pradesh"],"Bhima":["Maharashtra","Karnataka"],"Brahmani":["Odisha"],"Pennar":["Andhra Pradesh","Karnataka"],"Teesta":["West Bengal","Sikkim"],"Wainganga":["Maharashtra","Madhya Pradesh","Telangana"],"Indravati":["Chhattisgarh","Maharashtra","Odisha"],"Banas":["Rajasthan"],"Palar":["Tamil Nadu","Karnataka","Andhra Pradesh"],"Himalayas":["Himachal Pradesh","Arunachal Pradesh","Uttarakhand","Jammu and Kashmir","Sikkim"],"Western Ghats":["Maharashtra","Karnataka","Kerala","Tamil Nadu","Gujarat"],"Eastern Ghats":["Andhra Pradesh","Odisha","Tamil Nadu"],"Aravalli Range":["Rajasthan","Gujarat","Haryana"],"Vindhya Range":["Madhya Pradesh","Uttar Pradesh","Bihar"],"Satpura Range":["Madhya Pradesh","Maharashtra"],"K2":["Ladakh"],"Kangchenjunga":["Sikkim"],"Nanga Parbat":["Ladakh"],"Distaghil Sar":["Ladakh"],"Nanda Devi":["Uttarakhand"],"Kamet":["Uttarakhand"],"Saser Kangri I":["Ladakh"],"Nun":["Ladakh"],"Anamudi":["Kerala"],"Guru Shikhar":["Rajasthan"],"Jim Corbett":["Uttarakhand"],"Kaziranga":["Assam"],"Gir":["Gujarat"],"Kanha":["Madhya Pradesh"],"Sundarbans":["West Bengal"],"Ranthambore":["Rajasthan"],"Bandhavgarh":["Madhya Pradesh"],"Manas":["Assam"],"Keoladeo":["Rajasthan"],"Hemis":["Ladakh"],"Bandipur":["Karnataka"],"Periyar":["Kerala"],"Simlipal":["Odisha"],"Pench":["Madhya Pradesh"],"Vembanad":["Kerala"],"Chilika":["Odisha"],"Pulicat":["Andhra Pradesh","Tamil Nadu"],"Loktak":["Manipur"],"Wular":["Jammu and Kashmir"],"Sambhar":["Rajasthan"],"Kolleru":["Andhra Pradesh"],"Pangong Tso":["Ladakh"],"Tso Moriri":["Ladakh"],"Reo Purgyil":["Himachal Pradesh"],"Saltoro Kangri":["Ladakh"],"Kangto":["Arunachal Pradesh"],"Saramati":["Nagaland"],"Phawngpui":["Mizoram"],"Shillong Peak":["Meghalaya"],"Betlingchhip":["Tripura"],"Sandakphu":["West Bengal"],"Someshwar Fort":["Bihar"],"Parasnath":["Jharkhand"],"Deomali":["Odisha"],"Dhupgarh":["Madhya Pradesh"],"Amsot Peak":["Uttar Pradesh"],"Karoh Peak":["Haryana"],"Girnar":["Gujarat"],"Kalsubai":["Maharashtra"],"Mullayanagiri":["Karnataka"],"Doddabetta":["Tamil Nadu"],"Arma Konda":["Andhra Pradesh"],"Doli Gutta":["Telangana"],"Saddle Peak":["Andaman and Nicobar Islands"],"Thar Desert":["Rajasthan"],"Rann of Kutch":["Gujarat"]};
+  const CAPITAL_STATES = {"Amaravati":["Andhra Pradesh"],"Itanagar":["Arunachal Pradesh"],"Dispur":["Assam"],"Patna":["Bihar"],"Raipur":["Chhattisgarh"],"Panaji":["Goa"],"Gandhinagar":["Gujarat"],"Chandigarh":["Chandigarh","Punjab","Haryana"],"Shimla":["Himachal Pradesh"],"Dharamshala":["Himachal Pradesh"],"Ranchi":["Jharkhand"],"Bengaluru":["Karnataka"],"Thiruvananthapuram":["Kerala"],"Bhopal":["Madhya Pradesh"],"Mumbai":["Maharashtra"],"Nagpur":["Maharashtra"],"Imphal":["Manipur"],"Shillong":["Meghalaya"],"Aizawl":["Mizoram"],"Kohima":["Nagaland"],"Bhubaneswar":["Odisha"],"Jaipur":["Rajasthan"],"Gangtok":["Sikkim"],"Chennai":["Tamil Nadu"],"Hyderabad":["Telangana"],"Agartala":["Tripura"],"Lucknow":["Uttar Pradesh"],"Dehradun":["Uttarakhand"],"Bhararisain (Gairsain)":["Uttarakhand"],"Kolkata":["West Bengal"],"Sri Vijaya Puram":["Andaman and Nicobar Islands"],"New Delhi":["Delhi"],"Srinagar":["Jammu and Kashmir"],"Jammu":["Jammu and Kashmir"],"Leh":["Ladakh"],"Puducherry":["Puducherry"],"Daman":["Dadra and Nagar Haveli and Daman and Diu"],"Kavaratti":["Lakshadweep"]};
   const STATES = [
     'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
   ];
@@ -287,6 +291,7 @@
   let found = new Set(), missed = new Set(), mistakes = 0, roundActive = false, mapSvg, mapGroup, zoom, projection, path;
   let toastTimer = null;
   let roundStart = 0, timerId = null, mapStarted = false;
+  let learnTab = 'states', learnSel = null, lxItems = [], lxCat = 'all', lxQuery = '', lxLabels = true, lxPending = null;
   let reviewRound = false, reviewPool = [], pendingStart = false, learnPicked = null, showLabels = true;
 
   function canonical(raw) {
@@ -477,7 +482,7 @@
       if (clickable) g.on('click',event=>{event.stopPropagation();onRegion(perIsland?LK_NAMES[i]:'Lakshadweep');});
     });
   }
-  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.3)})`); }
+  function onMapZoom(event) { mapGroup.attr('transform',event.transform); mapK=event.transform.k; mapGroup.selectAll('.lk-isl').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.sqrt(mapK)})`); mapGroup.selectAll('.learn-label').attr('transform',d=>`translate(${d.x},${d.y}) scale(${1/Math.pow(mapK,0.3)})`); lxOnZoom(); }
   function drawAirportMap(collection) {
     const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines','nature'); host.classList.add('airports');
     mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label',(mode==='capitals'?'Map of India for locating state and Union Territory capitals':'Map of India for locating airports')).attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
@@ -1123,13 +1128,13 @@
     return [...collected.values()];
   }
   function showMapLoading() {
-    const label=(mode==='districts'||mode==='learn')?`Loading ${dset().loadName?'the '+dset().loadName:districtKey+'’s districts'}…`:mode==='airports'?'Loading airports map…':mode==='capitals'||mode==='nature'?'Loading the map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
+    const label=(mode==='learn'&&learnTab!=='districts')?'Loading the map…':(mode==='districts'||mode==='learn')?`Loading ${dset().loadName?'the '+dset().loadName:districtKey+'’s districts'}…`:mode==='airports'?'Loading airports map…':mode==='capitals'||mode==='nature'?'Loading the map…':mode==='outlines'?'Loading outlines…':'Loading India’s map…';
     $('map').classList.remove('ready','districts','airports','outlines','nature');
     $('map').innerHTML=`<div class="map-loading"><span class="loader"></span><strong>${label}</strong><small>Loading boundary data</small></div>`;
     $('map-message').textContent='Loading map…';
   }
   async function loadMap() {
-    const isD=mode==='districts'||mode==='learn';
+    const isD=mode==='districts'||(mode==='learn'&&learnTab==='districts');
     const token=++loadToken, m=mode, key=districtKey, mkey=(m==='learn'&&key)?mapKeyOf(key):key, cacheKey=isD?`districts:${mkey}`:'country';
     const pts=m==='capitals'?CAPITALS:AIRPORTS;
     airportFeatures=pts.map(([n,lat,lon])=>({type:'Feature',properties:{quizName:n},geometry:{type:'Point',coordinates:[lon,lat]}}));
@@ -1155,7 +1160,7 @@
       features=mapped;
       poolNames=isD?mapped.map(f=>f.properties.quizName).sort((a,b)=>a.localeCompare(b)):ALL.map(x=>x.name);
       }
-      drawMap({type:'FeatureCollection',features:mapped,context});
+      if (m==='learn'&&learnTab!=='districts') drawLearnExplorer({features:mapped}); else drawMap({type:'FeatureCollection',features:mapped,context});
       $('map').classList.add('ready'); updateStats(); showPrompt(); renderReview();
       if (m==='learn') renderLearnCard();
       if (isD) {
@@ -1185,7 +1190,8 @@
   }
   function applyModeUI() {
     $('mode-title').textContent=MODE_TITLES[mode]||'';
-    $('region-picker').hidden=!(mode==='districts'||mode==='nature'||mode==='learn'); renderStateSelect();
+    $('region-picker').hidden=!(mode==='districts'||mode==='nature'||(mode==='learn'&&learnTab==='districts')); renderStateSelect();
+    $('learn-tabs').hidden=mode!=='learn'; document.querySelectorAll('.learn-tab').forEach(b=>{ const on=b.dataset.ltab===learnTab; b.classList.toggle('active',on); b.setAttribute('aria-selected',String(on)); });
     $('picker-label').textContent=mode==='nature'?'Category':'State';
     $('picker-note').textContent=mode==='nature'?'10 rivers · 2 ranges · 4 parks · 5 lakes':mode==='learn'?'All 28 states + 8 Union Territories':'All 28 states + the Union Territories';
     $('state-select').setAttribute('aria-label',mode==='nature'?'Select a category':'Select a state');
@@ -1195,7 +1201,7 @@
     if (!['districts','nature','learn'].includes(newMode)) newKey=null;
     if (newMode===mode && newKey===districtKey) return;
     const wasActive=roundActive;
-    mode=newMode; districtKey=newKey; reviewRound=false; pendingStart=startAfter; learnPicked=null;
+    mode=newMode; districtKey=newKey; reviewRound=false; pendingStart=startAfter; learnPicked=null; learnSel=null; lxPending=null;
     try { localStorage.setItem(MODE_KEY,JSON.stringify({mode})); } catch {}
     gameId++; stopTimer(); renderTimer(0); roundActive=false; current=null; queue=[]; found=new Set(); missed=new Set(); mistakes=0; awaiting=false; hideCaption(); resetCodeInput(false);
     $('result-overlay').classList.remove('open'); $('result-overlay').setAttribute('aria-hidden','true');
@@ -1206,10 +1212,10 @@
   function openDrawer(open) { $('info-drawer').classList.toggle('open',open); $('drawer-scrim').classList.toggle('open',open); $('info-drawer').setAttribute('aria-hidden',String(!open)); }
   // ======================= v4.3 additions =======================
   const TROUBLE_KEY='indiaMapQuiz.trouble.v1', STATS_KEY='indiaMapQuiz.stats.v1';
-  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.7', APP_VERSION='4.7', OFFLINE_MB=26;
+  const OFFLINE_KEY='indiaMapQuiz.offline.v1', OFFLINE_CACHE='india-map-quiz-v4.8', APP_VERSION='4.8', OFFLINE_MB=26;
   const writeJSON=(k,v)=>{ try { localStorage.setItem(k,JSON.stringify(v)); } catch {} };
   const pointMode=()=>mode==='airports'||mode==='capitals';
-  const onRegion=name=>mode==='learn'?learnPick(name):handleRegionTap(name);
+  const onRegion=name=>mode==='learn'?(learnTab==='districts'?learnPick(name):lxSelect(name)):handleRegionTap(name);
 
   // ---- Review mistakes (all modes): every miss is remembered per mode/state/category and cleared when found later ----
   function trackKey() {
@@ -1318,6 +1324,13 @@
     const skip=$('skip'), sideSkip=$('side-skip');
     sideSkip.textContent=`Skip this ${noun()} →`;
     const needKey=(mode==='nature'||mode==='learn')&&!districtKey;
+    if (mode==='learn'&&learnTab!=='districts') {
+      const it=lxItems.find(x=>x.id===learnSel), tabName=(LEARN_TABS.find(t=>t[0]===learnTab)||[])[2]||'';
+      $('prompt-kind').textContent=it?(it.kind==='state'?(isStateName(it.name)?'STATE':'UNION TERRITORY'):KIND_LABEL[it.kind].toUpperCase()):tabName.toUpperCase();
+      $('prompt-name').textContent=it?it.name:'Tap the map';
+      $('prompt-hint').textContent=it?(it.kind==='state'?`Registration code ${codeText(it.name)}`:it.sub):'Or pick an item from the list below.';
+      skip.disabled=true; sideSkip.disabled=true; return;
+    }
     if (mode==='learn') {
       $('prompt-kind').textContent=districtKey?'DISTRICT':'LEARN';
       $('prompt-name').textContent=!districtKey?'Choose a state':(learnPicked||'Tap a district');
@@ -1353,15 +1366,29 @@
     mapGroup?.selectAll('.region').classed('learn-picked',d=>d.properties.quizName===name);
     showPrompt();
   }
-  const learnCount = key => DISTRICT_SETS[key] ? DISTRICT_SETS[key].expected : features.filter(f=>dset().parents?.[f.properties.quizName]===key).length;
+  // ======================= v4.8: Learn hub (States & UTs · Districts · Capitals · Airports · Nature) =======================
+  const LEARN_TABS=[['states','🗺️','States & UTs'],['districts','🏘️','Districts'],['capitals','📍','Capitals'],['airports','✈️','Airports'],['nature','🏔️','Nature']];
+  const LX_CATS=[['all','All'],['river','Rivers'],['mountain','Ranges'],['peak','Major peaks'],['hpoint','State highs'],['park','Parks'],['lake','Lakes'],['desert','Deserts']];
+  const STATE_HIGH=['Kangchenjunga','Nanda Devi','Anamudi','Guru Shikhar'];
+  const KIND_ORDER={river:0,mountain:1,peak:2,hpoint:3,park:4,lake:5,desert:6};
+  const KIND_LABEL={state:'State / UT',capital:'Capital',airport:'Airport',river:'River',mountain:'Mountain range',peak:'Mountain peak',hpoint:'Mountain peak',park:'National park',lake:'Lake',desert:'Desert / salt flat'};
+  const isStateName=n=>STATES.includes(n);
+  const codeText=n=>(PLATE[n]||[]).join(' / ');
+  const learnExplorer=()=>mode==='learn'&&learnTab!=='districts';
+  const learnCount = key => DISTRICT_SETS[key] ? DISTRICT_SETS[key].expected : Object.values(DISTRICT_SETS['Union Territories'].parents||{}).filter(v=>v===key).length;
   const learnCountText = key => `${learnCount(key)}${key==='Lakshadweep'?' sub-divisions (one district)':''}`;
+  function factRows(key) {
+    const L=LEARN[key]; if (!L) return [];
+    const rows=[['Registration code',codeText(key)],['Capital',L.capital],['Formed',L.formed],['Main languages',L.language],[DISTRICT_SETS[key]?'Districts':'Districts on the map',learnCountText(key)],['Population (2011)',L.pop],['Area',L.area],['Neighbours',L.neighbours],['Known for',L.known]];
+    return rows.filter(r=>r[1]);
+  }
   function learnCards(key) {
     const L=LEARN[key]; if (!L) return [];
-    return [
-      {q:`What is the capital of ${key}?`,a:L.capital},{q:`When was ${key} formed?`,a:L.formed},{q:`Which language is mainly spoken in ${key}?`,a:L.language},
+    const c=[{q:`What is the capital of ${key}?`,a:L.capital},{q:`When was ${key} formed?`,a:L.formed},{q:`Which language is mainly spoken in ${key}?`,a:L.language},
       {q:`How many districts does ${key} have in this quiz?`,a:learnCountText(key)},{q:`What was the population of ${key} in 2011?`,a:L.pop},{q:`What is the area of ${key}?`,a:L.area},
-      {q:`Which states or countries border ${key}?`,a:L.neighbours},{q:`What is ${key} known for?`,a:L.known}
-    ];
+      {q:`Which states or countries border ${key}?`,a:L.neighbours},{q:`What is ${key} known for?`,a:L.known}];
+    if (codeText(key)) c.push({q:`What is the vehicle registration code of ${key}?`,a:codeText(key)});
+    return c;
   }
   function renderFlash() {
     const q=$('flash-q'), a=$('flash-a');
@@ -1370,18 +1397,177 @@
     q.textContent=c.q; a.textContent=flashShown?c.a:'Tap to reveal the answer'; a.classList.toggle('shown',flashShown);
     $('flash-count').textContent=`${(flashIdx%flashDeck.length)+1} / ${flashDeck.length}`;
   }
+  const el=(tag,cls,txt)=>{ const e=document.createElement(tag); if (cls) e.className=cls; if (txt!=null) e.textContent=txt; return e; };
+  function chip(text,tab,id,title) {
+    const b=el('button','lx-chip',text); b.type='button'; b.dataset.tab=tab; b.dataset.id=id; if (title) b.title=title; return b;
+  }
+  function drawMiniOutline(svg,feats) {
+    const s=d3.select(svg); s.selectAll('*').remove();
+    if (!feats||!feats.length) return;
+    const W=120,H=96, proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:'FeatureCollection',features:feats}), p=d3.geoPath(proj);
+    s.attr('viewBox',`0 0 ${W} ${H}`); s.selectAll('path').data(feats).join('path').attr('d',p).attr('class','lx-mini');
+  }
+  // Everything the other modes know about one state or UT: its capitals, airports, rivers, peaks, parks, lakes
+  function renderLinks(box,key) {
+    box.textContent='';
+    const add=(title,items)=>{ if (!items.length) return; const g=el('div','lk-group'); g.append(el('span','lk-title',title)); const w=el('span','lk-chips'); items.forEach(i=>w.append(i)); g.append(w); box.append(g); };
+    add('Capitals',Object.entries(CAPITAL_STATES).filter(([,s])=>s.includes(key)).map(([c])=>chip(c,'capitals',c)));
+    add('Airports',AIRPORTS.filter(a=>AIRPORT_STATE[a[0]]===key).map(a=>{ const code=(a[0].match(/\(([A-Z]{3})\)$/)||[])[1]||a[0]; return chip(code,'airports',a[0],a[0]); }));
+    const nat=k=>NATURE.filter(f=>(NATURE_STATES[f.name]||[]).includes(key)&&k.includes(f.kind)).map(f=>chip(f.name,'nature',f.name,f.fact));
+    add('Rivers',nat(['river'])); add('Mountains & peaks',nat(['mountain','peak','hpoint'])); add('Parks',nat(['park'])); add('Lakes & deserts',nat(['lake','desert']));
+  }
   function renderLearnCard() {
+    const explorer=learnExplorer();
+    $('learn-districts').hidden=explorer; $('learn-explore').hidden=!explorer;
+    $('learn-eyebrow').textContent=(LEARN_TABS.find(t=>t[0]===learnTab)||[])[2]?.toUpperCase()||'LEARN';
+    if (explorer) { $('learn-dir').textContent=''; renderExplorerPanel(); return; }
     const L=LEARN[districtKey], facts=$('learn-facts');
     $('learn-title').textContent=districtKey||'Choose a state or UT';
     facts.textContent='';
-    if (!L) { $('learn-body').hidden=true; $('learn-empty').hidden=false; return; }
+    if (!L) { $('learn-body').hidden=true; $('learn-empty').hidden=false; drawMiniOutline($('learn-outline'),[]); $('learn-dir').textContent=''; return; }
     $('learn-body').hidden=false; $('learn-empty').hidden=true;
-    $('learn-dir').textContent=LEARN_GROUPS['States'].includes(districtKey)?'State':'Union Territory';
-    [['Capital',L.capital],['Formed',L.formed],['Main languages',L.language],[DISTRICT_SETS[districtKey]?'Districts':'Districts on this map',learnCountText(districtKey)],['Population (2011)',L.pop],['Area',L.area],['Neighbours',L.neighbours],['Known for',L.known]].forEach(([k,v])=>{
-      const dt=document.createElement('dt'), dd=document.createElement('dd'); dt.textContent=k; dd.textContent=v; facts.append(dt,dd);
-    });
+    $('learn-dir').textContent=isStateName(districtKey)?'State':'Union Territory';
+    factRows(districtKey).forEach(([k,v])=>{ const dt=el('dt',null,k), dd=el('dd',null,v); facts.append(dt,dd); });
+    renderLinks($('learn-links'),districtKey);
+    const isUT=!DISTRICT_SETS[districtKey];
+    drawMiniOutline($('learn-outline'),features.filter(f=>!isUT||dset().parents?.[f.properties.quizName]===districtKey));
     flashDeck=d3.shuffle(learnCards(districtKey)); flashIdx=0; flashShown=false; renderFlash();
     $('learn-labels').textContent=showLabels?'Hide names':'Show names';
+  }
+
+  // ---- Explorer tabs: a map + searchable list + detail card for states, capitals, airports and nature ----
+  function buildLxItems(collection) {
+    const items=[];
+    if (learnTab==='states') collection.features.forEach(f=>{ const n=f.properties.quizName; items.push({id:n,name:n,kind:'state',tab:'states',feature:f,sub:`${isStateName(n)?'State':'Union Territory'} · ${codeText(n)}`,search:`${n} ${codeText(n)}`.toLowerCase(),labels:[{t:codeText(n).split(' / ')[0],min:0,max:2.4},{t:n,min:2.4,max:99}]}); });
+    if (learnTab==='capitals') CAPITALS.forEach(c=>items.push({id:c[0],name:c[0],kind:'capital',tab:'capitals',pt:[c[2],c[1]],sub:`Capital of ${c[3]}`,search:`${c[0]} ${c[3]}`.toLowerCase(),labels:[{t:c[0],min:0,max:99}]}));
+    if (learnTab==='airports') AIRPORTS.forEach(a=>{ const code=(a[0].match(/\(([A-Z]{3})\)$/)||[])[1]||'', st=AIRPORT_STATE[a[0]]||''; items.push({id:a[0],name:a[0],kind:'airport',tab:'airports',pt:[a[2],a[1]],code,sub:st,search:`${a[0]} ${st}`.toLowerCase(),labels:[{t:code,min:1.8,max:99}]}); });
+    if (learnTab==='nature') NATURE.forEach(f=>{ const sts=(NATURE_STATES[f.name]||[]).join(', '); items.push({id:f.name,name:f.name,kind:f.kind,tab:'nature',f,pt:f.pt,sub:`${KIND_LABEL[f.kind]}${sts?' · '+sts:''}`,search:`${f.name} ${sts} ${KIND_LABEL[f.kind]}`.toLowerCase(),labels:[{t:f.name,min:f.kind==='river'||f.kind==='mountain'?1.2:1.6,max:99}]}); });
+    return items;
+  }
+  const lxMatch=it=>{
+    if (it.tab==='nature'&&lxCat!=='all') { const ok=lxCat==='hpoint'?(it.f.kind==='hpoint'||STATE_HIGH.includes(it.f.name)):it.f.kind===lxCat; if (!ok) return false; }
+    const q=lxQuery.trim().toLowerCase(); return !q||it.search.includes(q);
+  };
+  function lxOnZoom() {
+    if (!mapGroup) return;
+    mapGroup.selectAll('.lx-p').attr('transform',d=>`translate(${d.anchor[0]},${d.anchor[1]}) scale(${1/Math.pow(mapK,0.55)})`);
+    mapGroup.selectAll('.lx-label').style('display',d=>{ const it=d.it; return lxLabels&&mapK>=d.min&&mapK<d.max||(it.sel&&d.last)?null:'none'; });
+  }
+  function drawLearnExplorer(collection) {
+    const host=$('map'); host.innerHTML=''; host.classList.remove('districts','outlines','nature','airports');
+    mapSvg=d3.select(host).append('svg').attr('role','img').attr('aria-label','Interactive map for studying India').attr('viewBox','0 0 1000 760').attr('preserveAspectRatio','xMidYMid meet');
+    mapGroup=mapSvg.append('g').attr('class','map-world');
+    projection=d3.geoMercator().center([82.5,22.5]).scale(1050).translate([500,390]); path=d3.geoPath(projection);
+    projection.fitExtent([[65,65],[935,690]],{type:'FeatureCollection',features:collection.features});
+    const fontU=12*1000/Math.max(320,host.clientWidth||800), states=learnTab==='states';
+    mapGroup.selectAll('path.base-region').data(collection.features).join('path').attr('class','base-region'+(states?' lx-state':'')).attr('d',path)
+      .on('click',(event,d)=>{ if (!states) return; event.stopPropagation(); lxSelect(d.properties.quizName); });
+    addLakshadweepMarkers(states&&collection.features.some(d=>d.properties.quizName==='Lakshadweep'));
+    lxItems=buildLxItems(collection); learnSel=null;
+    const layer=mapGroup.append('g').attr('class','lx-layer');
+    lxItems.forEach(it=>{
+      const cls=it.tab==='nature'?`nat-node nat-${it.kind}`:it.kind==='state'?'lx-stitem':`lx-${it.kind}`;
+      it.g=layer.append('g').attr('class','lx-shape-g '+cls).datum(it);
+      let anchor, geo=null;
+      if (it.kind==='state') { anchor=path.centroid(it.feature); it.bounds=path.bounds(it.feature); }
+      else if (it.f&&(it.f.kind==='river'||it.f.kind==='mountain')) {
+        geo={type:'MultiLineString',coordinates:it.f.lines}; it.g.append('path').attr('class','nat-shape').attr('d',path(geo)); it.g.append('path').attr('class','lx-hit').attr('d',path(geo));
+        it.bounds=path.bounds(geo); const longest=it.f.lines.reduce((a,b)=>b.length>a.length?b:a,it.f.lines[0]); anchor=projection(longest[Math.floor(longest.length/2)]);
+      } else if (it.f&&it.f.kind==='lake') {
+        geo={type:'Polygon',coordinates:[fixRing(it.f.ring,true)]}; it.g.append('path').attr('class','nat-shape').attr('d',path(geo)); it.g.append('circle').attr('class','nat-halo').attr('cx',path.centroid(geo)[0]).attr('cy',path.centroid(geo)[1]).attr('r',10);
+        anchor=path.centroid(geo); it.bounds=path.bounds(geo);
+      } else anchor=projection(it.pt);
+      it.anchor=anchor;
+      it.p=layer.append('g').attr('class','lx-p '+cls).datum(it);
+      if (it.pt) { // point markers: capitals, airports, peaks, parks, deserts
+        it.p.append('circle').attr('class','lx-dot nat-shape').attr('r',it.kind==='airport'?3.4:4.6);
+        it.p.append('circle').attr('class','lx-hit').attr('r',13);
+      }
+      it.labels.forEach((l,i)=>{ if (!l.t) return; it.p.append('text').attr('class','learn-label lx-label').datum({it,min:l.min,max:l.max,last:i===it.labels.length-1}).attr('font-size',fontU).attr('stroke-width',fontU*0.3)
+        .attr('x',it.pt?fontU*0.6:0).attr('text-anchor',it.pt?'start':'middle').attr('dy','.32em').text(l.t); });
+      [it.g,it.p].forEach(sel=>sel.on('click',event=>{ event.stopPropagation(); lxSelect(it.id); }));
+    });
+    mapSvg.on('click',()=>{ if (learnSel) lxSelect(null); });
+    zoom=d3.zoom().scaleExtent([1,40]).filter(event=>event.type==='wheel'||event.type==='mousedown'||event.type==='touchstart'||event.type==='dblclick').on('zoom',onMapZoom);
+    mapSvg.call(zoom).on('dblclick.zoom',null);
+    lxApplyFilter(); lxOnZoom();
+    $('map-message').textContent=states?'Tap a state or UT, or pick one from the list':'Tap an item, or pick one from the list';
+  }
+  function lxApplyFilter() {
+    lxItems.forEach(it=>{ if (it.kind==='state') return; const on=lxMatch(it); it.g.style('display',on?null:'none'); it.p.style('display',on?null:'none'); });
+  }
+  function focusOn(it) {
+    if (!mapSvg||!zoom) return;
+    let k,cx,cy;
+    if (it.bounds&&isFinite(it.bounds[0][0])) { const [[x0,y0],[x1,y1]]=it.bounds; k=Math.max(1.4,Math.min(it.kind==='state'?9:7,0.78*Math.min(1000/Math.max(x1-x0,1),760/Math.max(y1-y0,1)))); cx=(x0+x1)/2; cy=(y0+y1)/2; }
+    else { k=it.kind==='desert'?2.5:5; [cx,cy]=it.anchor; }
+    mapSvg.transition().duration(560).call(zoom.transform,d3.zoomIdentity.translate(500-k*cx,380-k*cy).scale(k));
+  }
+  function lxSelect(id,opts={}) {
+    const it=id==null?null:lxItems.find(x=>x.id===id); learnSel=it?it.id:null;
+    lxItems.forEach(x=>{ x.sel=x===it; x.g.classed('lx-selected',x.sel); x.p.classed('lx-selected',x.sel); });
+    mapGroup.selectAll('.lx-state').classed('lx-sel',d=>it&&d.properties.quizName===it.id);
+    lxOnZoom(); renderDetail(it); renderLxList(); showPrompt();
+    if (it&&opts.zoom!==false) focusOn(it); else if (!it) resetMapView();
+  }
+  function renderDetail(it) {
+    const box=$('learn-detail'); box.textContent='';
+    if (!it) { box.append(el('p','lx-hint',learnTab==='states'?'Tap a state or Union Territory on the map, or pick one below, to see its facts, outline and everything else this app knows about it.':'Tap an item on the map or pick one from the list to see its details.')); return; }
+    const head=el('div','ld-head'); const info=el('div','ld-info');
+    if (it.kind==='state') { const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','lx-outline'); svg.setAttribute('aria-hidden','true'); head.append(svg); drawMiniOutline(svg,[it.feature]); }
+    else head.append(el('span','ld-icon',{capital:'📍',airport:'✈️',river:'🌊',mountain:'⛰️',peak:'🏔️',hpoint:'🏔️',park:'🌳',lake:'💧',desert:'🏜️'}[it.kind]||'•'));
+    info.append(el('h4','ld-title',it.name), el('span','ld-tag',it.kind==='state'?it.sub:KIND_LABEL[it.kind])); head.append(info); box.append(head);
+    const links=el('div','lk-box');
+    if (it.kind==='state') {
+      const dl=el('dl','learn-facts'); factRows(it.id).forEach(([k,v])=>dl.append(el('dt',null,k),el('dd',null,v))); box.append(dl);
+      renderLinks(links,it.id); box.append(links);
+      const b=el('button','primary-btn','Study its districts'); b.type='button'; b.id='lx-districts'; b.addEventListener('click',()=>learnOpenDistricts(it.id)); box.append(b);
+    } else {
+      const dl=el('dl','learn-facts');
+      if (it.kind==='capital') { dl.append(el('dt',null,'Capital of'),el('dd',null,it.sub.replace('Capital of ',''))); }
+      if (it.kind==='airport') { dl.append(el('dt',null,'Code'),el('dd',null,it.code||'—')); }
+      if (it.f) dl.append(el('dt',null,'About'),el('dd',null,it.f.fact));
+      if (it.pt) dl.append(el('dt',null,'Location'),el('dd',null,`${Math.abs(it.pt[1]).toFixed(2)}° ${it.pt[1]>=0?'N':'S'}, ${Math.abs(it.pt[0]).toFixed(2)}° ${it.pt[0]>=0?'E':'W'}`));
+      box.append(dl);
+      const sts=it.kind==='capital'?CAPITAL_STATES[it.id]:it.kind==='airport'?[AIRPORT_STATE[it.id]].filter(Boolean):NATURE_STATES[it.id]||[];
+      if (sts.length) { const g=el('div','lk-group'); g.append(el('span','lk-title',sts.length>1?'States / UTs':'State / UT')); const w=el('span','lk-chips'); sts.forEach(s=>w.append(chip(s,'states',s))); g.append(w); links.append(g); box.append(links); }
+    }
+  }
+  function renderLxList() {
+    const ul=$('learn-list'); ul.textContent='';
+    const rows=lxItems.filter(lxMatch).sort((a,b)=>learnTab==='nature'?(KIND_ORDER[a.kind]-KIND_ORDER[b.kind])||a.name.localeCompare(b.name):learnTab==='airports'?(a.sub.localeCompare(b.sub)||a.name.localeCompare(b.name)):a.name.localeCompare(b.name));
+    rows.forEach(it=>{ const li=el('li'); const b=el('button','lx-row'+(it.id===learnSel?' on':''),null); b.type='button'; b.dataset.id=it.id; b.append(el('span','lx-name',it.name),el('small','lx-sub',it.sub)); li.append(b); ul.append(li); });
+    if (!rows.length) ul.append(el('li','lx-none','Nothing matches your search.'));
+    $('learn-count').textContent=`${rows.length} of ${lxItems.length}`;
+  }
+  function renderExplorerPanel() {
+    $('learn-cats').hidden=learnTab!=='nature';
+    if (learnTab==='nature') { const box=$('learn-cats'); box.textContent=''; LX_CATS.forEach(([k,t])=>{ const b=el('button','lx-cat'+(lxCat===k?' on':''),t); b.type='button'; b.dataset.cat=k; b.setAttribute('aria-pressed',String(lxCat===k)); box.append(b); }); }
+    $('learn-search').value=lxQuery; $('learn-search').placeholder=({states:'Search states, UTs or codes…',capitals:'Search capitals or states…',airports:'Search airports, codes or states…',nature:'Search rivers, peaks, parks…'})[learnTab]||'Search…';
+    $('learn-names').textContent=lxLabels?'Hide names':'Show names';
+    lxApplyFilter(); renderLxList(); renderDetail(lxItems.find(x=>x.id===learnSel)||null);
+    if (lxPending&&lxItems.length) { const id=lxPending; lxPending=null; if (lxItems.some(x=>x.id===id)) lxSelect(id); }
+  }
+  function setLearnTab(t) {
+    if (learnTab===t) return;
+    learnTab=t; learnSel=null; lxQuery=''; lxCat='all'; lxPending=null; learnPicked=null; lxItems=[];
+    applyModeUI(); renderLearnCard(); loadMap();
+  }
+  function learnGoto(tab,id) {
+    if (tab==='districts') return learnOpenDistricts(id);
+    if (tab===learnTab) { if (lxItems.some(x=>x.id===id)) { lxQuery=''; lxCat='all'; renderExplorerPanel(); lxSelect(id); } return; }
+    learnTab=tab; learnSel=null; lxQuery=''; lxCat='all'; lxPending=id; lxItems=[]; applyModeUI(); renderLearnCard(); loadMap();
+  }
+  function learnOpenDistricts(key) {
+    learnTab='districts'; districtKey=key; learnSel=null; learnPicked=null; lxPending=null; lxItems=[]; applyModeUI(); renderLearnCard(); loadMap();
+  }
+  function initLearnUI() {
+    document.querySelectorAll('.learn-tab').forEach(b=>b.addEventListener('click',()=>setLearnTab(b.dataset.ltab)));
+    $('learn-search').addEventListener('input',e=>{ lxQuery=e.target.value; lxApplyFilter(); renderLxList(); });
+    $('learn-names').addEventListener('click',()=>{ lxLabels=!lxLabels; $('learn-names').textContent=lxLabels?'Hide names':'Show names'; lxOnZoom(); });
+    $('learn-cats').addEventListener('click',e=>{ const b=e.target.closest('.lx-cat'); if (!b) return; lxCat=b.dataset.cat; renderExplorerPanel(); });
+    $('learn-list').addEventListener('click',e=>{ const b=e.target.closest('.lx-row'); if (b) lxSelect(b.dataset.id); });
+    ['learn-detail','learn-links'].forEach(id=>$(id).addEventListener('click',e=>{ const b=e.target.closest('.lx-chip'); if (b) learnGoto(b.dataset.tab,b.dataset.id); }));
   }
 
   // ---- Offline: save the app and every boundary file for use without a connection ----
@@ -1498,7 +1684,7 @@
       if (document.body.dataset.view==='home') { const idx=Number(k)-1, cards=document.querySelectorAll('.home-card'); if (idx>=0&&idx<cards.length) openMode(cards[idx].dataset.mode); return; }
       if (k==='n') startGame(); else if (k==='s'&&roundActive) skipQuestion(); else if (k==='m') showHome();
     });
-    applyTheme();
+    initLearnUI(); applyTheme();
   }
   function init() {
     const saved=readJSON(MODE_KEY,null);

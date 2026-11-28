@@ -407,3 +407,56 @@ kbd{font:inherit;font-size:.74rem;padding:1px 6px;border-radius:6px;border:.5px 
 .nat-hpoint .nat-shape{fill:#7a5c8f;stroke:#fff;stroke-width:1.2px}
 .nat-hpoint .nat-halo{fill:rgba(122,92,143,.12);stroke:rgba(122,92,143,.5)}
 .nat-hpoint.missed .nat-shape{fill:#d64545}
+
+/* ===== v4.8: Learn hub ===== */
+.learn-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}
+.learn-tabs::-webkit-scrollbar{display:none}
+.learn-tab{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;background:var(--seg-bg);font-weight:600;font-size:.86rem;color:var(--label-2);white-space:nowrap}
+.learn-tab.active{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(0,122,255,.35)}
+.ld-head{display:flex;align-items:center;gap:12px;margin:2px 0 10px}
+.ld-info{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.ld-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:15px;background:var(--card);font-size:1.7rem;flex:none}
+.ld-title{margin:0;font-size:1.2rem;letter-spacing:-.02em}
+.ld-tag{display:inline-block;margin-top:4px;font-size:.74rem;font-weight:600;color:var(--blue);background:rgba(0,122,255,.12);padding:2px 9px;border-radius:99px}
+.lx-outline{width:88px;height:70px;flex:none;border-radius:13px;background:var(--card)}
+.lx-mini{fill:var(--blue);fill-opacity:.3;stroke:var(--blue);stroke-width:.8;stroke-linejoin:round}
+.lk-box{display:flex;flex-direction:column;gap:9px;margin:0 0 12px}
+.lk-box:empty{display:none}
+.lk-group{display:flex;flex-direction:column;gap:5px}
+.lk-title{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--label-2);font-weight:700}
+.lk-chips{display:flex;flex-wrap:wrap;gap:6px}
+.lx-chip{padding:5px 11px;border-radius:99px;background:var(--card);border:.5px solid var(--sep);font-size:.8rem;font-weight:600}
+.lx-chip:hover{border-color:var(--blue);color:var(--blue)}
+.lx-tools{display:flex;gap:8px;margin-bottom:8px}
+.lx-search{flex:1;min-width:0;padding:9px 12px;border-radius:12px;border:.5px solid var(--sep);background:var(--card-2);color:inherit;font:inherit}
+.lx-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.lx-cat{flex:none;padding:5px 12px;border-radius:99px;background:var(--seg-bg);font-size:.8rem;font-weight:600;color:var(--label-2)}
+.lx-cat.on{background:var(--blue);color:#fff}
+.lx-detail{margin-bottom:12px;padding:12px;border-radius:15px;background:var(--card-2)}
+.lx-detail .learn-facts{margin-bottom:10px}
+.lx-hint{margin:0;font-size:.88rem;color:var(--label-2);line-height:1.4}
+.lx-listhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.lx-count{font-size:.75rem;color:var(--label-2)}
+.lx-list{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto;border-top:.5px solid var(--sep)}
+.lx-row{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;padding:9px 8px;border-bottom:.5px solid var(--sep);border-radius:0}
+.lx-row:hover{background:var(--card-2)}
+.lx-row.on{background:rgba(0,122,255,.12)}
+.lx-name{font-weight:600;font-size:.9rem}
+.lx-sub,.lx-none{color:var(--label-2);font-size:.76rem}
+.lx-none{padding:12px 8px}
+/* explorer map */
+.lx-state{cursor:pointer}
+.lx-state:hover{fill:rgba(0,122,255,.22)}
+.base-region.lx-sel{fill:rgba(0,122,255,.3);stroke:var(--blue);stroke-width:1.3px}
+.lx-hit{fill:transparent;stroke:transparent;stroke-width:18px;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer}
+circle.lx-hit{fill:transparent;stroke:none;pointer-events:all}
+.lx-shape-g .nat-shape{vector-effect:non-scaling-stroke}
+.lx-dot{stroke:#fff;stroke-width:1.2px}
+.lx-capital .lx-dot{fill:#ff3b30}
+.lx-airport .lx-dot{fill:#5856d6}
+.lx-selected .nat-shape,.lx-selected .lx-dot{stroke:#ff9500!important;stroke-width:3px!important}
+.lx-selected.nat-river .nat-shape,.lx-selected.nat-mountain .nat-shape{stroke:#ff9500!important;stroke-width:4px!important}
+.lx-p,.lx-shape-g{cursor:pointer}
+.lx-label{pointer-events:none}
+.nat-hpoint .lx-dot{fill:#7a5c8f}
+.learn-card .primary-btn#lx-districts{width:100%;margin-top:4px}
